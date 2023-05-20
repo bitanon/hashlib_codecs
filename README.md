@@ -21,7 +21,7 @@ This library contains implementations of fast and error resilient codecs in pure
 | Constants | `base2`                  |
 | Methods   | `fromBinary`, `toBinary` |
 
-## Hexadecimal (Base-16)
+### Hexadecimal (Base-16)
 
 | Type      | Available               |
 | --------- | ----------------------- |
@@ -29,7 +29,7 @@ This library contains implementations of fast and error resilient codecs in pure
 | Constants | `base16`, `base16lower` |
 | Methods   | `fromHex`, `toHex`      |
 
-## Base-32 (RFC-4648)
+### Base-32 (RFC-4648)
 
 | Type      | Available                                                    |
 | --------- | ------------------------------------------------------------ |
@@ -37,7 +37,7 @@ This library contains implementations of fast and error resilient codecs in pure
 | Constants | `base32`, `base32lower`, `base32padded`, `base32paddedlower` |
 | Methods   | `fromBase32`, `toBase32`                                     |
 
-## Base-64 (RFC-4648)
+### Base-64 (RFC-4648)
 
 | Type      | Available                |
 | --------- | ------------------------ |
@@ -45,21 +45,13 @@ This library contains implementations of fast and error resilient codecs in pure
 | Constants | `base64`, `base64padded` |
 | Methods   | `fromBase64`, `toBase64` |
 
-## Base-64 URL-safe (RFC-4648)
+### Base-64 URL-safe (RFC-4648)
 
 | Type      | Available                      |
 | --------- | ------------------------------ |
 | Class     | `B64URLCodec`                  |
 | Constants | `base64url`, `base64urlpadded` |
 | Methods   | `fromBase64Url`, `toBase64Url` |
-
-### ASCII (RFC-4648)
-
-| Type      | Available              |
-| --------- | ---------------------- |
-| Class     | `ASCIICodec`           |
-| Constants | `ascii`                |
-| Methods   | `fromAscii`, `toAscii` |
 
 ## Getting Started
 
