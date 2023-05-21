@@ -40,7 +40,10 @@ jobs:
 
       - if: matrix.sdk != '2.14.0'
         name: Generate documentation
-        run: dart doc
+        run: dart doc --validate-links
 
-      - name: Run tests
-        run: dart test
+      - name: Run tests on vm
+        run: dart test -p vm
+
+      - name: Run tests on node
+        run: dart test -p node

@@ -34,18 +34,16 @@ class B32Codec extends Uint8Codec {
     alphabet: _base32Decoding,
   );
 
+  /// Codec instance to encode and decode 8-bit integer sequence to Base-32
+  /// character sequence using the uppercase alphabet.
   const B32Codec()
       : encoder = const Uint8Encoder(
           bits: 5,
           alphabet: _base32Encoding,
         );
 
-  const B32Codec.lower()
-      : encoder = const Uint8Encoder(
-          bits: 5,
-          alphabet: _base32lowerEncoding,
-        );
-
+  /// Codec instance to encode and decode 8-bit integer sequence to Base-32
+  /// character sequence using the uppercase alphabet with padding.
   const B32Codec.padded()
       : encoder = const Uint8Encoder(
           bits: 5,
@@ -53,59 +51,20 @@ class B32Codec extends Uint8Codec {
           alphabet: _base32Encoding,
         );
 
-  const B32Codec.paddedLower()
+  /// Codec instance to encode and decode 8-bit integer sequence to Base-32
+  /// character sequence using the lowercase alphabet.
+  const B32Codec.lower()
+      : encoder = const Uint8Encoder(
+          bits: 5,
+          alphabet: _base32lowerEncoding,
+        );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to Base-32
+  /// character sequence using the lowercase alphabet with padding.
+  const B32Codec.paddedlower()
       : encoder = const Uint8Encoder(
           bits: 5,
           padding: 61,
           alphabet: _base32lowerEncoding,
         );
-}
-
-/// Codec to encode and decode an iterable of 8-bit integers to 5-bit Base32
-/// alphabets as described in [RFC-4648][[rfc]:
-/// ```
-/// ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
-/// ```
-///
-/// [rfc]: https://www.ietf.org/rfc/rfc4648.html
-const base32 = B32Codec();
-
-/// Codec to encode and decode an iterable of 8-bit integers to 5-bit Base32
-/// alphabets as described in [RFC-4648][[rfc] but in lowercase:
-/// ```
-/// abcdefghijklmnopqrstuvwxyz234567
-/// ```
-///
-/// [rfc]: https://www.ietf.org/rfc/rfc4648.html
-const base32lower = B32Codec.lower();
-
-/// Same as [base32] but appends the padding character `=` in the output.
-const base32padded = B32Codec.padded();
-
-/// Same as [base32lower] but appends the padding character `=` in the output.
-const base32paddedlower = B32Codec.paddedLower();
-
-/// Encode an array of 8-bit integers to Base32 string
-///
-/// Parameters:
-/// - If [upper] is true, the string will be in uppercase alphabets.
-/// - If [padding] is true, the string will be padded with = at the end.
-String toBase32(
-  Iterable<int> input, {
-  bool upper = true,
-  bool padding = true,
-}) {
-  var codec = upper
-      ? padding
-          ? base32padded
-          : base32
-      : padding
-          ? base32paddedlower
-          : base32lower;
-  return String.fromCharCodes(codec.encoder.convert(input));
-}
-
-/// Decode an array of 8-bit integers from Base32 string
-List<int> fromBase32(String input) {
-  return base32.decoder.convert(input.codeUnits).toList();
 }

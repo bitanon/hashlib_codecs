@@ -43,11 +43,10 @@ class _B16Decoder extends Uint8Decoder {
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
-    bool f;
-    int p, x, y, n;
+    bool t;
+    int p, x, y;
     p = 0;
-    n = input.length;
-    f = (n & 1 != 0);
+    t = false;
     for (y in input) {
       if (y >= _smallA) {
         x = y - _smallA + 10;
@@ -61,12 +60,17 @@ class _B16Decoder extends Uint8Decoder {
       if (x < 0 || x > 15) {
         throw FormatException('Invalid character $y');
       }
-      if (f) {
-        yield (p | x);
+      if (t) {
+        yield ((p << 4) | x);
+        p = 0;
+        t = false;
       } else {
-        p = x << 4;
+        p = x;
+        t = true;
       }
-      f = !f;
+    }
+    if (t) {
+      yield p;
     }
   }
 }
@@ -78,54 +82,11 @@ class B16Codec extends Uint8Codec {
   @override
   final decoder = const _B16Decoder();
 
-  /// Base16 codec with lowercase letters
+  /// Codec instance to encode and decode 8-bit integer sequence to Base-16
+  /// or Hexadecimal character sequence using the uppercase alphabet.
   const B16Codec() : encoder = _B16Encoder.upper;
 
-  /// Base16 codec with uppercase letters
+  /// Codec instance to encode and decode 8-bit integer sequence to Base-16
+  /// or Hexadecimal character sequence using the lowercase alphabet.
   const B16Codec.lower() : encoder = _B16Encoder.lower;
-}
-
-/// Codec to encode and decode an iterable of 8-bit integers to 4-bit Base16
-/// alphabets (hexadecimal) as described in [RFC-4648][[rfc]:
-/// ```
-/// 0123456789ABCDEF
-/// ```
-///
-/// [rfc]: https://www.ietf.org/rfc/rfc4648.html
-const base16 = B16Codec();
-
-/// Codec to encode and decode an iterable of 8-bit integers to 4-bit Base16
-/// alphabets (hexadecimal) as described in [RFC-4648][[rfc] but in lowercase:
-/// ```
-/// 0123456789abcdef
-/// ```
-///
-/// [rfc]: https://www.ietf.org/rfc/rfc4648.html
-const base16lower = B16Codec.lower();
-
-/// Encode an array of 8-bit integers to Base16 (hexadecimal) string
-///
-/// Parameters:
-/// - If [upper] is true, the string will be in uppercase alphabets.
-/// - If [padding] is true, the string will be padded with 0 at the start.
-String toHex(
-  Iterable<int> input, {
-  bool upper = false,
-  bool padding = true,
-}) {
-  Iterable<int> out;
-  if (upper) {
-    out = base16.encoder.convert(input);
-  } else {
-    out = base16lower.encoder.convert(input);
-  }
-  if (!padding) {
-    out = out.skipWhile((value) => value == _zero);
-  }
-  return String.fromCharCodes(out);
-}
-
-/// Decode an array of 8-bit integers from Base16 (hexadecimal) string
-List<int> fromHex(String input) {
-  return base16.decoder.convert(input.codeUnits).toList();
 }

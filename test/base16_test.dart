@@ -9,17 +9,22 @@ import 'utils.dart';
 void main() {
   group('Test base16', () {
     group("encoding", () {
-      test('[] => ""', () {
+      test('[] => empty string', () {
         expect(toHex([]), "");
       });
-      test('[5] => "05"', () {
+      test('[5] => 05', () {
         expect(toHex([5]), "05");
       });
-      test('[12] => "0c"', () {
+      test('[12] => 0c', () {
         expect(toHex([12]), "0c");
       });
-      test('[16] => "10"', () {
+      test('[16] => 10', () {
         expect(toHex([16]), "10");
+      });
+      test('[0,0,0] => 000000 ', () {
+        var inp = [0, 0, 0];
+        var out = "000000";
+        expect(toHex(inp), equals(out));
       });
       test('random', () {
         for (int i = 0; i < 100; ++i) {
@@ -27,28 +32,6 @@ void main() {
           var hex = b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
           expect(toHex(b), hex, reason: 'length $i');
         }
-      });
-      group('no padding', () {
-        test('[5] => "5"', () {
-          expect(toHex([5], padding: false), "5");
-        });
-        test('[12] => "c"', () {
-          expect(toHex([12], padding: false), "c");
-        });
-        test('[0,0,0,12] => "c"', () {
-          expect(toHex([0, 0, 0, 12], padding: false), "c");
-        });
-        test('random', () {
-          for (int i = 0; i < 100; ++i) {
-            var b = randomBytes(i);
-            var hex = b
-                .expand((x) => x.toRadixString(16).padLeft(2, '0').codeUnits)
-                .skipWhile((value) => value == 48)
-                .map((e) => String.fromCharCode(e))
-                .join();
-            expect(toHex(b, padding: false), hex, reason: 'length $i');
-          }
-        });
       });
     });
     group('encoding buffer', () {
@@ -66,26 +49,31 @@ void main() {
       });
     });
     group("decoding", () {
-      test('"" => []', () {
+      test('empty string => []', () {
         expect(fromHex(""), []);
       });
-      test('"5" => [5]', () {
+      test('5 => [5]', () {
         expect(fromHex("5"), [5]);
       });
-      test('"c" => [12]', () {
+      test('c => [12]', () {
         expect(fromHex("c"), [12]);
       });
-      test('"0c" => [12]', () {
+      test('0c => [12]', () {
         expect(fromHex("0c"), [12]);
       });
-      test('"00c" => [0, 12]', () {
+      test('00c => [0, 12]', () {
         expect(fromHex("00c"), [0, 12]);
       });
-      test('"000c" => [0, 12]', () {
+      test('000c => [0, 12]', () {
         expect(fromHex("000c"), [0, 12]);
       });
-      test('"0000c" => [0, 0, 12]', () {
+      test('0000c => [0, 0, 12]', () {
         expect(fromHex("0000c"), [0, 0, 12]);
+      });
+      test('000000 => [0,0,0] ', () {
+        var inp = [0, 0, 0];
+        var out = "000000";
+        expect(fromHex(out), equals(inp));
       });
       test('random', () {
         for (int i = 0; i < 100; ++i) {
@@ -124,13 +112,13 @@ void main() {
       }
     });
     group('decoding with invalid chars', () {
-      test('"Error"', () {
+      test('Error', () {
         expect(() => fromHex("Error"), throwsFormatException);
       });
-      test('"-10"', () {
+      test('-10', () {
         expect(() => fromHex("-10"), throwsFormatException);
       });
-      test('"something"', () {
+      test('something', () {
         expect(() => fromHex("something"), throwsFormatException);
       });
     });

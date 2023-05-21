@@ -10,6 +10,26 @@ import 'utils.dart';
 
 void main() {
   group('Test base64', () {
+    test('encoding [0, 0, 0, 0] => AAAAAA==', () {
+      var inp = [0, 0, 0, 0];
+      var out = "AAAAAA==";
+      expect(toBase64(inp), equals(out));
+    });
+    test('decoding AAAAAA== => [0, 0, 0, 0]', () {
+      var inp = [0, 0, 0, 0];
+      var out = "AAAAAA==";
+      expect(fromBase64(out), equals(inp));
+    });
+    test('encoding no padding [0, 0, 0, 0] => AAAAAA', () {
+      var inp = [0, 0, 0, 0];
+      var out = "AAAAAA";
+      expect(toBase64(inp, padding: false), equals(out));
+    });
+    test('decoding no padding AAAAAA => [0, 0, 0, 0]', () {
+      var inp = [0, 0, 0, 0];
+      var out = "AAAAAA";
+      expect(fromBase64(out), equals(inp));
+    });
     test('encoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
@@ -53,35 +73,35 @@ void main() {
       }
     });
     group('decoding with invalid chars', () {
-      test('"Hashlib!"', () {
+      test('Hashlib!', () {
         expect(() => fromBase64("Hashlib!"), throwsFormatException);
       });
-      test('"-10"', () {
+      test('-10', () {
         expect(() => fromBase64(" 10"), throwsFormatException);
       });
-      test('"s_mething"', () {
-        expect(() => fromBase64("s_mething"), throwsFormatException);
+      test('s*mething', () {
+        expect(() => fromBase64("s*mething"), throwsFormatException);
       });
     });
-    // group('decoding with invalid length', () {
-    //   test('"H"', () {
-    //     expect(() => fromBase64("H"), throwsFormatException);
-    //   });
-    //   test('"Ha"', () {
-    //     expect(() => fromBase64("Ha"), throwsFormatException);
-    //   });
-    //   test('"Has"', () {
-    //     expect(() => fromBase64("Has"), throwsFormatException);
-    //   });
-    //   test('"Hashl"', () {
-    //     expect(() => fromBase64("Hashl"), throwsFormatException);
-    //   });
-    //   test('"Hashli"', () {
-    //     expect(() => fromBase64("Hashli"), throwsFormatException);
-    //   });
-    //   test('"Hashlib"', () {
-    //     expect(() => fromBase64("Hashlib"), throwsFormatException);
-    //   });
-    // });
+    group('decoding with invalid length', () {
+      test('H', () {
+        expect(() => fromBase64("H"), throwsFormatException);
+      });
+      test('Ha', () {
+        expect(() => fromBase64("Ha"), throwsFormatException);
+      });
+      test('HaB', () {
+        expect(() => fromBase64("HaB"), throwsFormatException);
+      });
+      test('Hashl', () {
+        expect(() => fromBase64("Hashl"), throwsFormatException);
+      });
+      test('Hashli', () {
+        expect(() => fromBase64("Hashli"), throwsFormatException);
+      });
+      test('Hashlib', () {
+        expect(() => fromBase64("Hashlib"), throwsFormatException);
+      });
+    });
   });
 }

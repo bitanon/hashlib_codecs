@@ -38,19 +38,19 @@ class _BinaryDecoder extends Uint8Decoder {
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
     int p, n, x, y;
-    n = (8 - (input.length & 7)) & 7;
-    p = 0;
+    p = n = 0;
     for (y in input) {
       x = y - _zero;
       if (x != 0 && x != 1) {
         throw FormatException('Invalid character $y');
       }
-      p = (p << 1) ^ x;
-      if (n < 7) {
+      if (n < 8) {
+        p = (p << 1) | x;
         n++;
       } else {
         yield p;
-        n = p = 0;
+        n = 1;
+        p = x;
       }
     }
     if (n > 0) {
@@ -66,30 +66,7 @@ class BinaryCodec extends Uint8Codec {
   @override
   final decoder = const _BinaryDecoder();
 
-  /// Base2 (binary) codec
+  /// Codec instance to encode and decode 8-bit integer sequence to Binary or
+  /// Base-2 character sequence using the alphabet: `01`
   const BinaryCodec();
-}
-
-/// Codec to encode and decode an iterable of 8-bit integers to 2-bit Base2
-/// alphabets (binary): `0` or `1`
-const base2 = BinaryCodec();
-
-/// Encode an array of 8-bit integers to Base2 (binary) string
-///
-/// Parameters:
-/// - If [padding] is true, the string will be padded with 0 at the start.
-String toBinary(
-  Iterable<int> input, {
-  bool padding = true,
-}) {
-  var out = base2.encoder.convert(input);
-  if (!padding) {
-    out = out.skipWhile((value) => value == _zero);
-  }
-  return String.fromCharCodes(out);
-}
-
-/// Decode an array of 8-bit integers from Base2 (binary) string
-List<int> fromBinary(String input) {
-  return base2.decoder.convert(input.codeUnits).toList();
 }

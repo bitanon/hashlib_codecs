@@ -9,19 +9,19 @@ import 'utils.dart';
 void main() {
   group('Test binary', () {
     group("encoding", () {
-      test('[] => ""', () {
+      test('[] => empty string', () {
         expect(toBinary([]), "");
       });
-      test('[1] => "00000001"', () {
+      test('[1] => 00000001', () {
         expect(toBinary([1]), "00000001");
       });
-      test('[7] => "00000111"', () {
+      test('[7] => 00000111', () {
         expect(toBinary([7]), "00000111");
       });
-      test('[10] => "00001010"', () {
+      test('[10] => 00001010', () {
         expect(toBinary([10]), "00001010");
       });
-      test('[0,10] => "00001010"', () {
+      test('[0,10] => 00001010', () {
         expect(toBinary([0, 10]), "0000000000001010");
       });
       test('random', () {
@@ -31,49 +31,27 @@ void main() {
           expect(toBinary(b), equals(r), reason: 'length $i');
         }
       });
-      group('no padding', () {
-        test('[1] => "1"', () {
-          expect(toBinary([1], padding: false), "1");
-        });
-        test('[10] => "1010"', () {
-          expect(toBinary([10], padding: false), "1010");
-        });
-        test('[0,0,0,10] => "1010"', () {
-          expect(toBinary([0, 0, 0, 10], padding: false), "1010");
-        });
-        test('random', () {
-          for (int i = 0; i < 100; ++i) {
-            var b = randomBytes(i);
-            var hex = b
-                .expand((x) => x.toRadixString(2).padLeft(8, '0').codeUnits)
-                .skipWhile((value) => value == 48)
-                .map((e) => String.fromCharCode(e))
-                .join();
-            expect(toBinary(b, padding: false), hex, reason: 'length $i');
-          }
-        });
-      });
     });
     group("decoding", () {
-      test('"" => []', () {
+      test('empty string => []', () {
         expect(fromBinary(""), []);
       });
-      test('"1010" => [10]', () {
+      test('1010 => [10]', () {
         expect(fromBinary("1010"), [10]);
       });
-      test('"01010" => [10]', () {
+      test('01010 => [10]', () {
         expect(fromBinary("01010"), [10]);
       });
-      test('"0001010" => [10]', () {
+      test('0001010 => [10]', () {
         expect(fromBinary("0001010"), [10]);
       });
-      test('"00001010" => [10]', () {
+      test('00001010 => [10]', () {
         expect(fromBinary("00001010"), [10]);
       });
-      test('"000001010" => [10]', () {
-        expect(fromBinary("000001010"), [0, 10]);
+      test('000001010 => [5, 0]', () {
+        expect(fromBinary("000001010"), [5, 0]);
       });
-      test('"0000000001010" => [10]', () {
+      test('0000000001010 => [0, 10]', () {
         expect(fromBinary("0000000001010"), [0, 10]);
       });
       test('random', () {
@@ -92,13 +70,13 @@ void main() {
       }
     });
     group('decoding with invalid chars', () {
-      test('"0158"', () {
+      test('0158', () {
         expect(() => fromBinary("0158"), throwsFormatException);
       });
-      test('"-10"', () {
+      test('-10', () {
         expect(() => fromBinary("-10"), throwsFormatException);
       });
-      test('"01a1"', () {
+      test('01a1', () {
         expect(() => fromBinary("01a1"), throwsFormatException);
       });
     });

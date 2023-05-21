@@ -52,9 +52,12 @@ class Uint8Encoder extends Uint8Converter {
     p = n = l = 0;
     for (x in input) {
       p = (p << 8) | x;
-      for (n += 8; n >= bits; n -= bits, p &= (1 << n) - 1) {
+      n += 8;
+      while (n >= bits) {
+        n -= bits;
         l += bits;
-        yield alphabet[p >>> (n - bits)];
+        yield alphabet[p >>> n];
+        p &= (1 << n) - 1;
       }
     }
     if (n > 0) {
@@ -89,12 +92,15 @@ class Uint8Decoder extends Uint8Converter {
       }
       if (x < 0) return;
       p = (p << bits) | x;
-      for (n += bits; n >= 8; n -= 8, p &= (1 << n) - 1) {
-        yield (p >>> (n - 8));
+      n += bits;
+      while (n >= 8) {
+        n -= 8;
+        yield p >>> n;
+        p &= (1 << n) - 1;
       }
     }
     if (p > 0) {
-      yield p;
+      throw FormatException('Invalid length');
     }
   }
 }

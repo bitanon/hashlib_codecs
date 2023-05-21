@@ -48,12 +48,12 @@ void main() {
       });
       test('foobar --lower--> mzxw6ytboi', () {
         var s = 'foobar';
-        expect(toBase32(s.codeUnits, upper: false, padding: false),
+        expect(toBase32(s.codeUnits, lower: true, padding: false),
             equals('mzxw6ytboi'));
       });
       test('48656c6c6f21deadbeef --lower--> jbswy3dpehpk3pxp', () {
         var encoded = fromHex('48656c6c6f21deadbeef');
-        expect(toBase32(encoded, upper: false, padding: false),
+        expect(toBase32(encoded, lower: true, padding: false),
             equals('jbswy3dpehpk3pxp'));
       });
     });
@@ -182,7 +182,7 @@ void main() {
     test('encoding <-> decoding uppercase', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = toBase32(b, upper: true);
+        var r = toBase32(b);
         expect(fromBase32(r), equals(b), reason: 'length $i');
       }
     });
@@ -192,6 +192,16 @@ void main() {
         var r = toBase32(b, padding: true);
         expect(fromBase32(r), equals(b), reason: 'length $i');
       }
+    });
+    test('encoding [0, 0, 0] => AAAA', () {
+      var inp = [0, 0, 0];
+      var out = "AAAAA===";
+      expect(toBase32(inp), equals(out));
+    });
+    test('decoding AAAA => [0, 0, 0]', () {
+      var inp = [0, 0, 0];
+      var out = "AAAAA===";
+      expect(fromBase32(out), equals(inp));
     });
 
     group('decoding with invalid chars', () {
