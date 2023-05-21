@@ -1,3 +1,7 @@
+# 1.1.1
+
+- Update project description
+
 # 1.1.0
 
 - Fixes padding issues with `base2` and `base16`
