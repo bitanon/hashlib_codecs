@@ -1,3 +1,11 @@
+# 1.2.0
+
+- Adds BigInt codec support.
+  - New class: `BigIntCodec`
+  - New methods: `fromBigInt`, `toBigInt`
+  - New constant: `bigintLE`, `bigintBE`
+- Updates documentations.
+
 # 1.1.1
 
 - Update project description

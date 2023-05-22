@@ -10,6 +10,13 @@ import 'codecs/base2.dart';
 const base2 = BinaryCodec();
 
 /// Converts 8-bit integer seqence to Binary character sequence.
+///
+/// Parameters:
+/// - [input] is a sequence of 8-bit integers
+///
+/// **Note that**, this implementation is a byte-wise encoding of the input
+/// array. You can use `toBigInt` to obtain actual binary representation in
+/// either little-endian or big-endian order from the [input].
 String toBinary(Iterable<int> input) {
   var out = base2.encoder.convert(input);
   return String.fromCharCodes(out);
@@ -17,6 +24,12 @@ String toBinary(Iterable<int> input) {
 
 /// Converts Binary integer sequence to 8-bit integer sequence using the [base2]
 /// codec.
+///
+/// Parameters:
+/// - [input] should be a valid binary/base-2 encoded string.
+///
+/// Throws:
+/// - [FormatException] if the [input] contains invalid characters.
 ///
 /// If a partial string is detected, the following bits are assumed to be zeros.
 Uint8List fromBinary(String input) {

@@ -23,6 +23,7 @@ const base16lower = B16Codec.lower();
 /// Converts 8-bit integer seqence to Hexadecimal character sequence.
 ///
 /// Parameters:
+/// - [input] is a sequence of 8-bit integers
 /// - If [upper] is true, the string will be in uppercase alphabets.
 ///
 /// Based on the parameter values, the following codecs are used:
@@ -36,6 +37,12 @@ String toHex(Iterable<int> input, {bool upper = false}) {
 
 /// Converts Base-16 integer sequence to 8-bit integer sequence using the
 /// [base16] codec.
+///
+/// Parameters:
+/// - [input] should be a valid hexadecimal/base-16 encoded string.
+///
+/// Throws:
+/// - [FormatException] if the [input] contains invalid characters.
 ///
 /// This implementation can handle both uppercase and lowercase alphabets. If a
 /// partial string is detected, the following bits are assumed to be zeros.

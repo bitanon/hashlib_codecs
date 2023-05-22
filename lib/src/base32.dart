@@ -31,6 +31,7 @@ const base32paddedlower = B32Codec.paddedlower();
 /// Converts 8-bit integer seqence to Base-32 character sequence.
 ///
 /// Parameters:
+/// - [input] is a sequence of 8-bit integers
 /// - If [padding] is true, the encoder will use character `=` as padding,
 /// which is appended at the end out the output to fill up any partial bytes.
 /// - If [lower] is true, the default lower case alphabets will be used.
@@ -57,6 +58,13 @@ String toBase32(
 
 /// Converts Base-32 integer sequence to 8-bit integer sequence using the
 /// [base32] codec.
+///
+/// Parameters:
+/// - [input] should be a valid base-32 encoded string.
+///
+/// Throws:
+/// - [FormatException] if the [input] contains invalid characters, and the
+///   length is not valid for a base-32 encoded string.
 ///
 /// This implementation can handle both uppercase and lowercase alphabets. Any
 /// letters appearing after the first padding character is observed are ignored.

@@ -31,6 +31,8 @@ This library contains implementations of fast and error resilient codecs in pure
 
 ### Base-32 (RFC-4648)
 
+> Supports conversion without padding
+
 | Type      | Available                                                    |
 | --------- | ------------------------------------------------------------ |
 | Class     | `B32Codec`                                                   |
@@ -39,19 +41,24 @@ This library contains implementations of fast and error resilient codecs in pure
 
 ### Base-64 (RFC-4648)
 
+> Supports conversion without padding, and <br>
+> the URL/Filename-safe Base64 conversion.
+
+| Type      | Available                                               |
+| --------- | ------------------------------------------------------- |
+| Class     | `B64Codec`                                              |
+| Constants | `base64`, `base64padded`,`base64url`, `base64urlpadded` |
+| Methods   | `fromBase64`, `toBase64`                                |
+
+### BigInt
+
+> Supports both the Big-Endian and Little-Endian conversion
+
 | Type      | Available                |
 | --------- | ------------------------ |
-| Class     | `B64Codec`               |
-| Constants | `base64`, `base64padded` |
-| Methods   | `fromBase64`, `toBase64` |
-
-### Base-64 URL-safe (RFC-4648)
-
-| Type      | Available                      |
-| --------- | ------------------------------ |
-| Class     | `B64URLCodec`                  |
-| Constants | `base64url`, `base64urlpadded` |
-| Methods   | `fromBase64Url`, `toBase64Url` |
+| Class     | `BigIntCodec`            |
+| Constants | `bigintLE`, `bigintBE`   |
+| Methods   | `fromBigInt`, `toBigInt` |
 
 ## Getting Started
 

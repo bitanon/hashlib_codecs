@@ -32,6 +32,7 @@ const base64urlpadded = B64Codec.urlpadded();
 /// Convert 8-bit integer seqence to Base-64 character sequence.
 ///
 /// Parameters:
+/// - [input] is a sequence of 8-bit integers
 /// - If [padding] is true, the encoder will use character `=` as padding,
 /// which is appended at the end out the output to fill up any partial bytes.
 /// - If [url] is true, the encoder will use the URL/filename-safe alphabets
@@ -59,6 +60,13 @@ String toBase64(
 
 /// Convert Base-64 integer sequence to 8-bit integer sequence using the
 /// [base64] codec.
+///
+/// Parameters:
+/// - [input] should be a valid base-64 encoded string.
+///
+/// Throws:
+/// - [FormatException] if the [input] contains invalid characters, and the
+///   length is not valid for a base-64 encoded string.
 ///
 /// This implementation can handle both the original and URL/filename-safe
 /// alphabets. Any letters appearing after the first padding character is
