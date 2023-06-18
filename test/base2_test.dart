@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 import 'utils.dart';
 
 void main() {
-  group('Test binary', () {
+  group('Test base2', () {
     group("encoding", () {
       test('[] => empty string', () {
         expect(toBinary([]), "");

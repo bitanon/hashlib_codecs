@@ -11,11 +11,11 @@ import 'codecs/base64.dart';
 /// ```
 /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
 /// ```
-const base64 = B64Codec();
+const base64 = Base64Codec();
 
 /// Same as [base64], but the encoder will use character `=` as padding,
 /// which is appended at the end out the output to fill up any partial bytes.
-const base64padded = B64Codec.padded();
+const base64padded = Base64Codec.padded();
 
 /// Codec instance to encode and decode 8-bit integer sequence to a modified
 /// Base64 character sequence that is both URL and filename safe using the
@@ -23,11 +23,11 @@ const base64padded = B64Codec.padded();
 /// ```
 /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_
 /// ```
-const base64url = B64Codec.url();
+const base64url = Base64Codec.url();
 
 /// Same as [base64url], but the encoder will use character `=` as padding,
 /// which is appended at the end out the output to fill up any partial bytes.
-const base64urlpadded = B64Codec.urlpadded();
+const base64urlpadded = Base64Codec.urlpadded();
 
 /// Convert 8-bit integer seqence to Base-64 character sequence.
 ///

@@ -2,23 +2,29 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/converter.dart';
+import 'package:hashlib_codecs/src/core/bit_converter.dart';
 
-const int _zero = 48;
-const int _bigA = 65;
-const int _smallA = 97;
+const int _zero = 0x30;
+const int _bigA = 0x41;
+const int _smallA = 0x61;
 
-class _B16Encoder extends Uint8Encoder {
+// ========================================================
+// Base-16 Converters
+// ========================================================
+
+class _Base16Encoder extends BitEncoder {
   final int startCode;
 
-  const _B16Encoder._(this.startCode)
-      : super(
-          bits: 4,
-          alphabet: const <int>[],
-        );
+  const _Base16Encoder._(this.startCode);
 
-  static const upper = _B16Encoder._(_bigA - 10);
-  static const lower = _B16Encoder._(_smallA - 10);
+  static const upper = _Base16Encoder._(_bigA - 10);
+  static const lower = _Base16Encoder._(_smallA - 10);
+
+  @override
+  final int source = 8;
+
+  @override
+  final int target = 4;
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -34,12 +40,14 @@ class _B16Encoder extends Uint8Encoder {
   }
 }
 
-class _B16Decoder extends Uint8Decoder {
-  const _B16Decoder()
-      : super(
-          bits: 4,
-          alphabet: const <int>[],
-        );
+class _Base16Decoder extends BitDecoder {
+  const _Base16Decoder();
+
+  @override
+  final int source = 4;
+
+  @override
+  final int target = 8;
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -75,18 +83,22 @@ class _B16Decoder extends Uint8Decoder {
   }
 }
 
-class B16Codec extends Uint8Codec {
+// ========================================================
+// Base-16 Codec
+// ========================================================
+
+class Base16Codec extends ByteCodec {
   @override
-  final Uint8Encoder encoder;
+  final BitEncoder encoder;
 
   @override
-  final decoder = const _B16Decoder();
+  final decoder = const _Base16Decoder();
 
   /// Codec instance to encode and decode 8-bit integer sequence to Base-16
   /// or Hexadecimal character sequence using the uppercase alphabet.
-  const B16Codec() : encoder = _B16Encoder.upper;
+  const Base16Codec() : encoder = _Base16Encoder.upper;
 
   /// Codec instance to encode and decode 8-bit integer sequence to Base-16
   /// or Hexadecimal character sequence using the lowercase alphabet.
-  const B16Codec.lower() : encoder = _B16Encoder.lower;
+  const Base16Codec.lower() : encoder = _Base16Encoder.lower;
 }

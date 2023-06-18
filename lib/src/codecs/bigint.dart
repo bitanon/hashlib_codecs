@@ -3,10 +3,17 @@
 
 import 'dart:convert' show Codec, Converter;
 
-const int _zero = 48;
-const int _smallA = 97;
+const int _zero = 0x30;
+const int _smallA = 0x61;
 
-class _BigIntLittleEndianEncoder extends Converter<Iterable<int>, BigInt> {
+typedef BigIntEncoder = Converter<Iterable<int>, BigInt>;
+typedef BigIntDecoder = Converter<BigInt, Iterable<int>>;
+
+// ========================================================
+// Little Endian Converters
+// ========================================================
+
+class _BigIntLittleEndianEncoder extends BigIntEncoder {
   const _BigIntLittleEndianEncoder();
 
   @override
@@ -37,29 +44,7 @@ class _BigIntLittleEndianEncoder extends Converter<Iterable<int>, BigInt> {
   }
 }
 
-class _BigIntBigEndianEncoder extends Converter<Iterable<int>, BigInt> {
-  const _BigIntBigEndianEncoder();
-
-  @override
-  BigInt convert(Iterable<int> input) {
-    int a, b;
-    var out = <int>[];
-    for (int x in input) {
-      a = (x >>> 4) & 0xF;
-      b = x & 0xF;
-      a += a < 10 ? _zero : _smallA - 10;
-      b += b < 10 ? _zero : _smallA - 10;
-      out.add(a);
-      out.add(b);
-    }
-    if (out.isEmpty) {
-      throw FormatException('Empty input');
-    }
-    return BigInt.parse(String.fromCharCodes(out), radix: 16);
-  }
-}
-
-class _BigIntLittleEndianDecoder extends Converter<BigInt, Iterable<int>> {
+class _BigIntLittleEndianDecoder extends BigIntDecoder {
   const _BigIntLittleEndianDecoder();
 
   @override
@@ -88,7 +73,33 @@ class _BigIntLittleEndianDecoder extends Converter<BigInt, Iterable<int>> {
   }
 }
 
-class _BigIntBigEndianDecoder extends Converter<BigInt, Iterable<int>> {
+// ========================================================
+// Big Endian Converters
+// ========================================================
+
+class _BigIntBigEndianEncoder extends BigIntEncoder {
+  const _BigIntBigEndianEncoder();
+
+  @override
+  BigInt convert(Iterable<int> input) {
+    int a, b;
+    var out = <int>[];
+    for (int x in input) {
+      a = (x >>> 4) & 0xF;
+      b = x & 0xF;
+      a += a < 10 ? _zero : _smallA - 10;
+      b += b < 10 ? _zero : _smallA - 10;
+      out.add(a);
+      out.add(b);
+    }
+    if (out.isEmpty) {
+      throw FormatException('Empty input');
+    }
+    return BigInt.parse(String.fromCharCodes(out), radix: 16);
+  }
+}
+
+class _BigIntBigEndianDecoder extends BigIntDecoder {
   const _BigIntBigEndianDecoder();
 
   @override
@@ -120,12 +131,16 @@ class _BigIntBigEndianDecoder extends Converter<BigInt, Iterable<int>> {
   }
 }
 
+// ========================================================
+// BigInt Codec
+// ========================================================
+
 class BigIntCodec extends Codec<Iterable<int>, BigInt> {
   @override
-  final Converter<Iterable<int>, BigInt> encoder;
+  final BigIntEncoder encoder;
 
   @override
-  final Converter<BigInt, Iterable<int>> decoder;
+  final BigIntDecoder decoder;
 
   /// Codec instance to encode and decode [BigInt] to byte sequence in
   /// big-endian order.

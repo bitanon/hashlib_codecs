@@ -11,14 +11,14 @@ import 'codecs/base16.dart';
 /// ```
 /// 0123456789ABCDEF
 /// ```
-const base16 = B16Codec();
+const base16 = Base16Codec();
 
 /// Codec instance to encode and decode 8-bit integer sequence to Base-16
 /// or Hexadecimal character sequence using the lowercase alphabet:
 /// ```
 /// 0123456789abcdef
 /// ```
-const base16lower = B16Codec.lower();
+const base16lower = Base16Codec.lower();
 
 /// Converts 8-bit integer seqence to Hexadecimal character sequence.
 ///

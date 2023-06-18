@@ -1,65 +1,95 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:convert' show Codec;
+import 'dart:convert' show Codec, Converter;
 import 'dart:typed_data';
 
-import 'converter.dart';
+abstract class BitConverter extends Converter<Iterable<int>, Iterable<int>> {
+  /// Creates a new [BitConverter] instance.
+  const BitConverter();
 
-abstract class Uint8Codec extends Codec<Iterable<int>, Iterable<int>> {
-  const Uint8Codec();
+  /// The bit-length of the input array elements.
+  int get source;
+
+  /// The bit-length of the output array elements.
+  int get target;
+
+  /// The final elements that may appear at the end.
+  int? get padding => null;
+
+  /// Converts [input] array of numbers with bit-length of [source] to an array
+  /// of numbers with bit-length of [target]. The [input] array will be treated
+  /// as a sequence of bits to convert.
+  @override
+  Iterable<int> convert(Iterable<int> input);
+}
+
+abstract class ByteCodec extends Codec<Iterable<int>, Iterable<int>> {
+  const ByteCodec();
 
   @override
-  Uint8Encoder get encoder;
+  BitConverter get encoder;
 
   @override
-  Uint8Decoder get decoder;
+  BitConverter get decoder;
 
-  /// Encode an input string using this codec and returns a string
+  /// Encodes an [input] string using this codec
   @pragma('vm:prefer-inline')
-  String encodeString(String input) {
-    return String.fromCharCodes(encoder.convert(input.codeUnits));
-  }
-
-  /// Decode an input string using this codec and returns a string
-  @pragma('vm:prefer-inline')
-  String decodeString(String input) {
-    return String.fromCharCodes(decoder.convert(input.codeUnits));
-  }
-
-  /// Encode an array of bytes using this codec and returns a string
-  @pragma('vm:prefer-inline')
-  String encodeToString(Iterable<int> input) {
-    return String.fromCharCodes(encoder.convert(input));
-  }
-
-  /// Decode an array of bytes using this codec and returns a string
-  @pragma('vm:prefer-inline')
-  String decodeToString(Iterable<int> input) {
-    return String.fromCharCodes(decoder.convert(input));
-  }
-
-  /// Encode an string using this codec and returns an array of bytes
-  @pragma('vm:prefer-inline')
-  Iterable<int> encodeFromString(String input) {
+  Iterable<int> encodeString(String input) {
     return encoder.convert(input.codeUnits);
   }
 
-  /// Decode an string using this codec and returns an array of bytes
+  /// Decodes an [input] string using this codec
   @pragma('vm:prefer-inline')
-  Iterable<int> decodeFromString(String input) {
+  Iterable<int> decodeString(String input) {
     return decoder.convert(input.codeUnits);
   }
 
-  /// Encode an input buffer using this codec
+  /// Encodes an [input] buffer using this codec
   @pragma('vm:prefer-inline')
   Iterable<int> encodeBuffer(ByteBuffer buffer) {
     return encoder.convert(buffer.asUint8List());
   }
 
-  /// Encode an input buffer using this codec and returns a string
+  /// Decodess an [input] buffer using this codec
+  @pragma('vm:prefer-inline')
+  Iterable<int> decodeBuffer(ByteBuffer buffer) {
+    return decoder.convert(buffer.asUint8List());
+  }
+
+  /// Encodes an [input] using this codec and returns string
+  @pragma('vm:prefer-inline')
+  String encodeToString(Iterable<int> input) {
+    return String.fromCharCodes(encoder.convert(input));
+  }
+
+  /// Decodes an [input] using this codec and returns string
+  @pragma('vm:prefer-inline')
+  String decodeToString(Iterable<int> input) {
+    return String.fromCharCodes(decoder.convert(input));
+  }
+
+  /// Encodes an [input] string using this codec and returns string
+  @pragma('vm:prefer-inline')
+  String encodeStringToString(String input) {
+    return String.fromCharCodes(encoder.convert(input.codeUnits));
+  }
+
+  /// Decodes an [input] string using this codec and returns string
+  @pragma('vm:prefer-inline')
+  String decodeStringToString(String input) {
+    return String.fromCharCodes(decoder.convert(input.codeUnits));
+  }
+
+  /// Encodes an [input] buffer using this codec and returns string
   @pragma('vm:prefer-inline')
   String encodeBufferToString(ByteBuffer buffer) {
     return String.fromCharCodes(encoder.convert(buffer.asUint8List()));
+  }
+
+  /// Decodes an [input] buffer using this codec and returns string
+  @pragma('vm:prefer-inline')
+  String decodeBufferToString(ByteBuffer buffer) {
+    return String.fromCharCodes(decoder.convert(buffer.asUint8List()));
   }
 }

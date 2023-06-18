@@ -11,22 +11,22 @@ import 'codecs/base32.dart';
 /// ```
 /// ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
 /// ```
-const base32 = B32Codec();
+const base32 = Base32Codec();
 
 /// Same as [base32], but the encoder will use character `=` as padding,
 /// which is appended at the end out the output to fill up any partial bytes.
-const base32padded = B32Codec.padded();
+const base32padded = Base32Codec.padded();
 
 /// Codec instance to encode and decode 8-bit integer sequence to Base-32
 /// character sequence using the lowercase alphabets:
 /// ```
 /// abcdefghijklmnopqrstuvwxyz234567
 /// ```
-const base32lower = B32Codec.lower();
+const base32lower = Base32Codec.lower();
 
 /// Same as [base32lower], but the encoder will use character `=` as padding,
 /// which is appended at the end out the output to fill up any partial bytes.
-const base32paddedlower = B32Codec.paddedlower();
+const base32paddedlower = Base32Codec.paddedlower();
 
 /// Converts 8-bit integer seqence to Base-32 character sequence.
 ///
