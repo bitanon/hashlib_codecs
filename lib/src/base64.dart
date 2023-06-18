@@ -5,8 +5,6 @@ import 'dart:typed_data';
 
 import 'codecs/base64.dart';
 
-const int _padding = 0x3d;
-
 /// Supported alphabets for Base-32 conversion
 enum Base64Alphabet {
   /// The alphabet from [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
@@ -50,10 +48,11 @@ String toBase64(
   bool padding = true,
   Base64Alphabet alphabet = Base64Alphabet.rfc,
 }) {
-  var out = alphabet.codec.encoder.convert(
-    input,
-    padding ? _padding : null,
-  );
+  var encoder = alphabet.codec.encoder;
+  var out = encoder.convert(input);
+  if (!padding) {
+    out = out.takeWhile((value) => value != encoder.padding);
+  }
   return String.fromCharCodes(out);
 }
 
@@ -79,9 +78,6 @@ Uint8List fromBase64(
   bool padding = true,
   Base64Alphabet alphabet = Base64Alphabet.rfc,
 }) {
-  var out = alphabet.codec.decoder.convert(
-    input.codeUnits,
-    padding ? _padding : null,
-  );
+  var out = alphabet.codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

@@ -5,8 +5,6 @@ import 'dart:typed_data';
 
 import 'codecs/base32.dart';
 
-const int _padding = 0x3d;
-
 /// Supported alphabets for Base-32 conversion
 enum Base32Alphabet {
   /// The alphabet from [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
@@ -49,10 +47,11 @@ String toBase32(
   bool padding = true,
   Base32Alphabet alphabet = Base32Alphabet.rfc,
 }) {
-  var out = alphabet.codec.encoder.convert(
-    input,
-    padding ? _padding : null,
-  );
+  var encoder = alphabet.codec.encoder;
+  var out = encoder.convert(input);
+  if (!padding) {
+    out = out.takeWhile((value) => value != encoder.padding);
+  }
   return String.fromCharCodes(out);
 }
 
@@ -61,9 +60,6 @@ String toBase32(
 /// Parameters:
 /// - [input] should be a valid base-32 encoded string.
 /// - [alphabet] configures the alphabet to use. DefaultL: [Base32Alphabet.rfc].
-/// - If [padding] is true, the decoder will use character `=` as padding and
-///   stop when encountering it, otherwise it will be treated as an invalid
-///   character and [FormatException] will be thrown.
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters, and the
@@ -74,12 +70,8 @@ String toBase32(
 /// If a partial string is detected, the following bits are assumed to be zeros.
 Uint8List fromBase32(
   String input, {
-  bool padding = true,
   Base32Alphabet alphabet = Base32Alphabet.rfc,
 }) {
-  var out = alphabet.codec.decoder.convert(
-    input.codeUnits,
-    padding ? _padding : null,
-  );
+  var out = alphabet.codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

@@ -2,10 +2,11 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/alphabet_converter.dart';
+import 'package:hashlib_codecs/src/core/converter.dart';
 
 // ignore: constant_identifier_names
 const int __ = -1;
+const int _padding = 0x3d;
 
 const _base64EncodingRfc = [
   0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, //
@@ -64,10 +65,12 @@ class Base64Codec extends ByteCodec {
   static const Base64Codec rfc = Base64Codec._(
     encoder: AlphabetEncoder(
       bits: 6,
+      padding: _padding,
       alphabet: _base64EncodingRfc,
     ),
     decoder: AlphabetDecoder(
       bits: 6,
+      padding: _padding,
       alphabet: _base64Decoding,
     ),
   );
@@ -82,10 +85,12 @@ class Base64Codec extends ByteCodec {
   static const Base64Codec urlSafe = Base64Codec._(
     encoder: AlphabetEncoder(
       bits: 6,
+      padding: _padding,
       alphabet: _base64EncodingUrlSafe,
     ),
     decoder: AlphabetDecoder(
       bits: 6,
+      padding: _padding,
       alphabet: _base64Decoding,
     ),
   );

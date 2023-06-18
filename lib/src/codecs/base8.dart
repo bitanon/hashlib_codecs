@@ -2,7 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/bit_converter.dart';
+import 'package:hashlib_codecs/src/core/converter.dart';
 
 const _zero = 0x30;
 
@@ -10,32 +10,26 @@ const _zero = 0x30;
 // Base-8 Converters
 // ========================================================
 
-class _Base8Encoder extends BitEncoder {
+class _Base8Encoder extends ByteEncoder {
   const _Base8Encoder();
-
-  @override
-  final int source = 8;
 
   @override
   final int target = 3;
 
   @override
-  Iterable<int> convert(Iterable<int> input, [int? padding]) {
+  Iterable<int> convert(Iterable<int> input) {
     return super.convert(input).map((y) => y + _zero);
   }
 }
 
-class _Base8Decoder extends BitDecoder {
+class _Base8Decoder extends ByteDecoder {
   const _Base8Decoder();
 
   @override
   final int source = 3;
 
   @override
-  final int target = 8;
-
-  @override
-  Iterable<int> convert(Iterable<int> input, [int? padding]) {
+  Iterable<int> convert(Iterable<int> input) {
     int x;
     return super.convert(input.map((y) {
       x = y - _zero;

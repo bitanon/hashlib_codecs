@@ -1,11 +1,12 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib_codecs/src/core/alphabet_converter.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
+import 'package:hashlib_codecs/src/core/converter.dart';
 
 // ignore: constant_identifier_names
 const int __ = -1;
+const int _padding = 0x3d;
 
 const _base32EncodingRfc = [
   0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, //
@@ -56,10 +57,12 @@ class Base32Codec extends ByteCodec {
   static const Base32Codec rfc = Base32Codec._(
     encoder: AlphabetEncoder(
       bits: 5,
+      padding: _padding,
       alphabet: _base32EncodingRfc,
     ),
     decoder: AlphabetDecoder(
       bits: 5,
+      padding: _padding,
       alphabet: _base32Decoding,
     ),
   );
@@ -72,10 +75,12 @@ class Base32Codec extends ByteCodec {
   static const Base32Codec rfcLower = Base32Codec._(
     encoder: AlphabetEncoder(
       bits: 5,
+      padding: _padding,
       alphabet: _base32EncodingRfcLower,
     ),
     decoder: AlphabetDecoder(
       bits: 5,
+      padding: _padding,
       alphabet: _base32Decoding,
     ),
   );

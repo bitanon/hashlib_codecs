@@ -14,5 +14,4 @@ export 'codecs/base64.dart';
 export 'codecs/base8.dart';
 export 'codecs/bigint.dart';
 export 'core/codec.dart';
-export 'core/bit_converter.dart';
-export 'core/alphabet_converter.dart';
+export 'core/converter.dart';

@@ -2,7 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/bit_converter.dart';
+import 'package:hashlib_codecs/src/core/converter.dart';
 
 const int _zero = 0x30;
 const int _bigA = 0x41;
@@ -12,7 +12,7 @@ const int _smallA = 0x61;
 // Base-16 Converters
 // ========================================================
 
-class _Base16Encoder extends BitEncoder {
+class _Base16Encoder extends ByteEncoder {
   final int startCode;
 
   const _Base16Encoder._(this.startCode);
@@ -21,13 +21,10 @@ class _Base16Encoder extends BitEncoder {
   static const lower = _Base16Encoder._(_smallA - 10);
 
   @override
-  final int source = 8;
-
-  @override
   final int target = 4;
 
   @override
-  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
+  Iterable<int> convert(Iterable<int> input) sync* {
     int a, b;
     for (int x in input) {
       a = (x >>> 4) & 0xF;
@@ -40,17 +37,14 @@ class _Base16Encoder extends BitEncoder {
   }
 }
 
-class _Base16Decoder extends BitDecoder {
+class _Base16Decoder extends ByteDecoder {
   const _Base16Decoder();
 
   @override
   final int source = 4;
 
   @override
-  final int target = 8;
-
-  @override
-  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
+  Iterable<int> convert(Iterable<int> input) sync* {
     bool t;
     int p, x, y;
     p = 0;
@@ -89,10 +83,10 @@ class _Base16Decoder extends BitDecoder {
 
 class Base16Codec extends ByteCodec {
   @override
-  final BitEncoder encoder;
+  final ByteEncoder encoder;
 
   @override
-  final BitDecoder decoder;
+  final ByteDecoder decoder;
 
   const Base16Codec._({
     required this.encoder,

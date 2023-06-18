@@ -2,7 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/bit_converter.dart';
+import 'package:hashlib_codecs/src/core/converter.dart';
 
 const int _zero = 0x30;
 
@@ -10,17 +10,14 @@ const int _zero = 0x30;
 // Base-2 Converters
 // ========================================================
 
-class _Base2Encoder extends BitEncoder {
+class _Base2Encoder extends ByteEncoder {
   const _Base2Encoder();
-
-  @override
-  final int source = 8;
 
   @override
   final int target = 2;
 
   @override
-  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
+  Iterable<int> convert(Iterable<int> input) sync* {
     for (int x in input) {
       yield _zero + ((x >>> 7) & 1);
       yield _zero + ((x >>> 6) & 1);
@@ -34,17 +31,14 @@ class _Base2Encoder extends BitEncoder {
   }
 }
 
-class _Base2Decoder extends BitDecoder {
+class _Base2Decoder extends ByteDecoder {
   const _Base2Decoder();
 
   @override
   final int source = 2;
 
   @override
-  final int target = 8;
-
-  @override
-  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
+  Iterable<int> convert(Iterable<int> input) sync* {
     int p, n, x, y;
     p = n = 0;
     for (y in input) {
