@@ -8,6 +8,9 @@ void main() {
   print("binary => ${toBinary(input)}");
   print('');
 
+  print("octal => ${toOctal(input)}");
+  print('');
+
   print("hexadecimal => ${toHex(input)}");
   print("hexadecimal (uppercase) => ${toHex(input, upper: true)}");
   print('');

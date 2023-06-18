@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/bit_converter.dart';
 
 const int _zero = 0x30;
 
@@ -10,14 +10,8 @@ const int _zero = 0x30;
 // Base-2 Converters
 // ========================================================
 
-class _Base2Encoder extends BitEncoder {
-  const _Base2Encoder();
-
-  @override
-  final int source = 8;
-
-  @override
-  final int target = 2;
+class _Base2Encoder extends ByteEncoder {
+  const _Base2Encoder() : super(bits: 2);
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -34,14 +28,8 @@ class _Base2Encoder extends BitEncoder {
   }
 }
 
-class _Base2Decoder extends BitDecoder {
-  const _Base2Decoder();
-
-  @override
-  final int source = 2;
-
-  @override
-  final int target = 8;
+class _Base2Decoder extends ByteDecoder {
+  const _Base2Decoder() : super(bits: 2);
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -71,14 +59,19 @@ class _Base2Decoder extends BitDecoder {
 // Base-2 Codec
 // ========================================================
 
-class Base2Codec extends ByteCodec {
+class Base2Codec extends HashlibCodec {
   @override
   final encoder = const _Base2Encoder();
 
   @override
   final decoder = const _Base2Decoder();
 
-  /// Codec instance to encode and decode 8-bit integer sequence to 2-bit Base-2
-  /// or Binary character sequence using the alphabet: `01`
-  const Base2Codec();
+  const Base2Codec._();
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 2-bit
+  /// Base-2 or Binary character sequence using the alphabet:
+  /// ```
+  /// 01
+  /// ```
+  static const Base2Codec standard = Base2Codec._();
 }

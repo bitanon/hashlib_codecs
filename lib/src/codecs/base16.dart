@@ -1,30 +1,24 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/bit_converter.dart';
+
+// ========================================================
+// Base-16 Encoder and Decoder
+// ========================================================
 
 const int _zero = 0x30;
 const int _bigA = 0x41;
 const int _smallA = 0x61;
 
-// ========================================================
-// Base-16 Converters
-// ========================================================
-
-class _Base16Encoder extends BitEncoder {
+class _Base16Encoder extends ByteEncoder {
   final int startCode;
 
-  const _Base16Encoder._(this.startCode);
+  const _Base16Encoder._(this.startCode) : super(bits: 4);
 
   static const upper = _Base16Encoder._(_bigA - 10);
   static const lower = _Base16Encoder._(_smallA - 10);
-
-  @override
-  final int source = 8;
-
-  @override
-  final int target = 4;
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -40,14 +34,8 @@ class _Base16Encoder extends BitEncoder {
   }
 }
 
-class _Base16Decoder extends BitDecoder {
-  const _Base16Decoder();
-
-  @override
-  final int source = 4;
-
-  @override
-  final int target = 8;
+class _Base16Decoder extends ByteDecoder {
+  const _Base16Decoder() : super(bits: 4);
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -87,18 +75,35 @@ class _Base16Decoder extends BitDecoder {
 // Base-16 Codec
 // ========================================================
 
-class Base16Codec extends ByteCodec {
+class Base16Codec extends HashlibCodec {
   @override
-  final BitEncoder encoder;
+  final ByteEncoder encoder;
 
   @override
-  final decoder = const _Base16Decoder();
+  final ByteDecoder decoder;
 
-  /// Codec instance to encode and decode 8-bit integer sequence to Base-16
-  /// or Hexadecimal character sequence using the uppercase alphabet.
-  const Base16Codec() : encoder = _Base16Encoder.upper;
+  const Base16Codec._({
+    required this.encoder,
+    required this.decoder,
+  });
 
-  /// Codec instance to encode and decode 8-bit integer sequence to Base-16
-  /// or Hexadecimal character sequence using the lowercase alphabet.
-  const Base16Codec.lower() : encoder = _Base16Encoder.lower;
+  /// Codec instance to encode and decode 8-bit integer sequence to 4-bit
+  /// Base-16 or Hexadecimal character sequence using the alphabet:
+  /// ```
+  /// 0123456789ABCDEF
+  /// ```
+  static const Base16Codec upper = Base16Codec._(
+    encoder: _Base16Encoder.upper,
+    decoder: _Base16Decoder(),
+  );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 4-bit
+  /// Base-16 or Hexadecimal character sequence using the alphabet:
+  /// ```
+  /// 0123456789abcdef
+  /// ```
+  static const Base16Codec lower = Base16Codec._(
+    encoder: _Base16Encoder.lower,
+    decoder: _Base16Decoder(),
+  );
 }

@@ -5,38 +5,55 @@ import 'dart:typed_data';
 
 import 'codecs/bigint.dart';
 
-/// Codec instance to encode and decode [BigInt] to byte sequence in
-/// big-endian order.
-const bigintBE = BigIntCodec.big();
+BigIntCodec _codecFromParameters({
+  bool msbFirst = false,
+}) {
+  if (msbFirst) {
+    return BigIntCodec.msbFirst;
+  } else {
+    return BigIntCodec.lsbFirst;
+  }
+}
 
-/// Codec instance to encode and decode [BigInt] to byte sequence in
-/// little-endian order.
-const bigintLE = BigIntCodec.little();
-
-/// Converts a byte sequence to [BigInt]. It will raise [FormatException] if
-/// the [input] is empty.
+/// Converts 8-bit integer sequence to [BigInt].
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers.
-/// - [endian] is the order of the input bytes.
+/// - If [msbFirst] is true, [input] bytes are read in big-endian order giving
+///   the first byte the most significant value, otherwise the bytes are read as
+///   little-endian order, giving the first byte the least significant value.
+/// - [codec] is the [BigIntCodec] to use. It is derived from the other
+///   parameters if not provided.
 ///
 /// Throws:
-/// - [FormatException] when the [input] is empty
-BigInt toBigInt(Iterable<int> input, {Endian endian = Endian.little}) {
-  var codec = endian == Endian.little ? bigintLE : bigintBE;
+/// - [FormatException] when the [input] is empty.
+BigInt toBigInt(
+  Iterable<int> input, {
+  BigIntCodec? codec,
+  bool msbFirst = false,
+}) {
+  codec ??= _codecFromParameters(msbFirst: msbFirst);
   return codec.encoder.convert(input);
 }
 
-/// Converts a [BigInt] to byte sequence. It will raise [FormatException] if
-/// the [input] is negative.
+/// Converts a [BigInt] to 8-bit integer sequence.
 ///
 /// Parameters:
-/// - [input] is a non-negative [BigInt]
-/// - [endian] determines the order of the output bytes.
+/// - [input] is a non-negative [BigInt].
+/// - If [msbFirst] is true, [input] bytes are read in big-endian order giving
+///   the first byte the most significant value, otherwise the bytes are read as
+///   little-endian order, giving the first byte the least significant value.
+/// - [codec] is the [BigIntCodec] to use. It is derived from the other
+///   parameters if not provided.
 ///
-/// Throws:
+/// Raises:
 /// - [FormatException] when the [input] is negative.
-Uint8List fromBigInt(BigInt input, {Endian endian = Endian.little}) {
-  var codec = endian == Endian.little ? bigintLE : bigintBE;
-  return Uint8List.fromList(codec.decoder.convert(input).toList());
+Uint8List fromBigInt(
+  BigInt input, {
+  BigIntCodec? codec,
+  bool msbFirst = false,
+}) {
+  codec ??= _codecFromParameters(msbFirst: msbFirst);
+  var out = codec.decoder.convert(input);
+  return Uint8List.fromList(out.toList());
 }

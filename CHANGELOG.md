@@ -1,27 +1,25 @@
 # 2.0.0
 
-- Generalize encoding and decoding
+- **Breaking**: Removes all constant exports.
+  - They are now available inside codec class. e.g.: `Base64Codec.urlSafe`
+- **Breaking**: Modify parameters of all public methods.
+- Improves encoding and decoding algorithm.
 - Adds Base-8 (Octal) codec support
   - New class: `Base8Codec`
   - New methods: `fromOctal`, `toOctal`
-  - New constant: `base8`
 - Renames a lot of exports
   - `Uint8Converter` -> `BitConverter`
-  - `Uint8Codec` -> `ByteCodec`
+  - `Uint8Codec` -> `HashlibCodec`
   - `BinaryCodec` -> `Base2Codec`
   - `B16Codec` -> `Base16Codec`
   - `B64Codec` -> `Base64Codec`
-- Change internal methods of `ByteCodec`
 - Separates base encoder and decoders
   - Generic encoders: `BitEncoder`, `AlphabetEncoder`
   - Generic decoders: `BitDecoder`, `AlphabetDecoder`
-- Exports two new types:
-  - `BigIntEncoder`
-  - `BigIntDecoder`
 
 # 1.2.0
 
-- Adds BigInt codec support.
+- Adds `BigInt` codec support.
   - New class: `BigIntCodec`
   - New methods: `fromBigInt`, `toBigInt`
   - New constant: `bigintLE`, `bigintBE`
@@ -29,7 +27,7 @@
 
 # 1.1.1
 
-- Update project description
+- Updates project description.
 
 # 1.1.0
 

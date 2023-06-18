@@ -5,64 +5,50 @@ import 'dart:typed_data';
 
 import 'codecs/base64.dart';
 
-/// Codec instance to encode and decode 8-bit integer sequence to Base-64
-/// character sequence using the alphabet described in
-/// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
-/// ```
-/// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
-/// ```
-const base64 = Base64Codec();
+Base64Codec _codecFromParameters({
+  bool url = false,
+  bool padding = false,
+}) {
+  if (url && padding) {
+    return Base64Codec.urlSafe;
+  } else if (url) {
+    return Base64Codec.urlSafeNoPadding;
+  } else if (padding) {
+    return Base64Codec.standard;
+  } else {
+    return Base64Codec.standardNoPadding;
+  }
+}
 
-/// Same as [base64], but the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-const base64padded = Base64Codec.padded();
-
-/// Codec instance to encode and decode 8-bit integer sequence to a modified
-/// Base64 character sequence that is both URL and filename safe using the
-/// alphabet described in [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
-/// ```
-/// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_
-/// ```
-const base64url = Base64Codec.url();
-
-/// Same as [base64url], but the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-const base64urlpadded = Base64Codec.urlpadded();
-
-/// Convert 8-bit integer seqence to Base-64 character sequence.
+/// Converts 8-bit integer sequence to 6-bit Base-64 character sequence.
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
-/// - If [padding] is true, the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-/// - If [url] is true, the encoder will use the URL/filename-safe alphabets
-/// instead of the original one.
-///
-/// Based on the parameter values, the following codecs are used:
-/// - [padding] is `true`, [url] is `true`: [base64urlpadded]
-/// - [padding] is `true`, [url] is `false`: [base64padded]
-/// - [padding] is `false`, [url] is `true`: [base64url]
-/// - [padding] is `false`, [url] is `false`: [base64]
+/// - If [url] is true, URL and Filename-safe alphabet is used.
+/// - If [padding] is true, the output will have padding characters.
+/// - [codec] is the [Base64Codec] to use. It is derived from the other
+///   parameters if not provided.
 String toBase64(
   Iterable<int> input, {
+  Base64Codec? codec,
   bool url = false,
   bool padding = true,
 }) {
-  var codec = url
-      ? padding
-          ? base64urlpadded
-          : base64url
-      : padding
-          ? base64padded
-          : base64;
-  return String.fromCharCodes(codec.encoder.convert(input));
+  codec ??= _codecFromParameters(
+    url: url,
+    padding: padding,
+  );
+  var out = codec.encoder.convert(input);
+  return String.fromCharCodes(out);
 }
 
-/// Convert Base-64 integer sequence to 8-bit integer sequence using the
-/// [base64] codec.
+/// Converts 6-bit Base-64 character sequence to 8-bit integer sequence.
 ///
 /// Parameters:
 /// - [input] should be a valid base-64 encoded string.
+/// - If [padding] is true, the output will have padding characters.
+/// - [codec] is the [Base64Codec] to use. It is derived from the other
+///   parameters if not provided.
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters, and the
@@ -72,7 +58,12 @@ String toBase64(
 /// alphabets. Any letters appearing after the first padding character is
 /// observed are ignored. If a partial string is detected, the following bits
 /// are assumed to be zeros.
-Uint8List fromBase64(String input) {
-  var out = base64.decoder.convert(input.codeUnits);
+Uint8List fromBase64(
+  String input, {
+  Base64Codec? codec,
+  bool padding = true,
+}) {
+  codec ??= _codecFromParameters(padding: padding);
+  var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

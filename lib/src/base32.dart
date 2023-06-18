@@ -5,62 +5,50 @@ import 'dart:typed_data';
 
 import 'codecs/base32.dart';
 
-/// Codec instance to encode and decode 8-bit integer sequence to Base-32
-/// character sequence using the alphabet described in
-/// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
-/// ```
-/// ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
-/// ```
-const base32 = Base32Codec();
+Base32Codec _codecFromParameters({
+  bool lower = false,
+  bool padding = false,
+}) {
+  if (lower && padding) {
+    return Base32Codec.lowercase;
+  } else if (lower) {
+    return Base32Codec.lowercaseNoPadding;
+  } else if (padding) {
+    return Base32Codec.standard;
+  } else {
+    return Base32Codec.standardNoPadding;
+  }
+}
 
-/// Same as [base32], but the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-const base32padded = Base32Codec.padded();
-
-/// Codec instance to encode and decode 8-bit integer sequence to Base-32
-/// character sequence using the lowercase alphabets:
-/// ```
-/// abcdefghijklmnopqrstuvwxyz234567
-/// ```
-const base32lower = Base32Codec.lower();
-
-/// Same as [base32lower], but the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-const base32paddedlower = Base32Codec.paddedlower();
-
-/// Converts 8-bit integer seqence to Base-32 character sequence.
+/// Converts 8-bit integer sequence to 5-bit Base-32 character sequence.
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
-/// - If [padding] is true, the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-/// - If [lower] is true, the default lower case alphabets will be used.
-///
-/// Based on the parameter values, the following codecs are used:
-/// - [padding] is `true`, [lower] is `true`: [base32paddedlower]
-/// - [padding] is `true`, [lower] is `false`: [base32padded]
-/// - [padding] is `false`, [lower] is `true`: [base32lower]
-/// - [padding] is `false`, [lower] is `false`: [base32]
+/// - If [lower] is true, the lowercase standard alphabet is used.
+/// - If [padding] is true, the output will not have padding characters.
+/// - [codec] is the [Base32Codec] to use. It is derived from the other
+///   parameters if not provided.
 String toBase32(
   Iterable<int> input, {
+  Base32Codec? codec,
   bool lower = false,
   bool padding = true,
 }) {
-  var codec = lower
-      ? padding
-          ? base32paddedlower
-          : base32lower
-      : padding
-          ? base32padded
-          : base32;
-  return String.fromCharCodes(codec.encoder.convert(input));
+  codec ??= _codecFromParameters(
+    lower: lower,
+    padding: padding,
+  );
+  var out = codec.encoder.convert(input);
+  return String.fromCharCodes(out);
 }
 
-/// Converts Base-32 integer sequence to 8-bit integer sequence using the
-/// [base32] codec.
+/// Converts 5-bit Base-32 character sequence to 8-bit integer sequence.
 ///
 /// Parameters:
 /// - [input] should be a valid base-32 encoded string.
+/// - If [padding] is true, the output will not have padding characters.
+/// - [codec] is the [Base32Codec] to use. It is derived from the other
+///   parameters if not provided.
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters, and the
@@ -69,7 +57,12 @@ String toBase32(
 /// This implementation can handle both uppercase and lowercase alphabets. Any
 /// letters appearing after the first padding character is observed are ignored.
 /// If a partial string is detected, the following bits are assumed to be zeros.
-Uint8List fromBase32(String input) {
-  var out = base32.decoder.convert(input.codeUnits);
+Uint8List fromBase32(
+  String input, {
+  Base32Codec? codec,
+  bool padding = true,
+}) {
+  codec ??= _codecFromParameters(padding: padding);
+  var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }
