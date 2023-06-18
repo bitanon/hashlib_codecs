@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/converter.dart';
 
 const int _zero = 0x30;
 
@@ -11,10 +11,7 @@ const int _zero = 0x30;
 // ========================================================
 
 class _Base2Encoder extends ByteEncoder {
-  const _Base2Encoder();
-
-  @override
-  final int target = 2;
+  const _Base2Encoder() : super(bits: 2);
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -32,10 +29,7 @@ class _Base2Encoder extends ByteEncoder {
 }
 
 class _Base2Decoder extends ByteDecoder {
-  const _Base2Decoder();
-
-  @override
-  final int source = 2;
+  const _Base2Decoder() : super(bits: 2);
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -65,7 +59,7 @@ class _Base2Decoder extends ByteDecoder {
 // Base-2 Codec
 // ========================================================
 
-class Base2Codec extends ByteCodec {
+class Base2Codec extends HashlibCodec {
   @override
   final encoder = const _Base2Encoder();
 
@@ -79,5 +73,5 @@ class Base2Codec extends ByteCodec {
   /// ```
   /// 01
   /// ```
-  static const Base2Codec sequence = Base2Codec._();
+  static const Base2Codec standard = Base2Codec._();
 }

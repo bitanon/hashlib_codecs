@@ -12,14 +12,14 @@ void main() {
   group('Test base64url', () {
     test('encoding', () {
       var b = [0, 0, 0];
-      var a = toBase64(b, alphabet: Base64Alphabet.urlSafe);
+      var a = toBase64(b, urlSafe: true);
       expect(a, equals("AAAA"));
     });
     test('encoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
         var m = base64UrlEncode(b).replaceAll('=', '');
-        var a = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: false);
+        var a = toBase64(b, noPadding: true, urlSafe: true);
         expect(a, equals(m), reason: 'length $i');
       }
     });
@@ -34,7 +34,7 @@ void main() {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
         var m = base64UrlEncode(b);
-        var a = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: true);
+        var a = toBase64(b, urlSafe: true);
         expect(a, equals(m), reason: 'length $i');
       }
     });
@@ -48,26 +48,41 @@ void main() {
     test('encoding <-> decoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: false);
+        var r = toBase64(b, noPadding: true, urlSafe: true);
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });
     test('encoding <-> decoding with padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: true);
+        var r = toBase64(b, urlSafe: true);
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });
     group('decoding with invalid chars', () {
-      test('"Hashlib!"', () {
-        expect(() => fromBase64("Hashlib!"), throwsFormatException);
+      test('Hashlib!', () {
+        try {
+          fromBase64("Hashlib!", urlSafe: true);
+          throw Exception('No error thrown');
+        } on FormatException catch (err) {
+          expect(err.message, equals("Invalid character 33"));
+        }
       });
-      test('"-10"', () {
-        expect(() => fromBase64(" 10"), throwsFormatException);
+      test('a.10', () {
+        try {
+          fromBase64("a.10", urlSafe: true);
+          throw Exception('No error thrown');
+        } on FormatException catch (err) {
+          expect(err.message, equals("Invalid character 46"));
+        }
       });
-      test('"s*mething"', () {
-        expect(() => fromBase64("s*mething"), throwsFormatException);
+      test('s*methings', () {
+        try {
+          fromBase64("s*methings", urlSafe: true);
+          throw Exception('No error thrown');
+        } on FormatException catch (err) {
+          expect(err.message, equals("Invalid character 42"));
+        }
       });
     });
   });

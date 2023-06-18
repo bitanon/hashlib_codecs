@@ -8,15 +8,19 @@ import 'codecs/base2.dart';
 /// Converts 8-bit integer sequence to 2-bit Base-2 character sequence.
 ///
 /// Parameters:
-/// - [input] is a sequence of 8-bit integers
+/// - [input] is a sequence of 8-bit integers.
+/// - [codec] is the [Base2Codec] to use. Default: [Base2Codec.standard].
 ///
 /// **NOTE:**, This implementation is a bit-wise encoding of the input bytes.
 /// To get the numeric representation of the [input] in binary:
 /// ```dart
 /// toBigInt(input).toRadixString(2)
 /// ```
-String toBinary(Iterable<int> input) {
-  var out = Base2Codec.sequence.encoder.convert(input);
+String toBinary(
+  Iterable<int> input, {
+  Base2Codec codec = Base2Codec.standard,
+}) {
+  var out = codec.encoder.convert(input);
   return String.fromCharCodes(out);
 }
 
@@ -24,6 +28,7 @@ String toBinary(Iterable<int> input) {
 ///
 /// Parameters:
 /// - [input] should be a valid binary/base-2 encoded string.
+/// - [codec] is the [Base2Codec] to use. Default: [Base2Codec.standard].
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters.
@@ -35,7 +40,10 @@ String toBinary(Iterable<int> input) {
 /// ```dart
 /// fromBigInt(BigInt.parse(input, radix: 2));
 /// ```
-Uint8List fromBinary(String input) {
-  var out = Base2Codec.sequence.decoder.convert(input.codeUnits);
+Uint8List fromBinary(
+  String input, {
+  Base2Codec codec = Base2Codec.standard,
+}) {
+  var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

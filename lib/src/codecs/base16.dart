@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/converter.dart';
 
 const int _zero = 0x30;
 const int _bigA = 0x41;
@@ -15,13 +15,10 @@ const int _smallA = 0x61;
 class _Base16Encoder extends ByteEncoder {
   final int startCode;
 
-  const _Base16Encoder._(this.startCode);
+  const _Base16Encoder._(this.startCode) : super(bits: 4);
 
   static const upper = _Base16Encoder._(_bigA - 10);
   static const lower = _Base16Encoder._(_smallA - 10);
-
-  @override
-  final int target = 4;
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -38,10 +35,7 @@ class _Base16Encoder extends ByteEncoder {
 }
 
 class _Base16Decoder extends ByteDecoder {
-  const _Base16Decoder();
-
-  @override
-  final int source = 4;
+  const _Base16Decoder() : super(bits: 4);
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -81,7 +75,7 @@ class _Base16Decoder extends ByteDecoder {
 // Base-16 Codec
 // ========================================================
 
-class Base16Codec extends ByteCodec {
+class Base16Codec extends HashlibCodec {
   @override
   final ByteEncoder encoder;
 

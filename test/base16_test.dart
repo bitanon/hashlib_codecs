@@ -9,6 +9,38 @@ import 'utils.dart';
 
 void main() {
   group('Test base16', () {
+    test('parameter overrides', () {
+      var a = toHex([12]);
+      expect(a, "0c");
+      a = toHex(
+        [12],
+        codec: Base16Codec.upper,
+      );
+      expect(a, "0C");
+      a = toHex(
+        [12],
+        codec: Base16Codec.lower,
+        upper: true,
+      );
+      expect(a, "0c");
+    });
+
+    test('encoding <-> decoding', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = toHex(b);
+        expect(fromHex(r), equals(b), reason: 'length $i');
+      }
+    });
+
+    test('encoding <-> decoding uppercase', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = toHex(b, upper: true);
+        expect(fromHex(r), equals(b), reason: 'length $i');
+      }
+    });
+
     group("encoding", () {
       test('[] => empty string', () {
         expect(toHex([]), "");
@@ -35,20 +67,7 @@ void main() {
         }
       });
     });
-    group('encoding buffer', () {
-      var buf = [
-        244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
-        55, 115, 178, 138, 230, 251
-      ];
-      var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
-      var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
-      test("lower", () {
-        expect(toHex(buf), lowerHex);
-      });
-      test("upper", () {
-        expect(toHex(buf, upper: true), upperHex);
-      });
-    });
+
     group("decoding", () {
       test('empty string => []', () {
         expect(fromHex(""), []);
@@ -84,6 +103,22 @@ void main() {
         }
       });
     });
+
+    group('encoding buffer', () {
+      var buf = [
+        244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
+        55, 115, 178, 138, 230, 251
+      ];
+      var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
+      var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
+      test("lower", () {
+        expect(toHex(buf), lowerHex);
+      });
+      test("upper", () {
+        expect(toHex(buf, upper: true), upperHex);
+      });
+    });
+
     group('decoding buffer', () {
       var buf = [
         244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
@@ -98,20 +133,7 @@ void main() {
         expect(fromHex(upperHex), equals(buf));
       });
     });
-    test('encoding <-> decoding', () {
-      for (int i = 0; i < 100; ++i) {
-        var b = randomBytes(i);
-        var r = toHex(b);
-        expect(fromHex(r), equals(b), reason: 'length $i');
-      }
-    });
-    test('encoding <-> decoding uppercase', () {
-      for (int i = 0; i < 100; ++i) {
-        var b = randomBytes(i);
-        var r = toHex(b, upper: true);
-        expect(fromHex(r), equals(b), reason: 'length $i');
-      }
-    });
+
     group('decoding with invalid chars', () {
       test('Error', () {
         expect(() => fromHex("Error"), throwsFormatException);
@@ -123,6 +145,7 @@ void main() {
         expect(() => fromHex("something"), throwsFormatException);
       });
     });
+
     group('compare against package: base_codecs', () {
       test('encoding', () {
         for (int i = 0; i < 100; ++i) {

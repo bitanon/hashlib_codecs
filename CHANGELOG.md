@@ -2,10 +2,7 @@
 
 - **Breaking**: Removes all constant exports, instead they are now available inside codec class. e.g.: `Base64Codec.urlSafe`
 - An optional padding character can now be passed as a constant to the `convert` method.
-- **Breaking**: Replaces some parameters with `alphabet` config. Affected methods:
-  - `toBase64`
-  - `toBase32`
-  - `toHex`
+- **Breaking**: Remove extra parameters with `codec` in all methods.
 - Improves encoding and decoding algorithm.
 - Adds Base-8 (Octal) codec support
   - New class: `Base8Codec`

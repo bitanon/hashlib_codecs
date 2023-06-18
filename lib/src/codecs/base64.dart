@@ -1,14 +1,14 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:hashlib_codecs/src/core/alphabet.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/converter.dart';
 
 // ignore: constant_identifier_names
 const int __ = -1;
 const int _padding = 0x3d;
 
-const _base64EncodingRfc = [
+const _base64EncodingRfc4648 = [
   0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, //
   0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
   0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
@@ -19,7 +19,7 @@ const _base64EncodingRfc = [
   0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x2b, 0x2f,
 ];
 
-const _base64EncodingUrlSafe = [
+const _base64EncodingRfc4648UrlSafe = [
   0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, //
   0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
   0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
@@ -30,7 +30,7 @@ const _base64EncodingUrlSafe = [
   0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x2d, 0x5f,
 ];
 
-const _base64Decoding = [
+const _base64DecodingRfc4648 = [
   __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, //
   __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
   __, __, __, __, __, 62, __, 62, __, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60,
@@ -44,7 +44,7 @@ const _base64Decoding = [
 // Base-64 Codec
 // ========================================================
 
-class Base64Codec extends ByteCodec {
+class Base64Codec extends HashlibCodec {
   @override
   final AlphabetEncoder encoder;
 
@@ -62,16 +62,16 @@ class Base64Codec extends ByteCodec {
   /// ```
   /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
   /// ```
-  static const Base64Codec rfc = Base64Codec._(
+  static const Base64Codec standard = Base64Codec._(
     encoder: AlphabetEncoder(
       bits: 6,
       padding: _padding,
-      alphabet: _base64EncodingRfc,
+      alphabet: _base64EncodingRfc4648,
     ),
     decoder: AlphabetDecoder(
       bits: 6,
       padding: _padding,
-      alphabet: _base64Decoding,
+      alphabet: _base64DecodingRfc4648,
     ),
   );
 
@@ -86,12 +86,47 @@ class Base64Codec extends ByteCodec {
     encoder: AlphabetEncoder(
       bits: 6,
       padding: _padding,
-      alphabet: _base64EncodingUrlSafe,
+      alphabet: _base64EncodingRfc4648UrlSafe,
     ),
     decoder: AlphabetDecoder(
       bits: 6,
       padding: _padding,
-      alphabet: _base64Decoding,
+      alphabet: _base64DecodingRfc4648,
+    ),
+  );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 6-bit
+  /// Base-64 character sequence using the alphabet described in
+  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
+  /// ```
+  /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+  /// ```
+  static const Base64Codec standardNoPadding = Base64Codec._(
+    encoder: AlphabetEncoder(
+      bits: 6,
+      alphabet: _base64EncodingRfc4648,
+    ),
+    decoder: AlphabetDecoder(
+      bits: 6,
+      alphabet: _base64DecodingRfc4648,
+    ),
+  );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 6-bit
+  /// Base-64 character sequence using the alphabet described in
+  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html), which is both URL and
+  /// filename safe using:
+  /// ```
+  /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_
+  /// ```
+  static const Base64Codec urlSafeNoPadding = Base64Codec._(
+    encoder: AlphabetEncoder(
+      bits: 6,
+      alphabet: _base64EncodingRfc4648UrlSafe,
+    ),
+    decoder: AlphabetDecoder(
+      bits: 6,
+      alphabet: _base64DecodingRfc4648,
     ),
   );
 }

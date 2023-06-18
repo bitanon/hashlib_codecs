@@ -8,15 +8,19 @@ import 'codecs/base8.dart';
 /// Converts 8-bit integer sequence to 3-bit Base-8 character sequence.
 ///
 /// Parameters:
-/// - [input] is a sequence of 8-bit integers
+/// - [input] is a sequence of 8-bit integers.
+/// - [codec] is the [Base8Codec] to use. Default: [Base8Codec.standard].
 ///
 /// **NOTE:**, This implementation is a bit-wise encoding of the input bytes.
 /// To get the numeric representation of the [input] in binary:
 /// ```dart
 /// toBigInt(input).toRadixString(8)
 /// ```
-String toOctal(Iterable<int> input) {
-  var out = Base8Codec.sequence.encoder.convert(input);
+String toOctal(
+  Iterable<int> input, {
+  Base8Codec codec = Base8Codec.standard,
+}) {
+  var out = codec.encoder.convert(input);
   return String.fromCharCodes(out);
 }
 
@@ -24,6 +28,7 @@ String toOctal(Iterable<int> input) {
 ///
 /// Parameters:
 /// - [input] should be a valid octal/base-8 encoded string.
+/// - [codec] is the [Base8Codec] to use. Default: [Base8Codec.standard].
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters.
@@ -35,7 +40,10 @@ String toOctal(Iterable<int> input) {
 /// ```dart
 /// fromBigInt(BigInt.parse(input, radix: 8));
 /// ```
-Uint8List fromOctal(String input) {
-  var out = Base8Codec.sequence.decoder.convert(input.codeUnits);
+Uint8List fromOctal(
+  String input, {
+  Base8Codec codec = Base8Codec.standard,
+}) {
+  var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

@@ -5,17 +5,29 @@ import 'dart:typed_data';
 
 import 'codecs/base16.dart';
 
+Base16Codec _codecFromParameters({
+  bool upper = false,
+}) {
+  if (upper) {
+    return Base16Codec.upper;
+  } else {
+    return Base16Codec.lower;
+  }
+}
+
 /// Converts 8-bit integer sequence to 4-bit Base-16 character sequence.
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers.
-/// - If [upper] is true, the output will be in uppercase. Default: `false`.
-///
-/// Based on the parameter values, the following codecs are used:
-/// - [upper] is `true`: [Base16Codec.upper]
-/// - [upper] is `false`: [Base16Codec.lower]
-String toHex(Iterable<int> input, {bool upper = false}) {
-  var codec = upper ? Base16Codec.upper : Base16Codec.lower;
+/// - If [upper] is true, the uppercase standard alphabet is used.
+/// - [codec] is the [Base16Codec] to use. It is derived from the other
+///   parameters if not provided.
+String toHex(
+  Iterable<int> input, {
+  Base16Codec? codec,
+  bool upper = false,
+}) {
+  codec ??= _codecFromParameters(upper: upper);
   var out = codec.encoder.convert(input);
   return String.fromCharCodes(out);
 }
@@ -24,13 +36,21 @@ String toHex(Iterable<int> input, {bool upper = false}) {
 ///
 /// Parameters:
 /// - [input] should be a valid Base-16 (hexadecimal) string.
+/// - If [upper] is true, the uppercase standard alphabet is used.
+/// - [codec] is the [Base16Codec] to use. It is derived from the other
+///   parameters if not provided.
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters.
 ///
 /// This implementation can handle both uppercase and lowercase alphabets. If a
 /// partial string is detected, the following bits are assumed to be zeros.
-Uint8List fromHex(String input) {
-  var out = Base16Codec.upper.decoder.convert(input.codeUnits);
+Uint8List fromHex(
+  String input, {
+  Base16Codec? codec,
+  bool upper = false,
+}) {
+  codec ??= _codecFromParameters(upper: upper);
+  var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

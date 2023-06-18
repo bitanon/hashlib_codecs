@@ -1,21 +1,22 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:convert' show Codec;
+import 'dart:convert' show Codec, Converter;
 import 'dart:typed_data';
 
-import 'converter.dart';
+import 'decoder.dart';
+import 'encoder.dart';
 
 /// Base class for encoding from and to 8-bit integer sequence
-abstract class ByteCodec extends Codec<Iterable<int>, Iterable<int>> {
-  /// Creates a new [ByteCodec] instance.
-  const ByteCodec();
+abstract class HashlibCodec extends Codec<Iterable<int>, Iterable<int>> {
+  /// Creates a new [HashlibCodec] instance.
+  const HashlibCodec();
 
   @override
-  BitConverter get encoder;
+  BitEncoder get encoder;
 
   @override
-  BitConverter get decoder;
+  BitDecoder get decoder;
 
   /// Encodes an [input] string using this codec
   @pragma('vm:prefer-inline')
@@ -33,4 +34,25 @@ abstract class ByteCodec extends Codec<Iterable<int>, Iterable<int>> {
   @pragma('vm:prefer-inline')
   Iterable<int> decodeBuffer(ByteBuffer encoded) =>
       decode(encoded.asUint8List());
+}
+
+/// Base class for bit-wise encoder and decoder implementation
+abstract class HashlibConverter
+    extends Converter<Iterable<int>, Iterable<int>> {
+  /// Creates a new [HashlibConverter] instance.
+  const HashlibConverter();
+
+  /// The bit-length of the input array elements.
+  /// The value should be between 2 to 64.
+  int get source;
+
+  /// The bit-length of the output array elements.
+  /// The value should be between 2 to 64.
+  int get target;
+
+  /// Converts [input] array of numbers with bit-length of [source] to an array
+  /// of numbers with bit-length of [target]. The [input] array will be treated
+  /// as a sequence of bits to convert.
+  @override
+  Iterable<int> convert(Iterable<int> input);
 }
