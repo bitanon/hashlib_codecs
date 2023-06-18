@@ -1,6 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:base_codecs/base_codecs.dart' as base_codecs;
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
@@ -70,7 +71,7 @@ void main() {
       test('0000c => [0, 0, 12]', () {
         expect(fromHex("0000c"), [0, 0, 12]);
       });
-      test('000000 => [0,0,0] ', () {
+      test('000000 => [0,0,0]', () {
         var inp = [0, 0, 0];
         var out = "000000";
         expect(fromHex(out), equals(inp));
@@ -120,6 +121,34 @@ void main() {
       });
       test('something', () {
         expect(() => fromHex("something"), throwsFormatException);
+      });
+    });
+    group('compare against package: base_codecs', () {
+      test('encoding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var hashlib = toHex(b, upper: true);
+          var base = base_codecs.base16.encode(b);
+          expect(base, hashlib, reason: 'length $i');
+        }
+      });
+      test('decoding (lowercase)', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var h = toHex(b);
+          var hashlib = fromHex(h);
+          var base = base_codecs.base16.decode(h);
+          expect(base, hashlib, reason: 'length $i');
+        }
+      });
+      test('decoding (uppercase)', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var h = toHex(b, upper: true);
+          var hashlib = fromHex(h);
+          var base = base_codecs.base16.decode(h);
+          expect(base, hashlib, reason: 'length $i');
+        }
       });
     });
   });

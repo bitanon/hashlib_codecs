@@ -2,16 +2,22 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/converter.dart';
+import 'package:hashlib_codecs/src/core/bit_converter.dart';
 
-const int _zero = 48;
+const int _zero = 0x30;
 
-class _BinaryEncoder extends Uint8Encoder {
-  const _BinaryEncoder()
-      : super(
-          bits: 2,
-          alphabet: const <int>[],
-        );
+// ========================================================
+// Base-2 Converters
+// ========================================================
+
+class _Base2Encoder extends BitEncoder {
+  const _Base2Encoder();
+
+  @override
+  final int source = 8;
+
+  @override
+  final int target = 2;
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -28,12 +34,14 @@ class _BinaryEncoder extends Uint8Encoder {
   }
 }
 
-class _BinaryDecoder extends Uint8Decoder {
-  const _BinaryDecoder()
-      : super(
-          bits: 2,
-          alphabet: const <int>[],
-        );
+class _Base2Decoder extends BitDecoder {
+  const _Base2Decoder();
+
+  @override
+  final int source = 2;
+
+  @override
+  final int target = 8;
 
   @override
   Iterable<int> convert(Iterable<int> input) sync* {
@@ -59,14 +67,18 @@ class _BinaryDecoder extends Uint8Decoder {
   }
 }
 
-class BinaryCodec extends Uint8Codec {
+// ========================================================
+// Base-2 Codec
+// ========================================================
+
+class Base2Codec extends ByteCodec {
   @override
-  final encoder = const _BinaryEncoder();
+  final encoder = const _Base2Encoder();
 
   @override
-  final decoder = const _BinaryDecoder();
+  final decoder = const _Base2Decoder();
 
-  /// Codec instance to encode and decode 8-bit integer sequence to Binary or
-  /// Base-2 character sequence using the alphabet: `01`
-  const BinaryCodec();
+  /// Codec instance to encode and decode 8-bit integer sequence to 2-bit Base-2
+  /// or Binary character sequence using the alphabet: `01`
+  const Base2Codec();
 }

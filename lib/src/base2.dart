@@ -7,7 +7,7 @@ import 'codecs/base2.dart';
 
 /// Codec instance to encode and decode 8-bit integer sequence to Base-2 or
 /// Binary character sequence using the alphabet: `01`
-const base2 = BinaryCodec();
+const base2 = Base2Codec();
 
 /// Converts 8-bit integer seqence to Binary character sequence.
 ///

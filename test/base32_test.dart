@@ -1,6 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'package:base_codecs/base_codecs.dart' as base_codecs;
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
@@ -215,49 +216,77 @@ void main() {
         expect(() => fromBase32("s*mething"), throwsFormatException);
       });
     });
-    // group('decoding with invalid length', () {
-    //   test('"1"', () {
-    //     expect(() => fromBase32("1"), throwsFormatException);
-    //   });
-    //   test('"12"', () {
-    //     expect(() => fromBase32("12"), throwsFormatException);
-    //   });
-    //   test('"123"', () {
-    //     expect(() => fromBase32("123"), throwsFormatException);
-    //   });
-    //   test('"1234"', () {
-    //     expect(() => fromBase32("1234"), throwsFormatException);
-    //   });
-    //   test('"12345"', () {
-    //     expect(() => fromBase32("12345"), throwsFormatException);
-    //   });
-    //   test('"123456"', () {
-    //     expect(() => fromBase32("123456"), throwsFormatException);
-    //   });
-    //   test('"1234567"', () {
-    //     expect(() => fromBase32("1234567"), throwsFormatException);
-    //   });
-    //   test('"123456789"', () {
-    //     expect(() => fromBase32("123456789"), throwsFormatException);
-    //   });
-    //   test('"1234567890"', () {
-    //     expect(() => fromBase32("1234567890"), throwsFormatException);
-    //   });
-    //   test('"12345678901"', () {
-    //     expect(() => fromBase32("12345678901"), throwsFormatException);
-    //   });
-    //   test('"123456789012"', () {
-    //     expect(() => fromBase32("123456789012"), throwsFormatException);
-    //   });
-    //   test('"1234567890123"', () {
-    //     expect(() => fromBase32("1234567890123"), throwsFormatException);
-    //   });
-    //   test('"12345678901234"', () {
-    //     expect(() => fromBase32("12345678901234"), throwsFormatException);
-    //   });
-    //   test('"123456789012345"', () {
-    //     expect(() => fromBase32("123456789012345"), throwsFormatException);
-    //   });
-    // });
+    group('decoding with invalid length', () {
+      test('"1"', () {
+        expect(() => fromBase32("1"), throwsFormatException);
+      });
+      test('"12"', () {
+        expect(() => fromBase32("12"), throwsFormatException);
+      });
+      test('"123"', () {
+        expect(() => fromBase32("123"), throwsFormatException);
+      });
+      test('"1234"', () {
+        expect(() => fromBase32("1234"), throwsFormatException);
+      });
+      test('"12345"', () {
+        expect(() => fromBase32("12345"), throwsFormatException);
+      });
+      test('"123456"', () {
+        expect(() => fromBase32("123456"), throwsFormatException);
+      });
+      test('"1234567"', () {
+        expect(() => fromBase32("1234567"), throwsFormatException);
+      });
+      test('"123456789"', () {
+        expect(() => fromBase32("123456789"), throwsFormatException);
+      });
+      test('"1234567890"', () {
+        expect(() => fromBase32("1234567890"), throwsFormatException);
+      });
+      test('"12345678901"', () {
+        expect(() => fromBase32("12345678901"), throwsFormatException);
+      });
+      test('"123456789012"', () {
+        expect(() => fromBase32("123456789012"), throwsFormatException);
+      });
+      test('"1234567890123"', () {
+        expect(() => fromBase32("1234567890123"), throwsFormatException);
+      });
+      test('"12345678901234"', () {
+        expect(() => fromBase32("12345678901234"), throwsFormatException);
+      });
+      test('"123456789012345"', () {
+        expect(() => fromBase32("123456789012345"), throwsFormatException);
+      });
+    });
+    group('compare against package: base_codecs', () {
+      test('encoding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var hashlib = toBase32(b);
+          var base = base_codecs.base32RfcEncode(b);
+          expect(base, hashlib, reason: 'length $i');
+        }
+      });
+      test('decoding (lowercase)', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var h = toBase32(b, lower: true);
+          var hashlib = fromBase32(h);
+          var base = base_codecs.base32RfcDecode(h);
+          expect(base, hashlib, reason: 'length $i');
+        }
+      });
+      test('decoding (uppercase)', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var h = toBase32(b);
+          var hashlib = fromBase32(h);
+          var base = base_codecs.base32RfcDecode(h);
+          expect(base, hashlib, reason: 'length $i');
+        }
+      });
+    });
   });
 }

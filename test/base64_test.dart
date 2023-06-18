@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:convert';
+import 'dart:convert' as cvt;
 
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
@@ -33,28 +33,28 @@ void main() {
     test('encoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = base64Encode(b).replaceAll('=', '');
+        var r = cvt.base64Encode(b).replaceAll('=', '');
         expect(toBase64(b, padding: false), r, reason: 'length $i');
       }
     });
     test('decoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = base64Encode(b).replaceAll('=', '');
+        var r = cvt.base64Encode(b).replaceAll('=', '');
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });
     test('encoding with padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = base64Encode(b);
+        var r = cvt.base64Encode(b);
         expect(toBase64(b, padding: true), r, reason: 'length $i');
       }
     });
     test('decoding with padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = base64Encode(b);
+        var r = cvt.base64Encode(b);
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });
