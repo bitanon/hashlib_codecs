@@ -9,13 +9,12 @@ abstract class BitConverter extends Converter<Iterable<int>, Iterable<int>> {
   const BitConverter();
 
   /// The bit-length of the input array elements.
+  /// The value should be between 2 to 64.
   int get source;
 
   /// The bit-length of the output array elements.
+  /// The value should be between 2 to 64.
   int get target;
-
-  /// The final elements that may appear at the end.
-  int? get padding => null;
 
   /// Converts [input] array of numbers with bit-length of [source] to an array
   /// of numbers with bit-length of [target]. The [input] array will be treated
