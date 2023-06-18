@@ -48,14 +48,22 @@ void main() {
         expect(toBase32(encoded, padding: false), equals('JBSWY3DPEHPK3PQ'));
       });
       test('foobar --lower--> mzxw6ytboi', () {
-        var s = 'foobar';
-        expect(toBase32(s.codeUnits, lower: true, padding: false),
-            equals('mzxw6ytboi'));
+        var text = 'foobar';
+        var actual = toBase32(
+          text.codeUnits,
+          alphabet: Base32Alphabet.lower,
+          padding: false,
+        );
+        expect(actual, equals('mzxw6ytboi'));
       });
       test('48656c6c6f21deadbeef --lower--> jbswy3dpehpk3pxp', () {
-        var encoded = fromHex('48656c6c6f21deadbeef');
-        expect(toBase32(encoded, lower: true, padding: false),
-            equals('jbswy3dpehpk3pxp'));
+        var text = fromHex('48656c6c6f21deadbeef');
+        var actual = toBase32(
+          text,
+          alphabet: Base32Alphabet.lower,
+          padding: false,
+        );
+        expect(actual, equals('jbswy3dpehpk3pxp'));
       });
     });
     group('decoding no padding', () {
@@ -272,7 +280,7 @@ void main() {
       test('decoding (lowercase)', () {
         for (int i = 0; i < 100; ++i) {
           var b = randomBytes(i);
-          var h = toBase32(b, lower: true);
+          var h = toBase32(b, alphabet: Base32Alphabet.lower);
           var hashlib = fromBase32(h);
           var base = base_codecs.base32RfcDecode(h);
           expect(base, hashlib, reason: 'length $i');

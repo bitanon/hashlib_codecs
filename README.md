@@ -15,50 +15,52 @@ This library contains implementations of fast and error resilient codecs in pure
 
 ### Binary (Base-2)
 
-| Type      | Available                |
-| --------- | ------------------------ |
-| Class     | `BinaryCodec`            |
-| Constants | `base2`                  |
-| Methods   | `fromBinary`, `toBinary` |
+| Type    | Available                |
+| ------- | ------------------------ |
+| Class   | `Base2Codec`             |
+| Methods | `fromBinary`, `toBinary` |
+
+### Octal (Base-8)
+
+| Type    | Available              |
+| ------- | ---------------------- |
+| Class   | `Base8Codec`           |
+| Methods | `fromOctal`, `toOctal` |
 
 ### Hexadecimal (Base-16)
 
-| Type      | Available               |
-| --------- | ----------------------- |
-| Class     | `B16Codec`              |
-| Constants | `base16`, `base16lower` |
-| Methods   | `fromHex`, `toHex`      |
+| Type    | Available          |
+| ------- | ------------------ |
+| Class   | `Base16Codec`      |
+| Methods | `fromHex`, `toHex` |
 
 ### Base-32 (RFC-4648)
 
 > Supports conversion without padding
 
-| Type      | Available                                                    |
-| --------- | ------------------------------------------------------------ |
-| Class     | `B32Codec`                                                   |
-| Constants | `base32`, `base32lower`, `base32padded`, `base32paddedlower` |
-| Methods   | `fromBase32`, `toBase32`                                     |
+| Type    | Available                |
+| ------- | ------------------------ |
+| Class   | `Base32Codec`            |
+| Methods | `fromBase32`, `toBase32` |
 
 ### Base-64 (RFC-4648)
 
 > Supports conversion without padding, and <br>
 > the URL/Filename-safe Base64 conversion.
 
-| Type      | Available                                               |
-| --------- | ------------------------------------------------------- |
-| Class     | `B64Codec`                                              |
-| Constants | `base64`, `base64padded`,`base64url`, `base64urlpadded` |
-| Methods   | `fromBase64`, `toBase64`                                |
+| Type    | Available                |
+| ------- | ------------------------ |
+| Class   | `Base64Codec`            |
+| Methods | `fromBase64`, `toBase64` |
 
 ### BigInt
 
 > Supports both the Big-Endian and Little-Endian conversion
 
-| Type      | Available                |
-| --------- | ------------------------ |
-| Class     | `BigIntCodec`            |
-| Constants | `bigintLE`, `bigintBE`   |
-| Methods   | `fromBigInt`, `toBigInt` |
+| Type    | Available                |
+| ------- | ------------------------ |
+| Class   | `BigIntCodec`            |
+| Methods | `fromBigInt`, `toBigInt` |
 
 ## Getting Started
 

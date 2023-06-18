@@ -27,7 +27,7 @@ class _Base16Encoder extends BitEncoder {
   final int target = 4;
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
+  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
     int a, b;
     for (int x in input) {
       a = (x >>> 4) & 0xF;
@@ -50,7 +50,7 @@ class _Base16Decoder extends BitDecoder {
   final int target = 8;
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
+  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
     bool t;
     int p, x, y;
     p = 0;
@@ -92,13 +92,30 @@ class Base16Codec extends ByteCodec {
   final BitEncoder encoder;
 
   @override
-  final decoder = const _Base16Decoder();
+  final BitDecoder decoder;
 
-  /// Codec instance to encode and decode 8-bit integer sequence to Base-16
-  /// or Hexadecimal character sequence using the uppercase alphabet.
-  const Base16Codec() : encoder = _Base16Encoder.upper;
+  const Base16Codec._({
+    required this.encoder,
+    required this.decoder,
+  });
 
-  /// Codec instance to encode and decode 8-bit integer sequence to Base-16
-  /// or Hexadecimal character sequence using the lowercase alphabet.
-  const Base16Codec.lower() : encoder = _Base16Encoder.lower;
+  /// Codec instance to encode and decode 8-bit integer sequence to 4-bit
+  /// Base-16 or Hexadecimal character sequence using the alphabet:
+  /// ```
+  /// 0123456789ABCDEF
+  /// ```
+  static const Base16Codec upper = Base16Codec._(
+    encoder: _Base16Encoder.upper,
+    decoder: _Base16Decoder(),
+  );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 4-bit
+  /// Base-16 or Hexadecimal character sequence using the alphabet:
+  /// ```
+  /// 0123456789abcdef
+  /// ```
+  static const Base16Codec lower = Base16Codec._(
+    encoder: _Base16Encoder.lower,
+    decoder: _Base16Decoder(),
+  );
 }

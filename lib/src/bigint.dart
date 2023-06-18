@@ -5,38 +5,29 @@ import 'dart:typed_data';
 
 import 'codecs/bigint.dart';
 
-/// Codec instance to encode and decode [BigInt] to byte sequence in
-/// big-endian order.
-const bigintBE = BigIntCodec.big();
-
-/// Codec instance to encode and decode [BigInt] to byte sequence in
-/// little-endian order.
-const bigintLE = BigIntCodec.little();
-
-/// Converts a byte sequence to [BigInt]. It will raise [FormatException] if
-/// the [input] is empty.
+/// Converts 8-bit integer sequence to [BigInt].
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers.
 /// - [endian] is the order of the input bytes.
 ///
 /// Throws:
-/// - [FormatException] when the [input] is empty
+/// - [FormatException] when the [input] is empty.
 BigInt toBigInt(Iterable<int> input, {Endian endian = Endian.little}) {
-  var codec = endian == Endian.little ? bigintLE : bigintBE;
+  var codec = endian == Endian.little ? BigIntCodec.little : BigIntCodec.big;
   return codec.encoder.convert(input);
 }
 
-/// Converts a [BigInt] to byte sequence. It will raise [FormatException] if
-/// the [input] is negative.
+/// Converts a [BigInt] to 8-bit integer sequence.
 ///
 /// Parameters:
 /// - [input] is a non-negative [BigInt]
 /// - [endian] determines the order of the output bytes.
 ///
-/// Throws:
+/// Raises:
 /// - [FormatException] when the [input] is negative.
 Uint8List fromBigInt(BigInt input, {Endian endian = Endian.little}) {
-  var codec = endian == Endian.little ? bigintLE : bigintBE;
-  return Uint8List.fromList(codec.decoder.convert(input).toList());
+  var codec = endian == Endian.little ? BigIntCodec.little : BigIntCodec.big;
+  var out = codec.decoder.convert(input);
+  return Uint8List.fromList(out.toList());
 }

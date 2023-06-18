@@ -142,15 +142,22 @@ class BigIntCodec extends Codec<Iterable<int>, BigInt> {
   @override
   final BigIntDecoder decoder;
 
-  /// Codec instance to encode and decode [BigInt] to byte sequence in
-  /// big-endian order.
-  const BigIntCodec.big()
-      : encoder = const _BigIntBigEndianEncoder(),
-        decoder = const _BigIntBigEndianDecoder();
+  const BigIntCodec({
+    required this.encoder,
+    required this.decoder,
+  });
 
-  /// Codec instance to encode and decode [BigInt] to byte sequence in
-  /// little-endian order.
-  const BigIntCodec.little()
-      : encoder = const _BigIntLittleEndianEncoder(),
-        decoder = const _BigIntLittleEndianDecoder();
+  /// Codec instance to encode and decode 8-bit integer sequence to [BigInt]
+  /// number treating the input bytes in big-endian order.
+  static const BigIntCodec big = BigIntCodec(
+    encoder: _BigIntBigEndianEncoder(),
+    decoder: _BigIntBigEndianDecoder(),
+  );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to [BigInt]
+  /// number treating the input bytes in little-endian order.
+  static const BigIntCodec little = BigIntCodec(
+    encoder: _BigIntLittleEndianEncoder(),
+    decoder: _BigIntLittleEndianDecoder(),
+  );
 }

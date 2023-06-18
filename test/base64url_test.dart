@@ -11,14 +11,16 @@ import 'utils.dart';
 void main() {
   group('Test base64url', () {
     test('encoding', () {
-      var inp = [0, 0, 0];
-      expect(toBase64(inp, url: true), "AAAA");
+      var b = [0, 0, 0];
+      var a = toBase64(b, alphabet: Base64Alphabet.urlSafe);
+      expect(a, equals("AAAA"));
     });
     test('encoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = base64UrlEncode(b).replaceAll('=', '');
-        expect(toBase64(b, url: true, padding: false), r, reason: 'length $i');
+        var m = base64UrlEncode(b).replaceAll('=', '');
+        var a = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: false);
+        expect(a, equals(m), reason: 'length $i');
       }
     });
     test('decoding no padding', () {
@@ -31,8 +33,9 @@ void main() {
     test('encoding with padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = base64UrlEncode(b);
-        expect(toBase64(b, url: true, padding: true), r, reason: 'length $i');
+        var m = base64UrlEncode(b);
+        var a = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: true);
+        expect(a, equals(m), reason: 'length $i');
       }
     });
     test('decoding with padding', () {
@@ -45,14 +48,14 @@ void main() {
     test('encoding <-> decoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = toBase64(b, url: true, padding: false);
+        var r = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: false);
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });
     test('encoding <-> decoding with padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = toBase64(b, url: true, padding: true);
+        var r = toBase64(b, alphabet: Base64Alphabet.urlSafe, padding: true);
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });

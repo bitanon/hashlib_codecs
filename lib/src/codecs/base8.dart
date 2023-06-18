@@ -20,7 +20,7 @@ class _Base8Encoder extends BitEncoder {
   final int target = 3;
 
   @override
-  Iterable<int> convert(Iterable<int> input) {
+  Iterable<int> convert(Iterable<int> input, [int? padding]) {
     return super.convert(input).map((y) => y + _zero);
   }
 }
@@ -35,7 +35,7 @@ class _Base8Decoder extends BitDecoder {
   final int target = 8;
 
   @override
-  Iterable<int> convert(Iterable<int> input) {
+  Iterable<int> convert(Iterable<int> input, [int? padding]) {
     int x;
     return super.convert(input.map((y) {
       x = y - _zero;
@@ -58,7 +58,12 @@ class Base8Codec extends ByteCodec {
   @override
   final decoder = const _Base8Decoder();
 
-  /// Codec instance to encode and decode 8-bit integer sequence to 3-bit Base-8
-  /// or Octal character sequence using the alphabet `012345678`.
-  const Base8Codec();
+  const Base8Codec._();
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 3-bit
+  /// Base-8 or Octal character sequence using the alphabet:
+  /// ```
+  /// 012345678
+  /// ```
+  static const Base8Codec sequence = Base8Codec._();
 }

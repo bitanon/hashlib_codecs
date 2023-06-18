@@ -23,6 +23,7 @@ abstract class BitConverter extends Converter<Iterable<int>, Iterable<int>> {
   Iterable<int> convert(Iterable<int> input);
 }
 
+// TODO: modify codec functions: alphabet codec and byte codec should be different.
 abstract class ByteCodec extends Codec<Iterable<int>, Iterable<int>> {
   const ByteCodec();
 

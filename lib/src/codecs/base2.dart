@@ -20,7 +20,7 @@ class _Base2Encoder extends BitEncoder {
   final int target = 2;
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
+  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
     for (int x in input) {
       yield _zero + ((x >>> 7) & 1);
       yield _zero + ((x >>> 6) & 1);
@@ -44,7 +44,7 @@ class _Base2Decoder extends BitDecoder {
   final int target = 8;
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
+  Iterable<int> convert(Iterable<int> input, [int? padding]) sync* {
     int p, n, x, y;
     p = n = 0;
     for (y in input) {
@@ -78,7 +78,12 @@ class Base2Codec extends ByteCodec {
   @override
   final decoder = const _Base2Decoder();
 
-  /// Codec instance to encode and decode 8-bit integer sequence to 2-bit Base-2
-  /// or Binary character sequence using the alphabet: `01`
-  const Base2Codec();
+  const Base2Codec._();
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 2-bit
+  /// Base-2 or Binary character sequence using the alphabet:
+  /// ```
+  /// 01
+  /// ```
+  static const Base2Codec sequence = Base2Codec._();
 }

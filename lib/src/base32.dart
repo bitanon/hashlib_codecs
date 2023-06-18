@@ -5,62 +5,65 @@ import 'dart:typed_data';
 
 import 'codecs/base32.dart';
 
-/// Codec instance to encode and decode 8-bit integer sequence to Base-32
-/// character sequence using the alphabet described in
-/// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
-/// ```
-/// ABCDEFGHIJKLMNOPQRSTUVWXYZ234567
-/// ```
-const base32 = Base32Codec();
+const int _padding = 0x3d;
 
-/// Same as [base32], but the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-const base32padded = Base32Codec.padded();
+/// Supported alphabets for Base-32 conversion
+enum Base32Alphabet {
+  /// The alphabet from [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
+  /// ```
+  /// ABCDEFGHIJKLMNOPQRSTUVWXYZ2345678
+  /// ```
+  rfc,
 
-/// Codec instance to encode and decode 8-bit integer sequence to Base-32
-/// character sequence using the lowercase alphabets:
-/// ```
-/// abcdefghijklmnopqrstuvwxyz234567
-/// ```
-const base32lower = Base32Codec.lower();
+  /// Alias of [Base32Alphabet.rfc]
+  uppercase,
 
-/// Same as [base32lower], but the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-const base32paddedlower = Base32Codec.paddedlower();
+  /// The lowercase alphabet from the [Base32Alphabet.rfc]:
+  /// ```
+  /// abcdefghijklmnopqrstuvwxyz234567
+  /// ```
+  lower,
+}
 
-/// Converts 8-bit integer seqence to Base-32 character sequence.
+extension on Base32Alphabet {
+  Base32Codec get codec {
+    switch (this) {
+      case Base32Alphabet.rfc:
+      case Base32Alphabet.uppercase:
+        return Base32Codec.rfc;
+      case Base32Alphabet.lower:
+        return Base32Codec.rfcLower;
+    }
+  }
+}
+
+/// Converts 8-bit integer sequence to 5-bit Base-32 character sequence.
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
+/// - [alphabet] configures the alphabet to use. DefaultL: [Base32Alphabet.rfc].
 /// - If [padding] is true, the encoder will use character `=` as padding,
-/// which is appended at the end out the output to fill up any partial bytes.
-/// - If [lower] is true, the default lower case alphabets will be used.
-///
-/// Based on the parameter values, the following codecs are used:
-/// - [padding] is `true`, [lower] is `true`: [base32paddedlower]
-/// - [padding] is `true`, [lower] is `false`: [base32padded]
-/// - [padding] is `false`, [lower] is `true`: [base32lower]
-/// - [padding] is `false`, [lower] is `false`: [base32]
+///   which is appended at the end out the output to fill up any partial bytes.
 String toBase32(
   Iterable<int> input, {
-  bool lower = false,
   bool padding = true,
+  Base32Alphabet alphabet = Base32Alphabet.rfc,
 }) {
-  var codec = lower
-      ? padding
-          ? base32paddedlower
-          : base32lower
-      : padding
-          ? base32padded
-          : base32;
-  return String.fromCharCodes(codec.encoder.convert(input));
+  var out = alphabet.codec.encoder.convert(
+    input,
+    padding ? _padding : null,
+  );
+  return String.fromCharCodes(out);
 }
 
-/// Converts Base-32 integer sequence to 8-bit integer sequence using the
-/// [base32] codec.
+/// Converts 5-bit Base-32 character sequence to 8-bit integer sequence.
 ///
 /// Parameters:
 /// - [input] should be a valid base-32 encoded string.
+/// - [alphabet] configures the alphabet to use. DefaultL: [Base32Alphabet.rfc].
+/// - If [padding] is true, the decoder will use character `=` as padding and
+///   stop when encountering it, otherwise it will be treated as an invalid
+///   character and [FormatException] will be thrown.
 ///
 /// Throws:
 /// - [FormatException] if the [input] contains invalid characters, and the
@@ -69,7 +72,14 @@ String toBase32(
 /// This implementation can handle both uppercase and lowercase alphabets. Any
 /// letters appearing after the first padding character is observed are ignored.
 /// If a partial string is detected, the following bits are assumed to be zeros.
-Uint8List fromBase32(String input) {
-  var out = base32.decoder.convert(input.codeUnits);
+Uint8List fromBase32(
+  String input, {
+  bool padding = true,
+  Base32Alphabet alphabet = Base32Alphabet.rfc,
+}) {
+  var out = alphabet.codec.decoder.convert(
+    input.codeUnits,
+    padding ? _padding : null,
+  );
   return Uint8List.fromList(out.toList());
 }
