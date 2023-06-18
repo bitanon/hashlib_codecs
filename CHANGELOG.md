@@ -1,25 +1,21 @@
 # 2.0.0
 
-- **Breaking**: Removes all constant exports, instead they are now available inside codec class. e.g.: `Base64Codec.urlSafe`
-- An optional padding character can now be passed as a constant to the `convert` method.
-- **Breaking**: Remove extra parameters with `codec` in all methods.
+- **Breaking**: Removes all constant exports.
+  - They are now available inside codec class. e.g.: `Base64Codec.urlSafe`
+- **Breaking**: Modify parameters of all public methods.
 - Improves encoding and decoding algorithm.
 - Adds Base-8 (Octal) codec support
   - New class: `Base8Codec`
   - New methods: `fromOctal`, `toOctal`
 - Renames a lot of exports
   - `Uint8Converter` -> `BitConverter`
-  - `Uint8Codec` -> `ByteCodec`
+  - `Uint8Codec` -> `HashlibCodec`
   - `BinaryCodec` -> `Base2Codec`
   - `B16Codec` -> `Base16Codec`
   - `B64Codec` -> `Base64Codec`
-- Change internal methods of `ByteCodec`
 - Separates base encoder and decoders
   - Generic encoders: `BitEncoder`, `AlphabetEncoder`
   - Generic decoders: `BitDecoder`, `AlphabetDecoder`
-- Exports two new types:
-  - `BigIntEncoder`
-  - `BigIntDecoder`
 
 # 1.2.0
 

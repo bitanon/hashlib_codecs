@@ -10,11 +10,11 @@ typedef BigIntEncoder = Converter<Iterable<int>, BigInt>;
 typedef BigIntDecoder = Converter<BigInt, Iterable<int>>;
 
 // ========================================================
-// Little Endian Converters
+// LSB First Encoder and Decoder
 // ========================================================
 
-class _BigIntLittleEndianEncoder extends BigIntEncoder {
-  const _BigIntLittleEndianEncoder();
+class _BigIntLSBFirstEncoder extends BigIntEncoder {
+  const _BigIntLSBFirstEncoder();
 
   @override
   BigInt convert(Iterable<int> input) {
@@ -44,8 +44,8 @@ class _BigIntLittleEndianEncoder extends BigIntEncoder {
   }
 }
 
-class _BigIntLittleEndianDecoder extends BigIntDecoder {
-  const _BigIntLittleEndianDecoder();
+class _BigIntLSBFirstDecoder extends BigIntDecoder {
+  const _BigIntLSBFirstDecoder();
 
   @override
   Iterable<int> convert(BigInt input) sync* {
@@ -74,11 +74,11 @@ class _BigIntLittleEndianDecoder extends BigIntDecoder {
 }
 
 // ========================================================
-// Big Endian Converters
+// MSB First Encoder and Decoder
 // ========================================================
 
-class _BigIntBigEndianEncoder extends BigIntEncoder {
-  const _BigIntBigEndianEncoder();
+class _BigIntMSBFirstEncoder extends BigIntEncoder {
+  const _BigIntMSBFirstEncoder();
 
   @override
   BigInt convert(Iterable<int> input) {
@@ -99,8 +99,8 @@ class _BigIntBigEndianEncoder extends BigIntEncoder {
   }
 }
 
-class _BigIntBigEndianDecoder extends BigIntDecoder {
-  const _BigIntBigEndianDecoder();
+class _BigIntMSBFirstDecoder extends BigIntDecoder {
+  const _BigIntMSBFirstDecoder();
 
   @override
   Iterable<int> convert(BigInt input) sync* {
@@ -142,22 +142,22 @@ class BigIntCodec extends Codec<Iterable<int>, BigInt> {
   @override
   final BigIntDecoder decoder;
 
-  const BigIntCodec({
+  const BigIntCodec._({
     required this.encoder,
     required this.decoder,
   });
 
   /// Codec instance to encode and decode 8-bit integer sequence to [BigInt]
   /// number treating the input bytes in big-endian order.
-  static const BigIntCodec big = BigIntCodec(
-    encoder: _BigIntBigEndianEncoder(),
-    decoder: _BigIntBigEndianDecoder(),
+  static const BigIntCodec msbFirst = BigIntCodec._(
+    encoder: _BigIntMSBFirstEncoder(),
+    decoder: _BigIntMSBFirstDecoder(),
   );
 
   /// Codec instance to encode and decode 8-bit integer sequence to [BigInt]
   /// number treating the input bytes in little-endian order.
-  static const BigIntCodec little = BigIntCodec(
-    encoder: _BigIntLittleEndianEncoder(),
-    decoder: _BigIntLittleEndianDecoder(),
+  static const BigIntCodec lsbFirst = BigIntCodec._(
+    encoder: _BigIntLSBFirstEncoder(),
+    decoder: _BigIntLSBFirstDecoder(),
   );
 }

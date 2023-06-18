@@ -6,17 +6,17 @@ import 'dart:typed_data';
 import 'codecs/base64.dart';
 
 Base64Codec _codecFromParameters({
-  bool urlSafe = false,
-  bool noPadding = false,
+  bool url = false,
+  bool padding = false,
 }) {
-  if (urlSafe && noPadding) {
-    return Base64Codec.urlSafeNoPadding;
-  } else if (urlSafe) {
+  if (url && padding) {
     return Base64Codec.urlSafe;
-  } else if (noPadding) {
-    return Base64Codec.standardNoPadding;
-  } else {
+  } else if (url) {
+    return Base64Codec.urlSafeNoPadding;
+  } else if (padding) {
     return Base64Codec.standard;
+  } else {
+    return Base64Codec.standardNoPadding;
   }
 }
 
@@ -24,19 +24,19 @@ Base64Codec _codecFromParameters({
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
-/// - If [urlSafe] is true, URL and Filename-safe alphabet is used.
-/// - If [noPadding] is true, the output will not have padding characters.
+/// - If [url] is true, URL and Filename-safe alphabet is used.
+/// - If [padding] is true, the output will have padding characters.
 /// - [codec] is the [Base64Codec] to use. It is derived from the other
 ///   parameters if not provided.
 String toBase64(
   Iterable<int> input, {
   Base64Codec? codec,
-  bool urlSafe = false,
-  bool noPadding = false,
+  bool url = false,
+  bool padding = true,
 }) {
   codec ??= _codecFromParameters(
-    urlSafe: urlSafe,
-    noPadding: noPadding,
+    url: url,
+    padding: padding,
   );
   var out = codec.encoder.convert(input);
   return String.fromCharCodes(out);
@@ -46,8 +46,7 @@ String toBase64(
 ///
 /// Parameters:
 /// - [input] should be a valid base-64 encoded string.
-/// - If [urlSafe] is true, URL and Filename-safe alphabet is used.
-/// - If [noPadding] is true, the output will not have padding characters.
+/// - If [padding] is true, the output will have padding characters.
 /// - [codec] is the [Base64Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -62,13 +61,9 @@ String toBase64(
 Uint8List fromBase64(
   String input, {
   Base64Codec? codec,
-  bool urlSafe = false,
-  bool noPadding = false,
+  bool padding = true,
 }) {
-  codec ??= _codecFromParameters(
-    urlSafe: urlSafe,
-    noPadding: noPadding,
-  );
+  codec ??= _codecFromParameters(padding: padding);
   var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

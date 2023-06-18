@@ -20,7 +20,7 @@ void main() {
       a = toBase32(
         s.codeUnits,
         codec: Base32Codec.standard,
-        noPadding: true,
+        padding: false,
       );
       expect(a, equals(r));
       a = toBase32(
@@ -32,7 +32,7 @@ void main() {
       a = toBase32(
         s.codeUnits,
         codec: Base32Codec.standard,
-        noPadding: true,
+        padding: false,
         lower: true,
       );
       expect(a, equals(r));
@@ -42,7 +42,7 @@ void main() {
       test('no padding', () {
         for (int i = 0; i < 100; ++i) {
           var b = randomBytes(i);
-          var r = toBase32(b, noPadding: true);
+          var r = toBase32(b, padding: false);
           expect(fromBase32(r), equals(b), reason: 'length $i');
         }
       });
@@ -68,63 +68,63 @@ void main() {
       group('no padding', () {
         test('"" -> ""', () {
           var s = '';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals(''));
         });
         test('f -> MY', () {
           var s = 'f';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals('MY'));
         });
         test('fo -> MZXQ', () {
           var s = 'fo';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals('MZXQ'));
         });
         test('foo -> MZXW6', () {
           var s = 'foo';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals('MZXW6'));
         });
         test('foob -> MZXW6YQ', () {
           var s = 'foob';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals('MZXW6YQ'));
         });
         test('fooba -> MZXW6YTB', () {
           var s = 'fooba';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals('MZXW6YTB'));
         });
         test('foobar -> MZXW6YTBOI', () {
           var s = 'foobar';
-          var a = toBase32(s.codeUnits, noPadding: true);
+          var a = toBase32(s.codeUnits, padding: false);
           expect(a, equals('MZXW6YTBOI'));
         });
         test('[0, 0, 0] => AAAAA', () {
           var inp = [0, 0, 0];
           var out = "AAAAA";
-          var act = toBase32(inp, noPadding: true);
+          var act = toBase32(inp, padding: false);
           expect(act, equals(out));
         });
         test('48656c6c6f21deadbeef -> JBSWY3DPEHPK3PXP', () {
           var encoded = fromHex('48656c6c6f21deadbeef');
-          var actual = toBase32(encoded, noPadding: true);
+          var actual = toBase32(encoded, padding: false);
           expect(actual, equals('JBSWY3DPEHPK3PXP'));
         });
         test('48656c6c6f21deadbe -> JBSWY3DPEHPK3PQ', () {
           var encoded = fromHex('48656c6c6f21deadbe');
-          var actual = toBase32(encoded, noPadding: true);
+          var actual = toBase32(encoded, padding: false);
           expect(actual, equals('JBSWY3DPEHPK3PQ'));
         });
         test('foobar --lower--> mzxw6ytboi', () {
           var text = 'foobar';
-          var actual = toBase32(text.codeUnits, noPadding: true, lower: true);
+          var actual = toBase32(text.codeUnits, padding: false, lower: true);
           expect(actual, equals('mzxw6ytboi'));
         });
         test('48656c6c6f21deadbeef --lower--> jbswy3dpehpk3pxp', () {
           var text = fromHex('48656c6c6f21deadbeef');
-          var actual = toBase32(text, noPadding: true, lower: true);
+          var actual = toBase32(text, padding: false, lower: true);
           expect(actual, equals('jbswy3dpehpk3pxp'));
         });
       });

@@ -15,13 +15,13 @@ void main() {
       expect(a, equals(o));
       a = toBigInt(
         i,
-        codec: BigIntCodec.little,
+        codec: BigIntCodec.lsbFirst,
       );
       expect(a, equals(o));
       a = toBigInt(
         i,
-        codec: BigIntCodec.little,
-        bigEndian: true,
+        codec: BigIntCodec.lsbFirst,
+        msbFirst: true,
       );
       expect(a, equals(o));
     });
@@ -39,7 +39,7 @@ void main() {
     test('encoding [0] => 0 big endian', () {
       var inp = <int>[0];
       var out = BigInt.zero;
-      expect(toBigInt(inp, bigEndian: true), equals(out));
+      expect(toBigInt(inp, msbFirst: true), equals(out));
     });
     test('encoding [0, 0, 0] => 0', () {
       var inp = <int>[0, 0, 0];
@@ -49,7 +49,7 @@ void main() {
     test('encoding [0, 0, 0] => 0 big endian', () {
       var inp = <int>[0, 0, 0];
       var out = BigInt.zero;
-      expect(toBigInt(inp, bigEndian: true), equals(out));
+      expect(toBigInt(inp, msbFirst: true), equals(out));
     });
     test('decoding 0 => [0]', () {
       var inp = <int>[0];
@@ -59,7 +59,7 @@ void main() {
     test('decoding 0 => [0] big endian', () {
       var inp = <int>[0];
       var out = BigInt.zero;
-      expect(fromBigInt(out, bigEndian: true), equals(inp));
+      expect(fromBigInt(out, msbFirst: true), equals(inp));
     });
     test('little-endian encoding <-> decoding', () {
       for (int i = 0; i < 100; ++i) {
@@ -72,8 +72,8 @@ void main() {
     test('big-endian encoding <-> decoding', () {
       for (int i = 0; i < 100; ++i) {
         var inp = [1, ...randomBytes(i)];
-        var out = toBigInt(inp, bigEndian: true);
-        var out2 = fromBigInt(out, bigEndian: true);
+        var out = toBigInt(inp, msbFirst: true);
+        var out2 = fromBigInt(out, msbFirst: true);
         expect(out2, equals(inp), reason: 'length $i');
       }
     });

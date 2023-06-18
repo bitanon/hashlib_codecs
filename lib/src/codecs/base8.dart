@@ -4,11 +4,11 @@
 import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
 
-const _zero = 0x30;
+// ========================================================
+// Base-8 Encoder and Decoder
+// ========================================================
 
-// ========================================================
-// Base-8 Converters
-// ========================================================
+const _zero = 0x30;
 
 class _Base8Encoder extends ByteEncoder {
   const _Base8Encoder() : super(bits: 3);
@@ -41,17 +41,23 @@ class _Base8Decoder extends ByteDecoder {
 
 class Base8Codec extends HashlibCodec {
   @override
-  final encoder = const _Base8Encoder();
+  final ByteEncoder encoder;
 
   @override
-  final decoder = const _Base8Decoder();
+  final ByteDecoder decoder;
 
-  const Base8Codec._();
+  const Base8Codec._({
+    required this.encoder,
+    required this.decoder,
+  });
 
   /// Codec instance to encode and decode 8-bit integer sequence to 3-bit
   /// Base-8 or Octal character sequence using the alphabet:
   /// ```
   /// 012345678
   /// ```
-  static const Base8Codec standard = Base8Codec._();
+  static const Base8Codec standard = Base8Codec._(
+    encoder: _Base8Encoder(),
+    decoder: _Base8Decoder(),
+  );
 }

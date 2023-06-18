@@ -48,9 +48,8 @@ String toHex(
 Uint8List fromHex(
   String input, {
   Base16Codec? codec,
-  bool upper = false,
 }) {
-  codec ??= _codecFromParameters(upper: upper);
+  codec ??= _codecFromParameters();
   var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

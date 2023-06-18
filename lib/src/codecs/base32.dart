@@ -4,9 +4,14 @@
 import 'package:hashlib_codecs/src/core/alphabet.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
 
+// ========================================================
+// Base-32 Alphabets
+// ========================================================
+
+const int _padding = 0x3d;
+
 // ignore: constant_identifier_names
 const int __ = -1;
-const int _padding = 0x3d;
 
 const _base32EncodingRfc4648 = [
   0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, //

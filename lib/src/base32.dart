@@ -7,16 +7,16 @@ import 'codecs/base32.dart';
 
 Base32Codec _codecFromParameters({
   bool lower = false,
-  bool noPadding = false,
+  bool padding = false,
 }) {
-  if (lower && noPadding) {
-    return Base32Codec.lowercaseNoPadding;
-  } else if (lower) {
+  if (lower && padding) {
     return Base32Codec.lowercase;
-  } else if (noPadding) {
-    return Base32Codec.standardNoPadding;
-  } else {
+  } else if (lower) {
+    return Base32Codec.lowercaseNoPadding;
+  } else if (padding) {
     return Base32Codec.standard;
+  } else {
+    return Base32Codec.standardNoPadding;
   }
 }
 
@@ -25,18 +25,18 @@ Base32Codec _codecFromParameters({
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
 /// - If [lower] is true, the lowercase standard alphabet is used.
-/// - If [noPadding] is true, the output will not have padding characters.
+/// - If [padding] is true, the output will not have padding characters.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 String toBase32(
   Iterable<int> input, {
   Base32Codec? codec,
   bool lower = false,
-  bool noPadding = false,
+  bool padding = true,
 }) {
   codec ??= _codecFromParameters(
     lower: lower,
-    noPadding: noPadding,
+    padding: padding,
   );
   var out = codec.encoder.convert(input);
   return String.fromCharCodes(out);
@@ -46,8 +46,7 @@ String toBase32(
 ///
 /// Parameters:
 /// - [input] should be a valid base-32 encoded string.
-/// - If [lower] is true, the lowercase standard alphabet is used.
-/// - If [noPadding] is true, the output will not have padding characters.
+/// - If [padding] is true, the output will not have padding characters.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -61,13 +60,9 @@ String toBase32(
 Uint8List fromBase32(
   String input, {
   Base32Codec? codec,
-  bool lower = false,
-  bool noPadding = false,
+  bool padding = true,
 }) {
-  codec ??= _codecFromParameters(
-    lower: lower,
-    noPadding: noPadding,
-  );
+  codec ??= _codecFromParameters(padding: padding);
   var out = codec.decoder.convert(input.codeUnits);
   return Uint8List.fromList(out.toList());
 }

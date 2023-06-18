@@ -23,20 +23,20 @@ void main() {
       act = toBase64(
         inp,
         codec: Base64Codec.standard,
-        noPadding: true,
+        padding: false,
       );
       expect(act, equals(out));
       act = toBase64(
         inp,
         codec: Base64Codec.standard,
-        urlSafe: true,
+        url: true,
       );
       expect(act, equals(out));
       act = toBase64(
         inp,
         codec: Base64Codec.standard,
-        noPadding: true,
-        urlSafe: true,
+        padding: false,
+        url: true,
       );
       expect(act, equals(out));
     });
@@ -53,7 +53,7 @@ void main() {
     test('encoding no padding [0, 0, 0, 0] => AAAAAA', () {
       var inp = [0, 0, 0, 0];
       var out = "AAAAAA";
-      var act = toBase64(inp, noPadding: true);
+      var act = toBase64(inp, padding: false);
       expect(act, equals(out));
     });
     test('decoding no padding AAAAAA => [0, 0, 0, 0]', () {
@@ -65,7 +65,7 @@ void main() {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
         var r = cvt.base64Encode(b).replaceAll('=', '');
-        var a = toBase64(b, noPadding: true);
+        var a = toBase64(b, padding: false);
         expect(a, r, reason: 'length $i');
       }
     });
@@ -93,7 +93,7 @@ void main() {
     test('encoding <-> decoding no padding', () {
       for (int i = 0; i < 100; ++i) {
         var b = randomBytes(i);
-        var r = toBase64(b, noPadding: true);
+        var r = toBase64(b, padding: false);
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });

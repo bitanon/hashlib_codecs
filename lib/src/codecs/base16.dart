@@ -4,13 +4,13 @@
 import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
 
+// ========================================================
+// Base-16 Encoder and Decoder
+// ========================================================
+
 const int _zero = 0x30;
 const int _bigA = 0x41;
 const int _smallA = 0x61;
-
-// ========================================================
-// Base-16 Converters
-// ========================================================
 
 class _Base16Encoder extends ByteEncoder {
   final int startCode;
