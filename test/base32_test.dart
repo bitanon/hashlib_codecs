@@ -15,6 +15,7 @@ void main() {
     test('parameter overrides', () {
       var s = 'foobar';
       var r = 'MZXW6YTBOI======';
+      var np = 'MZXW6YTBOI';
       var a = toBase32(s.codeUnits);
       expect(a, equals(r));
       a = toBase32(
@@ -22,7 +23,7 @@ void main() {
         codec: Base32Codec.standard,
         padding: false,
       );
-      expect(a, equals(r));
+      expect(a, equals(np));
       a = toBase32(
         s.codeUnits,
         codec: Base32Codec.standard,
@@ -35,31 +36,105 @@ void main() {
         padding: false,
         lower: true,
       );
-      expect(a, equals(r));
+      expect(a, equals(np));
     });
 
     group('encoding <-> decoding', () {
-      test('no padding', () {
+      test('standard', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b);
+          expect(r.toUpperCase(), equals(r), reason: 'length $i');
+          var a = fromBase32(r);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('lowercase', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, lower: true);
+          expect(r.toLowerCase(), equals(r), reason: 'length $i');
+          var a = fromBase32(r);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('standard no padding', () {
         for (int i = 0; i < 100; ++i) {
           var b = randomBytes(i);
           var r = toBase32(b, padding: false);
-          expect(fromBase32(r), equals(b), reason: 'length $i');
+          expect(r.toUpperCase(), equals(r), reason: 'length $i');
+          expect(r, isNot(endsWith('=')), reason: 'length $i');
+          var a = fromBase32(r);
+          expect(a, equals(b), reason: 'length $i');
         }
       });
-
-      test('uppercase', () {
+      test('hex uppercase', () {
         for (int i = 0; i < 100; ++i) {
           var b = randomBytes(i);
-          var r = toBase32(b);
-          expect(fromBase32(r), equals(b), reason: 'length $i');
+          var r = toBase32(b, codec: Base32Codec.hex);
+          var a = fromBase32(r, codec: Base32Codec.hex);
+          expect(a, equals(b), reason: 'length $i');
         }
       });
-
-      test('with padding', () {
+      test('hex lowercase', () {
         for (int i = 0; i < 100; ++i) {
           var b = randomBytes(i);
-          var r = toBase32(b);
-          expect(fromBase32(r), equals(b), reason: 'length $i');
+          var r = toBase32(b, codec: Base32Codec.hexLower);
+          var a = fromBase32(r, codec: Base32Codec.hexLower);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('crockford', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, codec: Base32Codec.crockford);
+          expect(r, isNot(endsWith('=')), reason: 'length $i');
+          var a = fromBase32(r, codec: Base32Codec.crockford);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('geohash', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, codec: Base32Codec.geohash);
+          expect(r.toLowerCase(), equals(r), reason: 'length $i');
+          var a = fromBase32(r, codec: Base32Codec.geohash);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('geohash no padding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, codec: Base32Codec.geohash, padding: false);
+          expect(r, isNot(endsWith('=')), reason: 'length $i');
+          var a = fromBase32(r, codec: Base32Codec.geohash);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('word-safe', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, codec: Base32Codec.wordSafe);
+          var a = fromBase32(r, codec: Base32Codec.wordSafe);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('word-safe no padding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, codec: Base32Codec.wordSafe, padding: false);
+          expect(r, isNot(endsWith('=')), reason: 'length $i');
+          var a = fromBase32(r, codec: Base32Codec.wordSafe);
+          expect(a, equals(b), reason: 'length $i');
+        }
+      });
+      test('z-base-32', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b, codec: Base32Codec.z);
+          expect(r, isNot(endsWith('=')), reason: 'length $i');
+          var a = fromBase32(r, codec: Base32Codec.z);
+          expect(a, equals(b), reason: 'length $i');
         }
       });
     });

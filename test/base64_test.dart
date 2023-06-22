@@ -13,6 +13,7 @@ void main() {
     test('parameter overrides', () {
       var inp = [0x3, 0xF1];
       var out = "A/E=";
+      var npo = "A/E";
       var act = toBase64(inp);
       expect(act, equals(out));
       act = toBase64(
@@ -25,7 +26,7 @@ void main() {
         codec: Base64Codec.standard,
         padding: false,
       );
-      expect(act, equals(out));
+      expect(act, equals(npo));
       act = toBase64(
         inp,
         codec: Base64Codec.standard,
@@ -38,7 +39,7 @@ void main() {
         padding: false,
         url: true,
       );
-      expect(act, equals(out));
+      expect(act, equals(npo));
     });
     test('encoding [0, 0, 0, 0] => AAAAAA==', () {
       var inp = [0, 0, 0, 0];

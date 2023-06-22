@@ -1,3 +1,14 @@
+# 2.1.0
+
+- Adds more alphabets to `Base32Codec`. Additional alphabets are:
+  - [base32hex](https://en.wikipedia.org/wiki/Base32#base32hex)
+  - Lowerase base32hex
+  - [Crockford's Base32](https://en.wikipedia.org/wiki/Base32#Crockford's_Base32)
+  - [Geohash's Base32](https://en.wikipedia.org/wiki/Base32#Geohash)
+  - [z-base-32](https://en.wikipedia.org/wiki/Base32#z-base-32)
+  - [Word-safe alphabet](https://en.wikipedia.org/wiki/Base32#Word-safe_alphabet)
+- Allows the `padding` parameter to be effective to any codecs in `Base32Codec` and `Base64Codec`.
+
 # 2.0.0
 
 - **Breaking**: Removes all constant exports.

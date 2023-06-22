@@ -20,12 +20,20 @@ This library contains implementations of fast and error resilient codecs in pure
 | Class   | `Base2Codec`             |
 | Methods | `fromBinary`, `toBinary` |
 
+Available codecs:
+
+- **standard**: `01` (default)
+
 ### Octal (Base-8)
 
 | Type    | Available              |
 | ------- | ---------------------- |
 | Class   | `Base8Codec`           |
 | Methods | `fromOctal`, `toOctal` |
+
+Available codecs:
+
+- **standard**: `012345678` (default)
 
 ### Hexadecimal (Base-16)
 
@@ -34,7 +42,12 @@ This library contains implementations of fast and error resilient codecs in pure
 | Class   | `Base16Codec`      |
 | Methods | `fromHex`, `toHex` |
 
-### Base-32 (RFC-4648)
+Available codecs:
+
+- **upper**: `0123456789ABCDEF` (default)
+- **lower**: `0123456789abcdef`
+
+### Base-32
 
 > Supports conversion without padding
 
@@ -43,7 +56,17 @@ This library contains implementations of fast and error resilient codecs in pure
 | Class   | `Base32Codec`            |
 | Methods | `fromBase32`, `toBase32` |
 
-### Base-64 (RFC-4648)
+Available codecs:
+
+- **standard** (RFC-4648): `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` (default)
+- **lowercase**: `abcdefghijklmnopqrstuvwxyz234567`
+- **hex**: `0123456789ABCDEFGHIJKLMNOPQRSTUV`
+- **hexLower**: `0123456789abcdefghijklmnopqrstuv`
+- **crockford**: `0123456789bcdefghjkmnpqrstuvwxyz`
+- **z**: `ybndrfg8ejkmcpqxot1uwisza345h769`
+- **wordSafe**: `23456789CFGHJMPQRVWXcfghjmpqrvwx`
+
+### Base-64
 
 > Supports conversion without padding, and <br>
 > the URL/Filename-safe Base64 conversion.
@@ -52,6 +75,11 @@ This library contains implementations of fast and error resilient codecs in pure
 | ------- | ------------------------ |
 | Class   | `Base64Codec`            |
 | Methods | `fromBase64`, `toBase64` |
+
+Available codecs:
+
+- **standard** (RFC-4648): `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/` (default)
+- **urlSafe**: `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
 
 ### BigInt
 
@@ -62,6 +90,11 @@ This library contains implementations of fast and error resilient codecs in pure
 | Class   | `BigIntCodec`            |
 | Methods | `fromBigInt`, `toBigInt` |
 
+Available codecs:
+
+- **msbFirst**: treats the input bytes in big-endian order
+- **lsbFirst**: treats the input bytes in little-endian order
+
 ## Getting Started
 
 The following import will give you access to all of the algorithms in this package.
@@ -70,7 +103,7 @@ The following import will give you access to all of the algorithms in this packa
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 ```
 
-Check the [API Reference](https://pub.dev/documentation/hashlib_codecs/latest/) for details.
+Check the [API Reference](https://pub.dev/documentation/hashlib_codecs/latest/hashlib_codecs/hashlib_codecs-library.html) for details.
 
 ## Usage
 
@@ -80,26 +113,33 @@ Examples can be found inside the `example` folder.
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 void main() {
-  var input = [0x3, 0xF1];
-  print("input => $input");
+  var inp = [0x3, 0xF1];
+  print("input => $inp");
   print('');
 
-  print("binary => ${toBinary(input)}");
-  print("binary (no padding) => ${toBinary(input, padding: false)}");
+  print("binary => ${toBinary(inp)}");
   print('');
 
-  print("hexadecimal => ${toHex(input)}");
-  print("hexadecimal (uppercase) => ${toHex(input, upper: true)}");
+  print("octal => ${toOctal(inp)}");
   print('');
 
-  print("base32 => ${toBase32(input)}");
-  print("base32 (lowercase) => ${toBase32(input, lower: true)}");
-  print("base32 (no padding) => ${toBase32(input, padding: false)}");
+  print("hexadecimal => ${toHex(inp)}");
+  print("hexadecimal (uppercase) => ${toHex(inp, upper: true)}");
   print('');
 
-  print("base64 => ${toBase64(input)}");
-  print("base64url => ${toBase64(input, url: true)}");
-  print("base64 (no padding) => ${toBase64(input, padding: false)}");
+  print("base32 => ${toBase32(inp)}");
+  print("base32 (lowercase) => ${toBase32(inp, lower: true)}");
+  print("base32 (no padding) => ${toBase32(inp, padding: false)}");
+  print("base32 (hex) => ${toBase32(inp, codec: Base32Codec.hex)}");
+  print("base32 (z-base-32) => ${toBase32(inp, codec: Base32Codec.z)}");
+  print("base32 (geohash) => ${toBase32(inp, codec: Base32Codec.geohash)}");
+  print("base32 (crockford) => ${toBase32(inp, codec: Base32Codec.crockford)}");
+  print("base32 (word-safe) => ${toBase32(inp, codec: Base32Codec.wordSafe)}");
+  print('');
+
+  print("base64 => ${toBase64(inp)}");
+  print("base64url => ${toBase64(inp, url: true)}");
+  print("base64 (no padding) => ${toBase64(inp, padding: false)}");
   print('');
 }
 ```

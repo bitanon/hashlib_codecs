@@ -67,6 +67,8 @@ class Base64Codec extends HashlibCodec {
   /// ```
   /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
   /// ```
+  ///
+  /// It is padded with `=`
   static const Base64Codec standard = Base64Codec._(
     encoder: AlphabetEncoder(
       bits: 6,
@@ -82,11 +84,32 @@ class Base64Codec extends HashlibCodec {
 
   /// Codec instance to encode and decode 8-bit integer sequence to 6-bit
   /// Base-64 character sequence using the alphabet described in
-  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html), which is both URL and
-  /// filename safe using:
+  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
+  /// ```
+  /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+  /// ```
+  ///
+  /// It is not padded.
+  static const Base64Codec standardNoPadding = Base64Codec._(
+    encoder: AlphabetEncoder(
+      bits: 6,
+      alphabet: _base64EncodingRfc4648,
+    ),
+    decoder: AlphabetDecoder(
+      bits: 6,
+      alphabet: _base64DecodingRfc4648,
+    ),
+  );
+
+  /// Codec instance to encode and decode 8-bit integer sequence to 6-bit
+  /// Base-64 character sequence using the alphabet described in
+  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html) considering the
+  /// URL and filename safety:
   /// ```
   /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_
   /// ```
+  ///
+  /// It is padded with `=`
   static const Base64Codec urlSafe = Base64Codec._(
     encoder: AlphabetEncoder(
       bits: 6,
@@ -102,28 +125,13 @@ class Base64Codec extends HashlibCodec {
 
   /// Codec instance to encode and decode 8-bit integer sequence to 6-bit
   /// Base-64 character sequence using the alphabet described in
-  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html):
-  /// ```
-  /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
-  /// ```
-  static const Base64Codec standardNoPadding = Base64Codec._(
-    encoder: AlphabetEncoder(
-      bits: 6,
-      alphabet: _base64EncodingRfc4648,
-    ),
-    decoder: AlphabetDecoder(
-      bits: 6,
-      alphabet: _base64DecodingRfc4648,
-    ),
-  );
-
-  /// Codec instance to encode and decode 8-bit integer sequence to 6-bit
-  /// Base-64 character sequence using the alphabet described in
-  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html), which is both URL and
-  /// filename safe using:
+  /// [RFC-4648](https://www.ietf.org/rfc/rfc4648.html) considering the
+  /// URL and filename safety:
   /// ```
   /// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_
   /// ```
+  ///
+  /// It is not padded.
   static const Base64Codec urlSafeNoPadding = Base64Codec._(
     encoder: AlphabetEncoder(
       bits: 6,

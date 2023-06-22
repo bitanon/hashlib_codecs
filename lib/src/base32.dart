@@ -20,11 +20,20 @@ Base32Codec _codecFromParameters({
   }
 }
 
+const _codecsWithPadding = {
+  Base32Codec.standard,
+  Base32Codec.lowercase,
+  Base32Codec.hex,
+  Base32Codec.hexLower,
+  Base32Codec.geohash,
+  Base32Codec.wordSafe,
+};
+
 /// Converts 8-bit integer sequence to 5-bit Base-32 character sequence.
 ///
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
-/// - If [lower] is true, the lowercase standard alphabet is used.
+/// - If [lower] is true, the [Base32Codec.lowercase] alphabet is used.
 /// - If [padding] is true, the output will not have padding characters.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
@@ -39,6 +48,9 @@ String toBase32(
     padding: padding,
   );
   var out = codec.encoder.convert(input);
+  if (!padding && _codecsWithPadding.contains(codec)) {
+    out = out.takeWhile((x) => x != codec!.encoder.padding);
+  }
   return String.fromCharCodes(out);
 }
 

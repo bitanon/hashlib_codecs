@@ -20,6 +20,11 @@ Base64Codec _codecFromParameters({
   }
 }
 
+const _codecsWithPadding = {
+  Base64Codec.standard,
+  Base64Codec.urlSafe,
+};
+
 /// Converts 8-bit integer sequence to 6-bit Base-64 character sequence.
 ///
 /// Parameters:
@@ -39,6 +44,9 @@ String toBase64(
     padding: padding,
   );
   var out = codec.encoder.convert(input);
+  if (!padding && _codecsWithPadding.contains(codec)) {
+    out = out.takeWhile((x) => x != codec!.encoder.padding);
+  }
   return String.fromCharCodes(out);
 }
 
