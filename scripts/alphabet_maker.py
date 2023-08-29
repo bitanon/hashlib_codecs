@@ -48,7 +48,12 @@ def fwd(s):
 # print("z-base-32 reversed", end=":")
 # rev(b"ybndrfg8ejkmcpqxot1uwisza345h769")
 
-print("word-safe", end=":")
-fwd(b"23456789CFGHJMPQRVWXcfghjmpqrvwx")
-print("word-safe reversed", end=":")
-rev(b"23456789CFGHJMPQRVWXcfghjmpqrvwx")
+# print("word-safe", end=":")
+# fwd(b"23456789CFGHJMPQRVWXcfghjmpqrvwx")
+# print("word-safe reversed", end=":")
+# rev(b"23456789CFGHJMPQRVWXcfghjmpqrvwx")
+
+print("base64 bcrypt", end=":")
+fwd(b"./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+print("base64 bcrypt reversed", end=":")
+rev(b"./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")

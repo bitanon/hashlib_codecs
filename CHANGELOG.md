@@ -1,3 +1,7 @@
+# 2.1.1
+
+- Adds new alphabet to `Base64Codec`: [bcrypt][https://en.wikipedia.org/wiki/Bcrypt#base64_encoding_alphabet]
+
 # 2.1.0
 
 - Adds more alphabets to `Base32Codec`. Additional alphabets are:

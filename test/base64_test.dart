@@ -105,6 +105,14 @@ void main() {
         expect(fromBase64(r), equals(b), reason: 'length $i');
       }
     });
+    test('[bcrypt] encoding <-> decoding', () {
+      for (int i = 0; i < 100; ++i) {
+        var b = randomBytes(i);
+        var r = toBase64(b, codec: Base64Codec.bcrypt);
+        var a = fromBase64(r, codec: Base64Codec.bcrypt);
+        expect(a, equals(b), reason: 'length $i');
+      }
+    });
     group('decoding with invalid chars', () {
       test('Hashlib!', () {
         try {
