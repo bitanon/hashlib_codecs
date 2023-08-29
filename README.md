@@ -80,6 +80,7 @@ Available codecs:
 
 - **standard** (RFC-4648): `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/` (default)
 - **urlSafe**: `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
+- **bcrypt**: `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`
 
 ### BigInt
 
@@ -140,6 +141,7 @@ void main() {
   print("base64 => ${toBase64(inp)}");
   print("base64url => ${toBase64(inp, url: true)}");
   print("base64 (no padding) => ${toBase64(inp, padding: false)}");
+  print("bcrypt => ${toBase64(inp, codec: Base64Codec.bcrypt)}");
   print('');
 }
 ```

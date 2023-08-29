@@ -28,5 +28,6 @@ void main() {
   print("base64 => ${toBase64(inp)}");
   print("base64url => ${toBase64(inp, url: true)}");
   print("base64 (no padding) => ${toBase64(inp, padding: false)}");
+  print("bcrypt => ${toBase64(inp, codec: Base64Codec.bcrypt)}");
   print('');
 }
