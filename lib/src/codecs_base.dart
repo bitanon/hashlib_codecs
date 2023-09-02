@@ -7,6 +7,7 @@ export 'base32.dart';
 export 'base64.dart';
 export 'base8.dart';
 export 'bigint.dart';
+export 'phc_sf.dart';
 export 'codecs/base16.dart';
 export 'codecs/base2.dart';
 export 'codecs/base32.dart';

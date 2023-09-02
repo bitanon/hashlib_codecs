@@ -96,6 +96,17 @@ Available codecs:
 - **msbFirst**: treats the input bytes in big-endian order
 - **lsbFirst**: treats the input bytes in little-endian order
 
+### PHC String Format
+
+> Encoding and Decoding of Hash algorithm output according to the
+> [PHC string format specification](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md).
+
+| Type     | Available              |
+| -------- | ---------------------- |
+| Class    | `PHCSF`                |
+| Constant | `phcsf`                |
+| Methods  | `toPHCSF`, `fromPHCSF` |
+
 ## Getting Started
 
 The following import will give you access to all of the algorithms in this package.

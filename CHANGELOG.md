@@ -1,3 +1,10 @@
+# 2.2.0
+
+- Support encoding and decoding with [PHC string format specification](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md)
+  - New Class : `PHCSF`
+  - New Constant: `phcsf`
+  - New Methods : `toPHCSF`, `fromPHCSF`
+
 # 2.1.1
 
 - Adds new alphabet to `Base64Codec`: [bcrypt](https://en.wikipedia.org/wiki/Bcrypt#base64_encoding_alphabet)

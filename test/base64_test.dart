@@ -139,6 +139,19 @@ void main() {
         }
       });
     });
+    test("decoding with PHC string format B64 (16 bytes)", () {
+      var inp = "gZiV/M1gPc22ElAH/Jh1Hw";
+      var out = fromBase64(inp, padding: false);
+      var res = toBase64(out, padding: false);
+      expect(res, inp);
+      // String "CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno"
+    });
+    test("decoding with PHC string format B64 (32 bytes)", () {
+      var inp = "CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
+      var out = fromBase64(inp, padding: false);
+      var res = toBase64(out, padding: false);
+      expect(res, inp);
+    });
     group('decoding with invalid length', () {
       test('H', () {
         expect(() => fromBase64("H"), throwsFormatException);
