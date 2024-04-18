@@ -11,6 +11,10 @@
 
 This library contains implementations of fast and error resilient codecs in pure Dart.
 
+## Depencencies
+
+This package has NO dependency.
+
 ## Features
 
 ### Binary (Base-2)
