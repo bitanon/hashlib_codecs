@@ -1,3 +1,17 @@
+# 2.3.0
+
+- **Breaking Changes**: Renames PHCSF -> CryptFormat. Affected names:
+  - Class:
+    - `PHCSF` -> `CryptFormat`
+    - `PHCSFData` -> `CryptData`
+    - `PHCSFEncoder` -> `CryptEncoder`
+    - `PHCSFDecoder` -> `CryptDecoder`
+  - Constant:
+    - `phcsf` -> `crypt`
+  - Methods:
+    - `toPHCSF` -> `toCrypt`
+    - `fromPHCSF` -> `fromCrypt`
+
 # 2.2.0
 
 - Support encoding and decoding with [PHC string format specification](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md)
