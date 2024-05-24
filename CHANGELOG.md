@@ -1,3 +1,8 @@
+# 2.4.0
+
+- **Breaking Changes**: Uses string for salt and hash in `CryptData`
+- New class `CryptDataBuilder` is available to construct `CryptData` instances.
+
 # 2.3.0
 
 - **Breaking Changes**: Renames PHCSF -> CryptFormat. Affected names:

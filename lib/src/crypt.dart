@@ -1,9 +1,9 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'codecs/crypt.dart';
+import 'codecs/crypt/crypt.dart';
 
-export 'codecs/crypt.dart';
+export 'codecs/crypt/crypt.dart';
 
 /// An instance of [CryptFormat] for encoding and decoding hash algorithm output
 /// with [PHC string format][phc]
