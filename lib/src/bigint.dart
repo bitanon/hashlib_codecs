@@ -55,5 +55,5 @@ Uint8List fromBigInt(
 }) {
   codec ??= _codecFromParameters(msbFirst: msbFirst);
   var out = codec.decoder.convert(input);
-  return Uint8List.fromList(out.toList());
+  return Uint8List.fromList(out as List<int>);
 }

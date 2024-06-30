@@ -12,14 +12,23 @@ Random _generator() {
   }
 }
 
-/// Generate a list of random 8-bit numbers of size [length]
-Uint8List randomBytes(int length) {
+/// Generate a list of random numbers of size [length]
+Uint8List randomNumbers(
+  int length, {
+  int start = 0,
+  int stop = 0xFFFFFFFF,
+}) {
   var random = _generator();
   var data = Uint8List(length);
   for (int i = 0; i < data.length; i++) {
-    data[i] = random.nextInt(256);
+    data[i] = random.nextInt(stop - start + 1) + start;
   }
   return data;
+}
+
+/// Generate a list of random 8-bit numbers of size [length]
+Uint8List randomBytes(int length) {
+  return randomNumbers(length, stop: 0xFF);
 }
 
 /// Fill the [buffer] with random numbers

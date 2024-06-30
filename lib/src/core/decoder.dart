@@ -18,7 +18,6 @@ abstract class BitDecoder extends HashlibConverter {
   ///
   /// After consuming all of input sequence, if there are some non-zero partial
   /// word remains, it will throw [FormatException].
-  // TODO: sync is slow. use typed list
   @override
   Iterable<int> convert(Iterable<int> encoded) {
     int x, p, s, t, l, n, sb, tb;

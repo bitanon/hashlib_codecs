@@ -18,7 +18,7 @@ class _Base2Encoder extends ByteEncoder {
   @override
   Iterable<int> convert(Iterable<int> input) {
     int i, p, x;
-    List<int> list = input is List<int> ? input : input.toList();
+    List<int> list = input is List<int> ? input : List.of(input);
     var result = Uint8List(list.length << 3);
     for (i = p = 0; p < list.length; p++, i += 8) {
       x = list[p];
@@ -68,7 +68,7 @@ class _Base2Decoder extends ByteDecoder {
 // Base-2 Codec
 // ========================================================
 
-class Base2Codec extends HashlibCodec {
+class Base2Codec extends IterableCodec {
   @override
   final encoder = const _Base2Encoder();
 

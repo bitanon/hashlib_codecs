@@ -39,7 +39,7 @@ class _Base8Decoder extends ByteDecoder {
 // Base-8 Codec
 // ========================================================
 
-class Base8Codec extends HashlibCodec {
+class Base8Codec extends IterableCodec {
   @override
   final ByteEncoder encoder;
 

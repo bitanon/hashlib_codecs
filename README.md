@@ -86,6 +86,17 @@ Available codecs:
 - **urlSafe**: `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_`
 - **bcrypt**: `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`
 
+### UTF-8
+
+| Type    | Available            |
+| ------- | -------------------- |
+| Class   | `UTF8Codec`          |
+| Methods | `fromUtf8`, `toUtf8` |
+
+Available codecs:
+
+- **standard**: [RFC-3629](https://datatracker.ietf.org/doc/html/rfc3629)
+
 ### BigInt
 
 > Supports both the Big-Endian and Little-Endian conversion

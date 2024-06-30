@@ -8,9 +8,9 @@ import 'decoder.dart';
 import 'encoder.dart';
 
 /// Base class for encoding from and to 8-bit integer sequence
-abstract class HashlibCodec extends Codec<Iterable<int>, Iterable<int>> {
-  /// Creates a new [HashlibCodec] instance.
-  const HashlibCodec();
+abstract class IterableCodec extends Codec<Iterable<int>, Iterable<int>> {
+  /// Creates a new [IterableCodec] instance.
+  const IterableCodec();
 
   @override
   BitEncoder get encoder;

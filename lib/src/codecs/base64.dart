@@ -67,7 +67,7 @@ const _base64DecodingBcrypt = [
 // Base-64 Codec
 // ========================================================
 
-class Base64Codec extends HashlibCodec {
+class Base64Codec extends IterableCodec {
   @override
   final AlphabetEncoder encoder;
 

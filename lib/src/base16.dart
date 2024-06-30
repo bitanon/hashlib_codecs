@@ -50,5 +50,5 @@ Uint8List fromHex(
 }) {
   codec ??= _codecFromParameters();
   var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out.toList());
+  return Uint8List.fromList(out as List<int>);
 }

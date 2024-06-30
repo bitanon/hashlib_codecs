@@ -145,7 +145,7 @@ const _base32DecodingWordSafe = [
 // Base-32 Codec
 // ========================================================
 
-class Base32Codec extends HashlibCodec {
+class Base32Codec extends IterableCodec {
   @override
   final AlphabetEncoder encoder;
 

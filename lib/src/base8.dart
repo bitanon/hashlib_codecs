@@ -45,5 +45,5 @@ Uint8List fromOctal(
   Base8Codec codec = Base8Codec.standard,
 }) {
   var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out.toList());
+  return Uint8List.fromList(out as List<int>);
 }

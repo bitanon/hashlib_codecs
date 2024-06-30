@@ -1,3 +1,12 @@
+# 2.5.0
+
+- Support UTF-8 encoding and decoding.
+  - New class: `UTF8Codec`
+  - New methods: `toUtf8`, `fromUtf8`
+- Renames:
+  - `HashlibCodec` -> `IterableCodec`
+- Minor performance impovements
+
 # 2.4.1
 
 - Refactor: Remove all sync generator to improve runtime.

@@ -45,5 +45,5 @@ Uint8List fromBinary(
   Base2Codec codec = Base2Codec.standard,
 }) {
   var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out.toList());
+  return Uint8List.fromList(out as List<int>);
 }
