@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'codec.dart';
 
 abstract class BitEncoder extends HashlibConverter {
@@ -14,28 +16,35 @@ abstract class BitEncoder extends HashlibConverter {
   /// After consuming all of input sequence, if there are some non-zero partial
   /// word remains, 0 will be padded on the right to make the final word.
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
-    if (source < 2 || source > 64) {
+  Iterable<int> convert(Iterable<int> input) {
+    int x, p, s, t, l, n, sb, tb;
+    sb = source;
+    tb = target;
+    if (sb < 2 || sb > 64) {
       throw ArgumentError('The source bit length should be between 2 to 64');
     }
-    if (target < 2 || target > 64) {
+    if (tb < 2 || tb > 64) {
       throw ArgumentError('The target bit length should be between 2 to 64');
     }
 
-    int x, p, n, s, t;
-    p = n = t = 0;
-    s = 1 << (source - 1);
-    s = s ^ (s - 1);
+    List<int> list = input is List<int> ? input : List<int>.of(input);
+    l = list.length * sb;
+    n = l ~/ tb;
+    if (n * tb < l) n++;
+    var out = Uint8List(n);
 
     // generate words from the input bits
-    for (x in input) {
-      p = (p << source) ^ (x & s);
-      t = (t << source) ^ s;
-      n += source;
-      while (n >= target) {
-        n -= target;
-        yield p >>> n;
-        t >>>= target;
+    p = n = l = t = 0;
+    s = 1 << (sb - 1);
+    s = s ^ (s - 1);
+    for (x in list) {
+      p = (p << sb) ^ (x & s);
+      t = (t << sb) ^ s;
+      n += sb;
+      while (n >= tb) {
+        n -= tb;
+        out[l++] = p >>> n;
+        t >>>= tb;
         p &= t;
       }
     }
@@ -43,7 +52,9 @@ abstract class BitEncoder extends HashlibConverter {
     // n > 0 means that there is a partial word remaining.
     if (n > 0) {
       // pad the word with 0 on the right to make the final word
-      yield p << (target - n);
+      out[l++] = p << (tb - n);
     }
+
+    return out;
   }
 }

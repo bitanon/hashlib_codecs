@@ -7,9 +7,6 @@ import 'encoder.dart';
 class ByteEncoder extends BitEncoder {
   final int bits;
 
-  @override
-  final int source = 8;
-
   /// Creates a new [ByteEncoder] instance.
   ///
   /// Parameters:
@@ -19,14 +16,14 @@ class ByteEncoder extends BitEncoder {
   });
 
   @override
+  final int source = 8;
+
+  @override
   int get target => bits;
 }
 
 class ByteDecoder extends BitDecoder {
   final int bits;
-
-  @override
-  final int target = 8;
 
   /// Creates a new [ByteDecoder] instance.
   ///
@@ -38,4 +35,7 @@ class ByteDecoder extends BitDecoder {
 
   @override
   int get source => bits;
+
+  @override
+  final int target = 8;
 }

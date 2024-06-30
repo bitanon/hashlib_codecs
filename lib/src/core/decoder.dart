@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'codec.dart';
 
 abstract class BitDecoder extends HashlibConverter {
@@ -16,30 +18,36 @@ abstract class BitDecoder extends HashlibConverter {
   ///
   /// After consuming all of input sequence, if there are some non-zero partial
   /// word remains, it will throw [FormatException].
+  // TODO: sync is slow. use typed list
   @override
-  Iterable<int> convert(Iterable<int> encoded) sync* {
-    if (source < 2 || source > 64) {
+  Iterable<int> convert(Iterable<int> encoded) {
+    int x, p, s, t, l, n, sb, tb;
+    sb = source;
+    tb = target;
+    if (sb < 2 || sb > 64) {
       throw ArgumentError('The source bit length should be between 2 to 64');
     }
-    if (target < 2 || target > 64) {
+    if (tb < 2 || tb > 64) {
       throw ArgumentError('The target bit length should be between 2 to 64');
     }
 
-    int x, p, n, s, t;
-    p = n = t = 0;
-    s = 1 << (source - 1);
-    s = s ^ (s - 1);
+    List<int> list = encoded is List<int> ? encoded : List<int>.of(encoded);
+    l = list.length * sb;
+    var out = Uint8List(l ~/ tb);
 
     // generate words from the input bits
-    for (x in encoded) {
+    p = n = t = l = 0;
+    s = 1 << (sb - 1);
+    s = s ^ (s - 1);
+    for (x in list) {
       if (x < 0 || x > s) break;
-      p = (p << source) ^ x;
-      t = (t << source) ^ s;
-      n += source;
-      while (n >= target) {
-        n -= target;
-        yield p >>> n;
-        t >>>= target;
+      p = (p << sb) ^ x;
+      t = (t << sb) ^ s;
+      n += sb;
+      while (n >= tb) {
+        n -= tb;
+        out[l++] = p >>> n;
+        t >>>= tb;
         p &= t;
       }
     }
@@ -48,5 +56,7 @@ abstract class BitDecoder extends HashlibConverter {
     if (p > 0) {
       throw FormatException('Invalid length');
     }
+
+    return Uint8List.view(out.buffer, 0, l);
   }
 }

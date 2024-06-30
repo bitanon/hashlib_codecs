@@ -1,3 +1,7 @@
+# 2.4.1
+
+- Refactor: Remove all sync generator to improve runtime.
+
 # 2.4.0
 
 - **Breaking Changes**: Uses string for salt and hash in `CryptData`

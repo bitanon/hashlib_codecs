@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
 
@@ -14,17 +16,22 @@ class _Base2Encoder extends ByteEncoder {
   const _Base2Encoder() : super(bits: 2);
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
-    for (int x in input) {
-      yield _zero + ((x >>> 7) & 1);
-      yield _zero + ((x >>> 6) & 1);
-      yield _zero + ((x >>> 5) & 1);
-      yield _zero + ((x >>> 4) & 1);
-      yield _zero + ((x >>> 3) & 1);
-      yield _zero + ((x >>> 2) & 1);
-      yield _zero + ((x >>> 1) & 1);
-      yield _zero + ((x) & 1);
+  Iterable<int> convert(Iterable<int> input) {
+    int i, p, x;
+    List<int> list = input is List<int> ? input : input.toList();
+    var result = Uint8List(list.length << 3);
+    for (i = p = 0; p < list.length; p++, i += 8) {
+      x = list[p];
+      result[i] = _zero + ((x >>> 7) & 1);
+      result[i + 1] = _zero + ((x >>> 6) & 1);
+      result[i + 2] = _zero + ((x >>> 5) & 1);
+      result[i + 3] = _zero + ((x >>> 4) & 1);
+      result[i + 4] = _zero + ((x >>> 3) & 1);
+      result[i + 5] = _zero + ((x >>> 2) & 1);
+      result[i + 6] = _zero + ((x >>> 1) & 1);
+      result[i + 7] = _zero + ((x) & 1);
     }
+    return result;
   }
 }
 
@@ -32,7 +39,8 @@ class _Base2Decoder extends ByteDecoder {
   const _Base2Decoder() : super(bits: 2);
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
+  Iterable<int> convert(Iterable<int> input) {
+    List<int> out = <int>[];
     int p, n, x, y;
     p = n = 0;
     for (y in input) {
@@ -44,14 +52,15 @@ class _Base2Decoder extends ByteDecoder {
         p = (p << 1) | x;
         n++;
       } else {
-        yield p;
+        out.add(p);
         n = 1;
         p = x;
       }
     }
     if (n > 0) {
-      yield p;
+      out.add(p);
     }
+    return out;
   }
 }
 

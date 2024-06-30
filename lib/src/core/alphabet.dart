@@ -34,17 +34,15 @@ class AlphabetEncoder extends BitEncoder {
   int get target => bits;
 
   @override
-  Iterable<int> convert(Iterable<int> input) sync* {
-    int l = 0;
-    for (final x in super.convert(input)) {
-      yield alphabet[x];
-      l += target;
-    }
+  Iterable<int> convert(Iterable<int> input) {
+    var out = super.convert(input).map((x) => alphabet[x]).toList();
+    int l = out.length * target;
     if (padding != null) {
       for (; (l & 7) != 0; l += target) {
-        yield padding!;
+        out.add(padding!);
       }
     }
+    return out;
   }
 }
 

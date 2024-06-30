@@ -19,7 +19,7 @@ class _BigIntLSBFirstEncoder extends BigIntEncoder {
   @override
   BigInt convert(Iterable<int> input) {
     int a, b, i, j;
-    var out = <int>[];
+    List<int> out = <int>[];
     for (int x in input) {
       a = (x >>> 4) & 0xF;
       b = x & 0xF;
@@ -48,28 +48,29 @@ class _BigIntLSBFirstDecoder extends BigIntDecoder {
   const _BigIntLSBFirstDecoder();
 
   @override
-  Iterable<int> convert(BigInt input) sync* {
+  Iterable<int> convert(BigInt input) {
     if (input.isNegative) {
       throw FormatException('Negative numbers are not supported');
     }
     if (input == BigInt.zero) {
-      yield 0;
-      return;
+      return [0];
     }
     int i, a, b;
+    List<int> out = <int>[];
     var bytes = input.toRadixString(16).codeUnits;
     for (i = bytes.length - 2; i >= 0; i -= 2) {
       a = bytes[i];
       b = bytes[i + 1];
       a -= a < _smallA ? _zero : _smallA - 10;
       b -= b < _smallA ? _zero : _smallA - 10;
-      yield (a << 4) | b;
+      out.add((a << 4) | b);
     }
     if (i == -1) {
       a = bytes[0];
       a -= a < _smallA ? _zero : _smallA - 10;
-      yield a;
+      out.add(a);
     }
+    return out;
   }
 }
 
@@ -83,7 +84,7 @@ class _BigIntMSBFirstEncoder extends BigIntEncoder {
   @override
   BigInt convert(Iterable<int> input) {
     int a, b;
-    var out = <int>[];
+    List<int> out = <int>[];
     for (int x in input) {
       a = (x >>> 4) & 0xF;
       b = x & 0xF;
@@ -103,22 +104,22 @@ class _BigIntMSBFirstDecoder extends BigIntDecoder {
   const _BigIntMSBFirstDecoder();
 
   @override
-  Iterable<int> convert(BigInt input) sync* {
+  Iterable<int> convert(BigInt input) {
     if (input.isNegative) {
       throw FormatException('Negative numbers are not supported');
     }
     if (input == BigInt.zero) {
-      yield 0;
-      return;
+      return [0];
     }
     int i, a, b, n;
+    List<int> out = <int>[];
     var bytes = input.toRadixString(16).codeUnits;
     n = bytes.length;
     i = 1;
     if (n & 1 == 1) {
       a = bytes[0];
       a -= a < _smallA ? _zero : _smallA - 10;
-      yield a;
+      out.add(a);
       i++;
     }
     for (; i < n; i += 2) {
@@ -126,8 +127,9 @@ class _BigIntMSBFirstDecoder extends BigIntDecoder {
       b = bytes[i];
       a -= a < _smallA ? _zero : _smallA - 10;
       b -= b < _smallA ? _zero : _smallA - 10;
-      yield (a << 4) | b;
+      out.add((a << 4) | b);
     }
+    return out;
   }
 }
 
