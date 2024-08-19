@@ -1,10 +1,12 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'decoder.dart';
 import 'encoder.dart';
 
-class ByteEncoder extends BitEncoder {
+abstract class ByteEncoder extends BitEncoder {
   final int bits;
 
   /// Creates a new [ByteEncoder] instance.
@@ -20,9 +22,12 @@ class ByteEncoder extends BitEncoder {
 
   @override
   int get target => bits;
+
+  @override
+  Uint8List convert(List<int> input);
 }
 
-class ByteDecoder extends BitDecoder {
+abstract class ByteDecoder extends BitDecoder {
   final int bits;
 
   /// Creates a new [ByteDecoder] instance.
@@ -38,4 +43,7 @@ class ByteDecoder extends BitDecoder {
 
   @override
   final int target = 8;
+
+  @override
+  Uint8List convert(List<int> encoded);
 }

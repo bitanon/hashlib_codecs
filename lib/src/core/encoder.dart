@@ -16,7 +16,7 @@ abstract class BitEncoder extends HashlibConverter {
   /// After consuming all of input sequence, if there are some non-zero partial
   /// word remains, 0 will be padded on the right to make the final word.
   @override
-  Iterable<int> convert(Iterable<int> input) {
+  List<int> convert(covariant List<int> input) {
     int x, p, s, t, l, n, sb, tb;
     sb = source;
     tb = target;
@@ -27,8 +27,7 @@ abstract class BitEncoder extends HashlibConverter {
       throw ArgumentError('The target bit length should be between 2 to 64');
     }
 
-    List<int> list = input is List<int> ? input : List<int>.of(input);
-    l = list.length * sb;
+    l = input.length * sb;
     n = l ~/ tb;
     if (n * tb < l) n++;
     var out = Uint8List(n);
@@ -37,7 +36,7 @@ abstract class BitEncoder extends HashlibConverter {
     p = n = l = t = 0;
     s = 1 << (sb - 1);
     s = s ^ (s - 1);
-    for (x in list) {
+    for (x in input) {
       p = (p << sb) ^ (x & s);
       t = (t << sb) ^ s;
       n += sb;

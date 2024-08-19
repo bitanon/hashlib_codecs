@@ -19,7 +19,7 @@ abstract class BitDecoder extends HashlibConverter {
   /// After consuming all of input sequence, if there are some non-zero partial
   /// word remains, it will throw [FormatException].
   @override
-  Iterable<int> convert(Iterable<int> encoded) {
+  List<int> convert(covariant List<int> encoded) {
     int x, p, s, t, l, n, sb, tb;
     sb = source;
     tb = target;
@@ -30,15 +30,14 @@ abstract class BitDecoder extends HashlibConverter {
       throw ArgumentError('The target bit length should be between 2 to 64');
     }
 
-    List<int> list = encoded is List<int> ? encoded : List<int>.of(encoded);
-    l = list.length * sb;
+    l = encoded.length * sb;
     var out = Uint8List(l ~/ tb);
 
     // generate words from the input bits
     p = n = t = l = 0;
     s = 1 << (sb - 1);
     s = s ^ (s - 1);
-    for (x in list) {
+    for (x in encoded) {
       if (x < 0 || x > s) break;
       p = (p << sb) ^ x;
       t = (t << sb) ^ s;
@@ -56,6 +55,9 @@ abstract class BitDecoder extends HashlibConverter {
       throw FormatException('Invalid length');
     }
 
-    return Uint8List.view(out.buffer, 0, l);
+    if (l < out.length) {
+      return out.sublist(0, l);
+    }
+    return out;
   }
 }

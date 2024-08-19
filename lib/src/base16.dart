@@ -23,7 +23,7 @@ Base16Codec _codecFromParameters({
 /// - [codec] is the [Base16Codec] to use. It is derived from the other
 ///   parameters if not provided.
 String toHex(
-  Iterable<int> input, {
+  List<int> input, {
   Base16Codec? codec,
   bool upper = false,
 }) {
@@ -49,6 +49,5 @@ Uint8List fromHex(
   Base16Codec? codec,
 }) {
   codec ??= _codecFromParameters();
-  var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out as List<int>);
+  return codec.decoder.convert(input.codeUnits);
 }

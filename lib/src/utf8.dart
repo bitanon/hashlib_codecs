@@ -15,7 +15,7 @@ Uint8List toUtf8(
   UTF8Codec codec = UTF8Codec.standard,
 }) {
   var out = codec.encoder.convert(input.codeUnits);
-  return Uint8List.fromList(out as List<int>);
+  return Uint8List.fromList(out);
 }
 
 /// Converts 8-bit UTF-8 octet sequence to UTF-8 character code points.
@@ -30,7 +30,7 @@ Uint8List toUtf8(
 /// This implementation can handle both uppercase and lowercase alphabets. If a
 /// partial string is detected, the following bits are assumed to be zeros.
 String fromUtf8(
-  Iterable<int> input, {
+  List<int> input, {
   UTF8Codec codec = UTF8Codec.standard,
 }) {
   var out = codec.decoder.convert(input);

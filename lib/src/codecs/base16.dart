@@ -6,13 +6,31 @@ import 'dart:typed_data';
 import 'package:hashlib_codecs/src/core/byte.dart';
 import 'package:hashlib_codecs/src/core/codec.dart';
 
-// ========================================================
-// Base-16 Encoder and Decoder
-// ========================================================
-
 const int _zero = 0x30;
 const int _bigA = 0x41;
 const int _smallA = 0x61;
+
+extension on List<int> {
+  @pragma('vm:prefer-inline')
+  int dec(int p) {
+    int x = this[p] & 0xFF;
+    if (x >= _smallA) {
+      x -= _smallA - 10;
+    } else if (x >= _bigA) {
+      x -= _bigA - 10;
+    } else {
+      x -= _zero;
+    }
+    if (x < 0 || x > 15) {
+      throw FormatException('Invalid character at $p');
+    }
+    return x;
+  }
+}
+
+// ========================================================
+// Base-16 Encoder and Decoder
+// ========================================================
 
 class _Base16Encoder extends ByteEncoder {
   final int startCode;
@@ -23,20 +41,19 @@ class _Base16Encoder extends ByteEncoder {
   static const lower = _Base16Encoder._(_smallA - 10);
 
   @override
-  Iterable<int> convert(Iterable<int> input) {
+  Uint8List convert(List<int> input) {
     int i, p, x, a, b;
-    List<int> list = input is List<int> ? input : List.of(input);
-    var result = Uint8List(list.length << 1);
-    for (i = p = 0; p < list.length; p++, i += 2) {
-      x = list[p];
+    var out = Uint8List(input.length << 1);
+    for (i = p = 0; p < input.length; p++, i += 2) {
+      x = input[p];
       a = (x >>> 4) & 0xF;
       b = x & 0xF;
       a += a < 10 ? _zero : startCode;
       b += b < 10 ? _zero : startCode;
-      result[i] = a;
-      result[i + 1] = b;
+      out[i] = a;
+      out[i + 1] = b;
     }
-    return result;
+    return out;
   }
 }
 
@@ -44,37 +61,22 @@ class _Base16Decoder extends ByteDecoder {
   const _Base16Decoder() : super(bits: 4);
 
   @override
-  Iterable<int> convert(Iterable<int> input) {
-    bool t;
-    int p, x, y;
-    p = 0;
-    t = false;
-    List<int> out = <int>[];
-    for (y in input) {
-      if (y >= _smallA) {
-        x = y - _smallA + 10;
-      } else if (y >= _bigA) {
-        x = y - _bigA + 10;
-      } else if (y >= _zero) {
-        x = y - _zero;
-      } else {
-        x = -1;
-      }
-      if (x < 0 || x > 15) {
-        throw FormatException('Invalid character $y');
-      }
-      if (t) {
-        out.add((p << 4) | x);
-        p = 0;
-        t = false;
-      } else {
-        p = x;
-        t = true;
-      }
+  Uint8List convert(List<int> encoded) {
+    int p, n;
+
+    n = encoded.length;
+    p = (n >>> 1) + (n & 1);
+    var out = Uint8List(p);
+
+    for (p--; n >= 2; n -= 2, p--) {
+      out[p] = encoded.dec(n - 1) ^ //
+          (encoded.dec(n - 2) << 4);
     }
-    if (t) {
-      out.add(p);
+
+    if (n == 1) {
+      out[p] = encoded.dec(0);
     }
+
     return out;
   }
 }

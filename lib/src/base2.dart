@@ -17,7 +17,7 @@ import 'codecs/base2.dart';
 /// toBigInt(input).toRadixString(2)
 /// ```
 String toBinary(
-  Iterable<int> input, {
+  List<int> input, {
   Base2Codec codec = Base2Codec.standard,
 }) {
   var out = codec.encoder.convert(input);
@@ -44,6 +44,5 @@ Uint8List fromBinary(
   String input, {
   Base2Codec codec = Base2Codec.standard,
 }) {
-  var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out as List<int>);
+  return codec.decoder.convert(input.codeUnits);
 }

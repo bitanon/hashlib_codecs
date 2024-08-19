@@ -38,7 +38,7 @@ const _codecsWithPadding = {
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 String toBase32(
-  Iterable<int> input, {
+  List<int> input, {
   Base32Codec? codec,
   bool lower = false,
   bool padding = true,
@@ -47,7 +47,7 @@ String toBase32(
     lower: lower,
     padding: padding,
   );
-  var out = codec.encoder.convert(input);
+  Iterable<int> out = codec.encoder.convert(input);
   if (!padding && _codecsWithPadding.contains(codec)) {
     out = out.takeWhile((x) => x != codec!.encoder.padding);
   }
@@ -76,5 +76,5 @@ Uint8List fromBase32(
 }) {
   codec ??= _codecFromParameters(padding: padding);
   var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out as List<int>);
+  return Uint8List.fromList(out);
 }

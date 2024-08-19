@@ -1,3 +1,9 @@
+# 2.6.0
+
+- [**Breaking Changes**]
+  - Change the behavior of the Base-8 encoder to follow the standard
+  - Accept only `List<int>` instead of `Iterable<int>` in converters
+
 # 2.5.0
 
 - Support UTF-8 encoding and decoding.

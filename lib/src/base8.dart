@@ -17,7 +17,7 @@ import 'codecs/base8.dart';
 /// toBigInt(input).toRadixString(8)
 /// ```
 String toOctal(
-  Iterable<int> input, {
+  List<int> input, {
   Base8Codec codec = Base8Codec.standard,
 }) {
   var out = codec.encoder.convert(input);
@@ -44,6 +44,5 @@ Uint8List fromOctal(
   String input, {
   Base8Codec codec = Base8Codec.standard,
 }) {
-  var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out as List<int>);
+  return codec.decoder.convert(input.codeUnits);
 }

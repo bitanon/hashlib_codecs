@@ -1,6 +1,8 @@
 // Copyright (c) 2024, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 
 /*
@@ -17,6 +19,19 @@ const int _range2 = 0x000007FF;
 const int _range3 = 0x0000FFFF;
 const int _range4 = 0x0010FFFF;
 
+extension on List<int> {
+  int validate(int i) {
+    if (i >= length) {
+      throw FormatException('Insufficient input');
+    }
+    int x = this[i];
+    if (x & 0xC0 != 0x80) {
+      throw FormatException('Invalid at $i');
+    }
+    return x & 0x3F;
+  }
+}
+
 // ========================================================
 // UTF-8 Encoder and Decoder
 // ========================================================
@@ -31,10 +46,9 @@ class _UTF8Encoder extends BitEncoder {
   int get target => 8;
 
   @override
-  Iterable<int> convert(Iterable<int> input) {
+  Uint8List convert(List<int> input) {
     List<int> out = <int>[];
-    List<int> list = input is List<int> ? input : List.of(input);
-    for (int x in list) {
+    for (int x in input) {
       if (x <= _range1) {
         out.add(x & 0x7F);
       } else if (x <= _range2) {
@@ -53,7 +67,7 @@ class _UTF8Encoder extends BitEncoder {
         throw FormatException('Invalid character $x');
       }
     }
-    return out;
+    return Uint8List.fromList(out);
   }
 }
 
@@ -67,32 +81,31 @@ class _UTF8Decoder extends BitDecoder {
   int get target => 32;
 
   @override
-  Iterable<int> convert(Iterable<int> input) {
+  List<int> convert(List<int> encoded) {
     List<int> out = <int>[];
-    List<int> list = input is List<int> ? input : List.of(input);
-    for (int x, y, p = 0; p < list.length; ++p) {
-      x = list[p];
+    for (int x, y, p = 0; p < encoded.length; ++p) {
+      x = encoded[p];
       if (x <= 0x7F) {
         out.add(x);
       } else if (x & 0xE0 == 0xC0) {
         y = (x & 0x1F) << 6;
-        x = _validatePartial(list, ++p);
+        x = encoded.validate(++p);
         y |= x;
         out.add(y);
       } else if (x & 0xF0 == 0xE0) {
         y = (x & 0xF) << 12;
-        x = _validatePartial(list, ++p);
+        x = encoded.validate(++p);
         y |= (x & 0x3F) << 6;
-        x = _validatePartial(list, ++p);
+        x = encoded.validate(++p);
         y |= x & 0x3F;
         out.add(y);
       } else if (x & 0xF8 == 0xF0) {
         y = (x & 0x7) << 18;
-        x = _validatePartial(list, ++p);
+        x = encoded.validate(++p);
         y |= (x & 0x3F) << 12;
-        x = _validatePartial(list, ++p);
+        x = encoded.validate(++p);
         y |= (x & 0x3F) << 6;
-        x = _validatePartial(list, ++p);
+        x = encoded.validate(++p);
         y |= x & 0x3F;
         out.add(y);
       } else {
@@ -100,18 +113,6 @@ class _UTF8Decoder extends BitDecoder {
       }
     }
     return out;
-  }
-
-  @pragma('vm:prefer-inline')
-  static int _validatePartial(List<int> list, int x) {
-    if (x >= list.length) {
-      throw FormatException('Insufficient input');
-    }
-    x = list[x];
-    if (x & 0xC0 != 0x80) {
-      throw FormatException('Invalid character $x');
-    }
-    return x & 0x3F;
   }
 }
 

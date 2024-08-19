@@ -34,7 +34,7 @@ const _codecsWithPadding = {
 /// - [codec] is the [Base64Codec] to use. It is derived from the other
 ///   parameters if not provided.
 String toBase64(
-  Iterable<int> input, {
+  List<int> input, {
   Base64Codec? codec,
   bool url = false,
   bool padding = true,
@@ -43,7 +43,7 @@ String toBase64(
     url: url,
     padding: padding,
   );
-  var out = codec.encoder.convert(input);
+  Iterable<int> out = codec.encoder.convert(input);
   if (!padding && _codecsWithPadding.contains(codec)) {
     out = out.takeWhile((x) => x != codec!.encoder.padding);
   }
@@ -73,5 +73,5 @@ Uint8List fromBase64(
 }) {
   codec ??= _codecFromParameters(padding: padding);
   var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out as List<int>);
+  return Uint8List.fromList(out);
 }

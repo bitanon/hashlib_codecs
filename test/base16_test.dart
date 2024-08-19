@@ -66,6 +66,20 @@ void main() {
           expect(toHex(b), hex, reason: 'length $i');
         }
       });
+      group('buffer', () {
+        var buf = [
+          244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
+          55, 115, 178, 138, 230, 251
+        ];
+        var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
+        var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
+        test("lower", () {
+          expect(toHex(buf), lowerHex);
+        });
+        test("upper", () {
+          expect(toHex(buf, upper: true), upperHex);
+        });
+      });
     });
 
     group("decoding", () {
@@ -102,47 +116,31 @@ void main() {
           expect(fromHex(hex), equals(b), reason: 'length $i');
         }
       });
-    });
 
-    group('encoding buffer', () {
-      var buf = [
-        244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
-        55, 115, 178, 138, 230, 251
-      ];
-      var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
-      var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
-      test("lower", () {
-        expect(toHex(buf), lowerHex);
+      group('buffer', () {
+        var buf = [
+          244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
+          55, 115, 178, 138, 230, 251
+        ];
+        var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
+        var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
+        test("lower", () {
+          expect(fromHex(lowerHex), equals(buf));
+        });
+        test("upper", () {
+          expect(fromHex(upperHex), equals(buf));
+        });
       });
-      test("upper", () {
-        expect(toHex(buf, upper: true), upperHex);
-      });
-    });
-
-    group('decoding buffer', () {
-      var buf = [
-        244, 11, 21, 63, 222, 56, 63, 111, 57, 64, 22, 56, 32, //
-        55, 115, 178, 138, 230, 251
-      ];
-      var lowerHex = "f40b153fde383f6f39401638203773b28ae6fb";
-      var upperHex = "F40B153FDE383F6F39401638203773B28AE6FB";
-      test("lower", () {
-        expect(fromHex(lowerHex), equals(buf));
-      });
-      test("upper", () {
-        expect(fromHex(upperHex), equals(buf));
-      });
-    });
-
-    group('decoding with invalid chars', () {
-      test('Error', () {
-        expect(() => fromHex("Error"), throwsFormatException);
-      });
-      test('-10', () {
-        expect(() => fromHex("-10"), throwsFormatException);
-      });
-      test('something', () {
-        expect(() => fromHex("something"), throwsFormatException);
+      group('with invalid chars', () {
+        test('Error', () {
+          expect(() => fromHex("Error"), throwsFormatException);
+        });
+        test('-10', () {
+          expect(() => fromHex("-10"), throwsFormatException);
+        });
+        test('something', () {
+          expect(() => fromHex("something"), throwsFormatException);
+        });
       });
     });
 
