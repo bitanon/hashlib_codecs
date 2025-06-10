@@ -1,3 +1,7 @@
+# 3.0.0
+
+- Set minimum Dart SDK to 2.19.0
+
 # 2.6.0
 
 - [**Breaking Changes**]

@@ -6,7 +6,7 @@
 [![likes](https://img.shields.io/pub/likes/hashlib_codecs?logo=dart)](https://pub.dev/packages/hashlib_codecs/score)
 [![pub points](https://img.shields.io/pub/points/hashlib_codecs?logo=dart&color=teal)](https://pub.dev/packages/hashlib_codecs/score)
 [![popularity](https://img.shields.io/pub/popularity/hashlib_codecs?logo=dart)](https://pub.dev/packages/hashlib_codecs/score)
-[![dart support](https://img.shields.io/badge/dart-%3e%3d%202.14.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
+[![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
 [![dependencies](https://img.shields.io/badge/dependencies-zero-889)](https://github.com/bitanon/hashlib_codecs/blob/master/pubspec.yaml)
 
 <!-- [![test](https://github.com/bitanon/hashlib_codecs/actions/workflows/test.yml/badge.svg)](https://github.com/bitanon/hashlib_codecs/actions/workflows/test.yml) -->
