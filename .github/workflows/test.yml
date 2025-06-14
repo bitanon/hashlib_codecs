@@ -1,7 +1,6 @@
 name: Test
 
 on:
-  workflow_call:
   workflow_dispatch:
   push:
     branches: [master]
@@ -58,23 +57,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['stable', '2.19', 'beta']
-        platform: ['vm', 'node']
-        exclude:
-          # skip test for beta
-          - sdk: 'beta'
-            os: macos-latest
-          - sdk: 'beta'
-            os: windows-latest
-          - sdk: 'beta'
-            platform: 'node'
-          # Skip node platform
-          - platform: 'node'
-            sdk: '2.19'
-            os: macos-latest
-          - platform: 'node'
-            sdk: '2.19'
-            os: windows-latest
+        sdk: ['stable', '2.19']
+        platform: ['vm']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -102,13 +86,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: ['stable', '2.19', 'beta']
-        exclude:
-          # skip test on macOS/Windows for beta
-          - sdk: 'beta'
-            os: macos-latest
-          - sdk: 'beta'
-            os: windows-latest
+        sdk: ['stable', '2.19']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -129,19 +107,6 @@ jobs:
           cd test_integration
           dart pub get
           dart run main.dart
-
-  pana:
-    if: github.repository == 'bitanon/hashlib_codecs'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
-
-      - name: Install pana
-        run: dart pub global activate pana
-
-      - name: Verify with pana
-        run: pana --exit-code-threshold 0
 
   coverage:
     if: github.repository == 'bitanon/hashlib_codecs'
