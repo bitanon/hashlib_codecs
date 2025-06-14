@@ -1,7 +1,7 @@
 name: hashlib_codecs
 description: Fast and error resilient codecs. Currently supporting Binary(Base2), Hexadecimal(Base16), Base32, Base64, BigInt.
 homepage: https://github.com/bitanon/hashlib_codecs
-version: 3.0.0
+version: 3.0.1
 
 environment:
   sdk: '>=2.19.0 <4.0.0'

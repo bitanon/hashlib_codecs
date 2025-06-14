@@ -9,8 +9,6 @@
 [![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
 [![dependencies](https://img.shields.io/badge/dependencies-zero-889)](https://github.com/bitanon/hashlib_codecs/blob/master/pubspec.yaml)
 
-<!-- [![test](https://github.com/bitanon/hashlib_codecs/actions/workflows/test.yml/badge.svg)](https://github.com/bitanon/hashlib_codecs/actions/workflows/test.yml) -->
-
 This library contains implementations of fast and error resilient codecs in pure Dart.
 
 ## Depencencies

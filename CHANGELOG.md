@@ -1,3 +1,7 @@
+# 3.0.1
+
+- Test release with workflow
+
 # 3.0.0
 
 - Set minimum Dart SDK to 2.19.0
