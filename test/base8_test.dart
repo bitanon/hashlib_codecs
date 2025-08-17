@@ -1,10 +1,7 @@
-// Copyright (c) 2023, Sudipto Chandra
-// All rights reserved. Check LICENSE file for details.
-
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
-import 'utils.dart';
+import './utils.dart';
 
 void main() {
   group('Test base8', () {
@@ -104,6 +101,11 @@ void main() {
       test('long partial message', () {
         final input = '4020060200501403410';
         final output = [1, 2, 3, 4, 5, 6, 7, 8];
+        expect(fromOctal(input), equals(output));
+      });
+      test('200000', () {
+        var input = '200000';
+        var output = [1, 0, 0];
         expect(fromOctal(input), equals(output));
       });
       test('182', () {

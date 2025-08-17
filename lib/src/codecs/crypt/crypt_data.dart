@@ -5,14 +5,7 @@ import 'dart:typed_data';
 
 import 'package:hashlib_codecs/src/base64.dart';
 
-import 'crypt_data_builder.dart';
-
-final _id = RegExp(r'^[a-z0-9-]+$');
-final _version = RegExp(r'^[0-9]+$');
-final _paramName = RegExp(r'^[a-z0-9-]+$');
-final _paramValue = RegExp(r'^[a-zA-Z0-9/+.-]+$');
-final _saltValue = _paramValue;
-final _hashValue = _paramValue;
+import 'crypt_builder.dart';
 
 /// The PHC string format data
 class CryptData {
@@ -86,43 +79,56 @@ class CryptData {
     return val == null ? null : int.tryParse(val);
   }
 
-  /// Validate the parameters
-  ///
-  /// Throws [ArgumentError] if something is wrong.
+  /// Validate this PHC string.
+  /// Throws [ArgumentError] when any field is invalid.
   void validate() {
-    if (id.length > 32) {
-      throw ArgumentError('Exceeds 32 character limit', 'id');
+    final digitRe = RegExp(r'^[0-9]+$');
+    final alnumRe = RegExp(r'^[a-z0-9-]{1,32}$');
+    final base64Re = RegExp(r'^[a-zA-Z0-9/+.-]+$');
+
+    // id
+    if (!alnumRe.hasMatch(id)) {
+      throw ArgumentError.value(
+          id, 'id', 'must be [a-z0-9-] and under 32 characters');
     }
-    if (!_id.hasMatch(id)) {
-      throw ArgumentError('Invalid character', 'id');
+
+    // version (optional)
+    if (version != null && !digitRe.hasMatch(version!)) {
+      throw ArgumentError.value(version, 'version', 'must be decimal digits');
     }
-    if (version != null && version!.isNotEmpty) {
-      if (!_version.hasMatch(version!)) {
-        throw ArgumentError('Invalid character', 'version');
-      }
-    }
-    if (salt != null && salt!.isNotEmpty) {
-      if (!_saltValue.hasMatch(salt!)) {
-        throw ArgumentError('Invalid salt', 'salt');
-      }
-    }
-    if (hash != null && hash!.isNotEmpty) {
-      if (!_hashValue.hasMatch(hash!)) {
-        throw ArgumentError('Invalid hash', 'hash');
-      }
-    }
+
+    // params (optional)
     if (params != null) {
       for (final e in params!.entries) {
-        if (e.key.length > 32) {
-          throw ArgumentError('Exceeds 32 character limit', 'params:${e.key}');
+        final k = e.key;
+        final v = e.value;
+        if (!alnumRe.hasMatch(k)) {
+          throw ArgumentError.value(
+              k, 'params.key', 'must be [a-z0-9-] and under 32 chars');
         }
-        if (!_paramName.hasMatch(e.key)) {
-          throw ArgumentError('Invalid character', 'params:${e.key}');
+        if (k == 'v') {
+          throw ArgumentError.value(
+              k, 'params.key', 'reserved; use version field instead');
         }
-        if (!_paramValue.hasMatch(e.value)) {
-          throw ArgumentError('Invalid character', 'params:${e.key}:value');
+        if (v.isEmpty) {
+          throw ArgumentError.value(v, 'params[$k]', 'value is empty');
+        } else if (!base64Re.hasMatch(v)) {
+          throw ArgumentError.value(
+              v, 'params[$k]', 'value has invalid characters');
         }
       }
+    }
+
+    // salt (optional)
+    if (salt != null && !base64Re.hasMatch(salt!)) {
+      throw ArgumentError.value(
+          salt, 'salt', 'expected base64 string without padding');
+    }
+
+    // hash (optional)
+    if (hash != null && !base64Re.hasMatch(hash!)) {
+      throw ArgumentError.value(
+          hash, 'hash', 'expected base64 string without padding');
     }
   }
 }

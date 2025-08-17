@@ -1,10 +1,7 @@
-// Copyright (c) 2023, Sudipto Chandra
-// All rights reserved. Check LICENSE file for details.
-
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
-import 'utils.dart';
+import './utils.dart';
 
 void main() {
   group('Test BigInt', () {
@@ -25,11 +22,27 @@ void main() {
       );
       expect(a, equals(o));
     });
-    test('encoding empty list to raise error', () {
+    test('encoding empty list to raise error for LSB first', () {
       expect(() => toBigInt([]), throwsFormatException);
     });
-    test('decoding negative to raise error', () {
+    test('decoding negative to raise error for LSB first', () {
       expect(() => fromBigInt(-BigInt.two), throwsFormatException);
+    });
+    test('encoding empty list to raise error for LSB first', () {
+      expect(() {
+        toBigInt(
+          [],
+          codec: BigIntCodec.msbFirst,
+        );
+      }, throwsFormatException);
+    });
+    test('decoding negative to raise error for MSB first', () {
+      expect(() {
+        fromBigInt(
+          -BigInt.two,
+          codec: BigIntCodec.msbFirst,
+        );
+      }, throwsFormatException);
     });
     test('encoding [0] => 0', () {
       var inp = <int>[0];

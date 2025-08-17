@@ -1,10 +1,7 @@
-// Copyright (c) 2023, Sudipto Chandra
-// All rights reserved. Check LICENSE file for details.
-
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
 
-import 'utils.dart';
+import './utils.dart';
 
 void main() {
   group('Test base2', () {
