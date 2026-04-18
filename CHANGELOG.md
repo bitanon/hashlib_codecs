@@ -1,3 +1,7 @@
+# 3.1.1
+
+- Add const constructor to `ByteCollector` class.
+
 # 3.1.0
 
 - Introduce `ByteCollector` abstract class with methods for various encoding formats (hex, binary, octal, base32, base64, BigInt).

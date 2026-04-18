@@ -21,6 +21,9 @@ import 'bigint.dart' show toBigInt;
 /// It also features convenient equality checks and utilities for converting
 /// and comparing digests across representations.
 abstract class ByteCollector extends Object {
+  /// Creates a new [ByteCollector].
+  const ByteCollector();
+
   /// The collected bytes.
   Uint8List get bytes;
 

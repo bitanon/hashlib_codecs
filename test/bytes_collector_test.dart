@@ -8,10 +8,10 @@ import 'package:hashlib_codecs/src/bytes_collector.dart';
 import 'package:test/test.dart';
 
 class TestCollector extends ByteCollector {
-  TestCollector(this.bytes);
-
   @override
   final Uint8List bytes;
+
+  const TestCollector(this.bytes);
 }
 
 void main() {
