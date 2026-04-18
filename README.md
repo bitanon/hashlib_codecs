@@ -122,6 +122,28 @@ Available codecs:
 | Constant | `crypt`                |
 | Methods  | `toCrypt`, `fromCrypt` |
 
+### ByteCollector
+
+A container for digest bytes produced by a hash or encoding function. Available methods:
+
+| Method                        | Description                                                 |
+| ----------------------------- | ----------------------------------------------------------- |
+| `bytes`                       | Raw bytes as `Uint8List`                                    |
+| `length`                      | Length of the bytes                                         |
+| `buffer`                      | The byte buffer backing the data                            |
+| `toString()`                  | String representation (hexadecimal)                         |
+| `hex([upper])`                | Hexadecimal string (optionally uppercase)                   |
+| `binary()`                    | Binary string representation                                |
+| `octal()`                     | Octal string representation                                 |
+| `base32({upper, padding})`    | Base32 encoding (with case and padding options)             |
+| `base64({urlSafe, padding})`  | Base64 encoding (with URL-safe and padding options)         |
+| `bigInt({endian})`            | Interprets the bytes as a `BigInt` (endian selectable)      |
+| `number([bitLength, endian])` | Reads an unsigned integer of specified bit-length           |
+| `ascii()`                     | Decodes bytes as an ASCII string                            |
+| `utf8()`                      | Decodes bytes as a UTF-8 string                             |
+| `to(encoding)`                | Decodes bytes with a given Dart `Encoding`                  |
+| `isEqual(other)`              | Compares the bytes with another list, buffer, or hex string |
+
 ## Getting Started
 
 The following import will give you access to all of the algorithms in this package.

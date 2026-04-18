@@ -1,3 +1,8 @@
+# 3.1.0
+
+- Introduce `ByteCollector` abstract class with methods for various encoding formats (hex, binary, octal, base32, base64, BigInt).
+  and utility methods for equality check.
+
 # 3.0.1
 
 - Test release with workflow
