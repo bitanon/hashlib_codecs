@@ -144,7 +144,7 @@ abstract class ByteCollector extends Object {
         return false;
       }
       for (int i = 0; i < bytes.length; ++i) {
-        if (other[i] != bytes[i++]) {
+        if (other[i] != bytes[i]) {
           return false;
         }
       }
