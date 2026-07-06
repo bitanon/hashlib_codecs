@@ -30,7 +30,7 @@ abstract class IterableCodec extends Codec<Iterable<int>, Iterable<int>> {
   @pragma('vm:prefer-inline')
   Iterable<int> encodeBuffer(ByteBuffer input) => encode(input.asUint8List());
 
-  /// Decodess an [encoded] buffer using this codec
+  /// Decodes an [encoded] buffer using this codec
   @pragma('vm:prefer-inline')
   Iterable<int> decodeBuffer(ByteBuffer encoded) =>
       decode(encoded.asUint8List());

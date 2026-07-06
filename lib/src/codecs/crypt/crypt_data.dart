@@ -26,7 +26,7 @@ class CryptData {
 
   /// Creates an instance of [CryptData].
   ///
-  /// Paramaters:
+  /// Parameters:
   /// - [id] The identifier name, must not exceed 32 characters in length and
   ///   must be a sequence of characters in: `[a-z0-9-]`.
   /// - [version] (Optional) The value for the version must be a sequence of
@@ -70,10 +70,10 @@ class CryptData {
   bool hasParam(String key) =>
       params == null ? false : params!.containsKey(key);
 
-  /// Get the value of a paramter by [key]
+  /// Get the value of a parameter by [key]
   String? getParam(String key) => params?[key];
 
-  /// Get the value of a paramter by [key] as integer
+  /// Get the value of a parameter by [key] as integer
   int? getIntParam(String key) {
     var val = getParam(key);
     return val == null ? null : int.tryParse(val);

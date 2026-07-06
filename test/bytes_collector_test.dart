@@ -125,7 +125,6 @@ void main() {
     });
 
     test('equality and hashCode with shared Uint8List buffer', () {
-      // [Uint8List]== uses identity; same backing buffer yields == / hashCode match.
       final shared = Uint8List.fromList([1, 2]);
       final a = TestCollector(shared);
       final b = TestCollector(shared);
@@ -133,6 +132,16 @@ void main() {
       expect(a, equals(b));
       expect(a, isNot(equals(c)));
       expect(a.hashCode, b.hashCode);
+    });
+
+    test('equality and hashCode are value-based', () {
+      // Equal bytes in distinct backing lists must be == and usable as keys.
+      final a = TestCollector(Uint8List.fromList([1, 2]));
+      final b = TestCollector(Uint8List.fromList([1, 2]));
+      expect(a == b, isTrue);
+      expect(a.hashCode, b.hashCode);
+      expect({a}.contains(b), isTrue);
+      expect(a == TestCollector(Uint8List.fromList([2, 1])), isFalse);
     });
 
     test('operator == identical and ByteCollector equality', () {
@@ -205,6 +214,25 @@ void main() {
         final x = TestCollector(u8);
         final copy = Uint8List.fromList([5, 6, 7]);
         expect(x.isEqual(copy.buffer), isTrue);
+      });
+
+      test('ByteBuffer content mismatch returns false', () {
+        // Regression: the ByteBuffer branch used to compare the collector
+        // against its own buffer, so any same-length buffer matched.
+        final x = TestCollector(Uint8List.fromList([5, 6, 7]));
+        expect(x.isEqual(Uint8List.fromList([9, 9, 9]).buffer), isFalse);
+        expect(x.isEqual(Uint8List.fromList([5, 6]).buffer), isFalse);
+      });
+
+      test('TypedData view respects offset and length', () {
+        // Regression: the TypedData branch used to view the whole backing
+        // buffer, ignoring the view's offset and length.
+        final big = Uint8List.fromList([0, 1, 2, 3, 4, 5, 6, 7]);
+        final slice = ByteData.view(big.buffer, 2, 3); // bytes [2, 3, 4]
+        expect(TestCollector(Uint8List.fromList([2, 3, 4])).isEqual(slice),
+            isTrue);
+        expect(TestCollector(Uint8List.fromList([0, 1, 2])).isEqual(slice),
+            isFalse);
       });
 
       test('non-Uint8List TypedData (ByteData)', () {

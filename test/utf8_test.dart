@@ -19,13 +19,28 @@ void main() {
 
     test('encoding <-> decoding', () {
       for (int i = 0; i < 100; ++i) {
-        var b = randomNumbers(i, stop: 0x0010FFFF);
+        var b = randomCodePoints(i);
         var test = String.fromCharCodes(b);
         var actual = Utf8Encoder().convert(test);
         var mine = toUtf8(test);
         expect(mine, equals(actual), reason: 'Encoding: #$i');
         var decoded = fromUtf8(mine);
         expect(decoded, equals(test), reason: 'Decoding: #$i');
+      }
+    });
+
+    test('2-byte sequences where continuation payload bits are zero', () {
+      // Regression for a missing `& 0x3F` in the 2-byte decoder path:
+      // C4 80 must decode to U+0100, not U+0180. Expected values verified
+      // against RFC-3629 and `dart:convert`.
+      expect(fromUtf8([0xC4, 0x80]), String.fromCharCodes([0x100]));
+      expect(toUtf8(String.fromCharCodes([0x100])), [0xC4, 0x80]);
+      // Cover both sides of every flag-bit boundary in the 2-byte range.
+      for (var cp in [0x80, 0xA9, 0xFF, 0x100, 0x141, 0x180, 0x7C0, 0x7FF]) {
+        var s = String.fromCharCodes([cp]);
+        var enc = Utf8Encoder().convert(s);
+        expect(toUtf8(s), equals(enc), reason: 'U+${cp.toRadixString(16)}');
+        expect(fromUtf8(enc), equals(s), reason: 'U+${cp.toRadixString(16)}');
       }
     });
 

@@ -11,7 +11,7 @@
 
 This library contains implementations of fast and error resilient codecs in pure Dart.
 
-## Depencencies
+## Dependencies
 
 This package has NO dependency.
 
@@ -66,7 +66,8 @@ Available codecs:
 - **lowercase**: `abcdefghijklmnopqrstuvwxyz234567`
 - **hex**: `0123456789ABCDEFGHIJKLMNOPQRSTUV`
 - **hexLower**: `0123456789abcdefghijklmnopqrstuv`
-- **crockford**: `0123456789bcdefghjkmnpqrstuvwxyz`
+- **crockford**: `0123456789ABCDEFGHJKMNPQRSTVWXYZ`
+- **geohash**: `0123456789bcdefghjkmnpqrstuvwxyz`
 - **z**: `ybndrfg8ejkmcpqxot1uwisza345h769`
 - **wordSafe**: `23456789CFGHJMPQRVWXcfghjmpqrvwx`
 

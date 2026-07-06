@@ -54,7 +54,8 @@ String toBase64(
 ///
 /// Parameters:
 /// - [input] should be a valid base-64 encoded string.
-/// - If [padding] is true, the output will have padding characters.
+/// - If [padding] is true, the [input] may contain padding characters, which
+///   are ignored during decoding.
 /// - [codec] is the [Base64Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///

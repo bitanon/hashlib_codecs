@@ -10,6 +10,12 @@ import 'codecs/utf8.dart';
 /// Parameters:
 /// - [input] is a sequence of UTF-8 character code points.
 /// - [codec] is the [UTF8Codec] to use.
+///
+/// Throws:
+/// - [FormatException] if the [input] contains unpaired surrogates.
+///
+/// Unlike the encoder from `dart:convert`, which replaces unpaired surrogates
+/// with the replacement character `U+FFFD`, this implementation rejects them.
 Uint8List toUtf8(
   String input, {
   UTF8Codec codec = UTF8Codec.standard,
@@ -25,10 +31,7 @@ Uint8List toUtf8(
 /// - [codec] is the [UTF8Codec] to use.
 ///
 /// Throws:
-/// - [FormatException] if the [input] contains invalid characters.
-///
-/// This implementation can handle both uppercase and lowercase alphabets. If a
-/// partial string is detected, the following bits are assumed to be zeros.
+/// - [FormatException] if the [input] is not a valid UTF-8 octet sequence.
 String fromUtf8(
   List<int> input, {
   UTF8Codec codec = UTF8Codec.standard,

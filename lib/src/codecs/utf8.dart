@@ -112,7 +112,7 @@ class _UTF8Decoder extends BitDecoder {
           throw FormatException('Invalid continuation byte $z at $p');
         }
 
-        y = ((x & 0x1F) << 6) | z;
+        y = ((x & 0x1F) << 6) | (z & 0x3F);
         out.add(y);
       }
       // Case: 3-bytes

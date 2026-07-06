@@ -1,3 +1,17 @@
+# 3.2.0
+
+- [**Breaking Changes**]
+  - Fix `Base32Codec.wordSafe` to use the documented word-safe alphabet
+    (`23456789CFGHJMPQRVWXcfghjmpqrvwx`); it previously used the z-base-32 alphabet.
+  - `ByteCollector` equality is now value-based: `==` and `hashCode` compare the
+    collected bytes instead of the identity of the underlying list.
+- Fix UTF-8 decoder producing wrong code points for some 2-byte sequences (e.g. `U+0100`)
+- Fix `ByteCollector.isEqual` comparing against its own buffer when given a `ByteBuffer`
+- Fix `ByteCollector.isEqual` ignoring the offset and length of a partial `TypedData` view
+- Fix incorrect alphabets of `crockford` and `geohash` in the README
+- Fix incorrect parameter descriptions of `toBase32`, `fromBase32`, `fromBase64`, and `fromUtf8`
+- Document that `toUtf8` rejects unpaired surrogates
+
 # 3.1.2
 
 - Add const constructor to `ByteCollector` class.

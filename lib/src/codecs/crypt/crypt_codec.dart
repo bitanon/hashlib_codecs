@@ -12,7 +12,7 @@ import 'crypt_data.dart';
 /// designed to ensure consistency and interoperability between different
 /// password hashing implementations.
 ///
-/// The string format specifiction:
+/// The string format specification:
 /// ```
 /// $<id>[$v=<version>][$<param>=<value>(,<param>=<value>)*][$<salt>[$<hash>]]
 /// ```

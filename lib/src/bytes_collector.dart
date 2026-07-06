@@ -111,12 +111,13 @@ abstract class ByteCollector extends Object {
   String to(cvt.Encoding encoding) => encoding.decode(bytes);
 
   @override
-  int get hashCode => bytes.hashCode;
+  int get hashCode => Object.hashAll(bytes);
 
+  /// Two [ByteCollector] instances are equal if their [bytes] are equal.
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ByteCollector && bytes == other.bytes);
+      (other is ByteCollector && isEqual(other.bytes));
 
   /// Checks if the message digest equals to [other].
   ///
@@ -134,9 +135,11 @@ abstract class ByteCollector extends Object {
     } else if (other is ByteCollector) {
       return isEqual(other.bytes);
     } else if (other is ByteBuffer) {
-      return isEqual(Uint8List.view(buffer));
+      return isEqual(Uint8List.view(other));
     } else if (other is TypedData && other is! Uint8List) {
-      return isEqual(Uint8List.view(other.buffer));
+      return isEqual(
+        Uint8List.view(other.buffer, other.offsetInBytes, other.lengthInBytes),
+      );
     } else if (other is String) {
       return isEqual(fromHex(other));
     } else if (other is List<int>) {

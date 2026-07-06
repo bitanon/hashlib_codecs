@@ -34,7 +34,7 @@ const _codecsWithPadding = {
 /// Parameters:
 /// - [input] is a sequence of 8-bit integers
 /// - If [lower] is true, the [Base32Codec.lowercase] alphabet is used.
-/// - If [padding] is true, the output will not have padding characters.
+/// - If [padding] is true, the output will have padding characters.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 String toBase32(
@@ -58,7 +58,8 @@ String toBase32(
 ///
 /// Parameters:
 /// - [input] should be a valid base-32 encoded string.
-/// - If [padding] is true, the output will not have padding characters.
+/// - If [padding] is true, the [input] may contain padding characters, which
+///   are ignored during decoding.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
