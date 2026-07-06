@@ -17,3 +17,4 @@ pubspec.lock
 # Others
 __pycache__/
 *.pyc
+node_modules/
