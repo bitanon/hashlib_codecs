@@ -1,108 +1,182 @@
+import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:test/test.dart';
-import 'package:hashlib_codecs/src/codecs/crypt/crypt_data.dart';
+
+void expectError<T>(Function fun, String message) {
+  expect(fun, throwsA(isA<T>().having((e) => '$e', 'message', message)));
+}
 
 void main() {
-  group('CryptData', () {
-    test('constructor and fields', () {
-      final data = CryptData(
-        'argon2id',
-        version: '19',
-        salt: 'c2FsdA', // "salt" in base64
-        hash: 'aGFzaA', // "hash" in base64
-        params: {'m': '65536', 't': '3', 'p': '4'},
-      );
-      expect(data.id, 'argon2id');
-      expect(data.version, '19');
-      expect(data.salt, 'c2FsdA');
-      expect(data.hash, 'aGFzaA');
-      expect(data.params, {'m': '65536', 't': '3', 'p': '4'});
+  group('Modular Crypt Format', () {
+    group('on valid string', () {
+      test('including all parts', () {
+        var v =
+            r"$argon2id$v=19$m=65536,t=2,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without version', () {
+        var v =
+            r"$argon2id$m=65536,t=2,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without params', () {
+        var v =
+            r"$argon2id$v=19$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without hash', () {
+        String v = r"$argon2id$v=19$m=65536,t=2,p=1$gZiV/M1gPc22ElAH/Jh1Hw";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without salt and hash', () {
+        String v = r"$argon2id$v=19$m=65536,t=2,p=1";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without version and params', () {
+        var v =
+            r"$argon2id$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without params, salt and hash', () {
+        var v = r"$argon2id$v=19";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without version, params and hash', () {
+        var v = r"$argon2id$gZiV/M1gPc22ElAH/Jh1Hw";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
+      test('without version, params, salt and hash', () {
+        var v = r"$argon2id";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
     });
 
-    test('saltBytes and hashBytes', () {
-      final data = CryptData('id', salt: 'c2FsdA', hash: 'aGFzaA');
-      expect(data.saltBytes(), isA<List<int>>());
-      expect(data.hashBytes(), isA<List<int>>());
-      expect(String.fromCharCodes(data.saltBytes()!), 'salt');
-      expect(String.fromCharCodes(data.hashBytes()!), 'hash');
-    });
+    group('Decoder failure cases', () {
+      test('throws on empty string', () {
+        expectError<FormatException>(
+          () => fromCrypt(''),
+          'FormatException: Empty string',
+        );
+      });
+      test('throws on invalid start character', () {
+        expectError<FormatException>(
+          () => fromCrypt('s'),
+          r'FormatException: Does not start with "$"',
+        );
+      });
 
-    test('versionInt', () {
-      final data = CryptData('id', version: '42');
-      expect(data.versionInt(), 42);
+      test('empty string with a single dollar sign', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r'$'),
+          'Invalid argument (id): must be [a-z0-9-] and under 32 characters: ""',
+        );
+      });
+      test('id is more than 32 characters', () {
+        var name = List.filled(50, 'a').join();
+        expectError<ArgumentError>(
+          () => fromCrypt('\$$name'),
+          'Invalid argument (id): must be [a-z0-9-] and under 32 characters: "$name"',
+        );
+      });
+      test('id contains invalid characters', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$v=19"),
+          'Invalid argument (id): must be [a-z0-9-] and under 32 characters: "v=19"',
+        );
+      });
 
-      final invalid = CryptData('id', version: 'abc');
-      expect(invalid.versionInt(), null);
-
-      final none = CryptData('id');
-      expect(none.versionInt(), null);
-    });
-
-    test('hasParam, getParam, getIntParam', () {
-      final data = CryptData('id', params: {'x': '123', 'y': 'abc'});
-      expect(data.hasParam('x'), true);
-      expect(data.hasParam('z'), false);
-      expect(data.getParam('x'), '123');
-      expect(data.getParam('y'), 'abc');
-      expect(data.getParam('z'), null);
-      expect(data.getIntParam('x'), 123);
-      expect(data.getIntParam('y'), null);
-      expect(data.getIntParam('z'), null);
-    });
-
-    test('validate passes for valid data', () {
-      final data = CryptData(
-        'argon2id',
-        version: '19',
-        salt: 'c2FsdA',
-        hash: 'aGFzaA',
-        params: {'m': '65536', 't': '3', 'p': '4'},
-      );
-      expect(() => data.validate(), returnsNormally);
-    });
-
-    test('validate fails for invalid id', () {
-      final data = CryptData('Argon2id!');
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for invalid version', () {
-      final data = CryptData('id', version: 'v19');
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for invalid param key', () {
-      final data = CryptData('id', params: {'bad_key!': '123'});
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for reserved param key "v"', () {
-      final data = CryptData('id', params: {'v': '123'});
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for empty param value', () {
-      final data = CryptData('id', params: {'x': ''});
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for invalid param value', () {
-      final data = CryptData('id', params: {'x': 'bad*value'});
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for invalid salt', () {
-      final data = CryptData('id', salt: 'bad*salt');
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('validate fails for invalid hash', () {
-      final data = CryptData('id', hash: 'bad*hash');
-      expect(() => data.validate(), throwsArgumentError);
-    });
-
-    test('builder returns CryptDataBuilder', () {
-      final builder = CryptData.builder('argon2id');
-      expect(builder.runtimeType.toString(), contains('CryptDataBuilder'));
+      test('empty version', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$v=sd"),
+          'Invalid argument (version): '
+          'must be decimal digits without leading zeros: "sd"',
+        );
+      });
+      test('using reserved key in parameter', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$v=3$v=42"),
+          'Invalid argument (params.key): reserved; use version field instead: "v"',
+        );
+      });
+      test('using reserved key in parameter', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$v=3$p=3,v=42"),
+          'Invalid argument (params.key): reserved; use version field instead: "v"',
+        );
+      });
+      test('empty parameter name', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$=1"),
+          'Invalid argument (params.key): must be [a-z0-9-] and under 32 chars: ""',
+        );
+      });
+      test('empty parameter value', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$sd=,3=2"),
+          'Invalid argument (params[sd]): value is empty: ""',
+        );
+      });
+      test('parameter value with invalid character', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$sd=o@o,3=2"),
+          'Invalid argument (params[sd]): value has invalid characters: "o@o"',
+        );
+      });
+      test('parameter without equal sign', () {
+        expectError<FormatException>(
+          () => fromCrypt(r"$argon2id$k,f=3$salt$hash"),
+          'FormatException: Invalid parameter: "k"',
+        );
+      });
+      test('duplicate parameter keys', () {
+        expectError<FormatException>(
+          () => fromCrypt(r"$argon2id$k=1,k=2$salt$hash"),
+          'FormatException: Duplicate parameter key: "k"',
+        );
+      });
+      test('empty parameters fields', () {
+        expectError<FormatException>(
+          () => fromCrypt(r"$argon2id$,$salt"),
+          'FormatException: Invalid parameter: ""',
+        );
+      });
+      test('invalid character in salt value', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$3$v=3$p=2$p&p"),
+          'Invalid argument (salt): '
+          'must be characters in [a-zA-Z0-9/+.-]: "p&p"',
+        );
+      });
+      test('equal sign with salt value', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$3$v=3$p=2$salt="),
+          'Invalid argument (salt): '
+          'must be characters in [a-zA-Z0-9/+.-]: "salt="',
+        );
+      });
+      test('invalid character in hash value', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$2$salt$er*er"),
+          'Invalid argument (hash): expected B64 string without padding: "er*er"',
+        );
+      });
+      test('equal sign with hash value', () {
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$2$salt$hash="),
+          'Invalid argument (hash): expected B64 string without padding: "hash="',
+        );
+      });
+      test('extra characters at the end', () {
+        expectError<FormatException>(
+          () => fromCrypt(r"$argon2id$salt$hash$extra"),
+          'FormatException: Extra characters at the end',
+        );
+      });
+      test('extra dollar sign at the end', () {
+        expectError<FormatException>(
+          () => fromCrypt(r"$argon2id$salt$hash$"),
+          'FormatException: Extra characters at the end',
+        );
+      });
     });
   });
 }

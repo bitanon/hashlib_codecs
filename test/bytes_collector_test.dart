@@ -190,8 +190,9 @@ void main() {
         expect(x.isEqual(const _BytesIterable([1, 2, 9])), isFalse);
         // Extra elements: exhaust digest length then fail on excess.
         expect(x.isEqual(const _BytesIterable([1, 2, 3, 4])), isFalse);
-        // Fewer elements than digest: loop ends with return true (known API).
-        expect(x.isEqual(const _BytesIterable([1, 2])), isTrue);
+        // Fewer elements than digest: a strict prefix is not equal.
+        expect(x.isEqual(const _BytesIterable([1, 2])), isFalse);
+        expect(x.isEqual(const _BytesIterable([])), isFalse);
       });
 
       test('List<int> byte mismatch', () {

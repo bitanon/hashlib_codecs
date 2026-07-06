@@ -23,10 +23,10 @@ class AlphabetEncoder extends ByteEncoder {
   /// - The output array will be padded with the [padding] to make the length of
   ///   the array to be divisible by [source].
   const AlphabetEncoder({
-    required int bits,
+    required super.bits,
     required this.alphabet,
     this.padding,
-  }) : super(bits: bits);
+  });
 
   @override
   int get target => bits;
@@ -87,14 +87,50 @@ class AlphabetDecoder extends BitDecoder {
   int get source => bits;
 
   @override
-  List<int> convert(List<int> encoded) {
-    int x;
-    return super.convert(encoded.map((y) {
-      if (y == padding) return -1;
+  Uint8List convert(List<int> encoded) {
+    int i, x, y, p, n, l, sb;
+    sb = bits;
+    if (sb < 2 || sb > 64) {
+      throw ArgumentError('The source bit length should be between 2 to 64');
+    }
+
+    var out = Uint8List((encoded.length * sb) >>> 3);
+
+    // fuse the alphabet lookup with the bit regrouping to avoid building an
+    // intermediate list per call
+    p = n = l = 0;
+    for (i = 0; i < encoded.length; ++i) {
+      y = encoded[i];
+      if (y == padding) break;
       if (y < 0 || y >= alphabet.length || (x = alphabet[y]) < 0) {
-        throw FormatException('Invalid character $y');
+        throw FormatException('Invalid character $y at $i');
       }
-      return x;
-    }).toList());
+      p = (p << sb) ^ x;
+      n += sb;
+      while (n >= 8) {
+        n -= 8;
+        out[l++] = p >>> n;
+        p &= (1 << n) - 1;
+      }
+    }
+
+    // conversion stops at the first padding character, but the rest of
+    // the input must still be padding or alphabet characters
+    for (; i < encoded.length; ++i) {
+      y = encoded[i];
+      if (y != padding) {
+        throw FormatException('Invalid character $y at $i');
+      }
+    }
+
+    // p > 0 means that there is a non-zero partial word remaining
+    if (p > 0) {
+      throw FormatException('Invalid length');
+    }
+
+    if (l < out.length) {
+      return out.sublist(0, l);
+    }
+    return out;
   }
 }

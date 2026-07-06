@@ -1,3 +1,20 @@
+# 3.3.0
+
+- [**Breaking Changes**]
+  - `ByteCollector.isEqual` requires an `Iterable` argument to match the full
+    length; previously a strict prefix of the bytes compared equal.
+  - `CryptData.validate` now follows the [PHC string format specification](https://github.com/C2SP/C2SP/blob/main/phc-strings.md)
+    strictly: the hash must be a B64 string (`[a-zA-Z0-9/+]`, no `.` or `-`),
+    and the version must not have leading zeros.
+  - Reject invalid values after padding in `AlphabetDecoder`. Affected codecs are `Base32` and `Base64`.
+- `ByteCollector.isEqual` now compares content in constant time, making it safe
+  for comparing MACs and message digests
+- Performance improvements (measured on Apple Silicon, 10KB inputs):
+  - Base-32 decoding: ~6x faster (425 Mbps -> 2.52 Gbps)
+  - Base-64 decoding: ~6.4x faster (453 Mbps -> 2.9 Gbps)
+  - UTF-8 encoding: ~6.5x faster (403 Mbps -> 2.61 Gbps)
+- Update the PHC string format specification link to its new home at C2SP
+
 # 3.2.0
 
 - [**Breaking Changes**]

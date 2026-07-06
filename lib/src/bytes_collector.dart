@@ -129,6 +129,10 @@ abstract class ByteCollector extends Object {
   /// This function will return True if all bytes in the [other] matches with
   /// the [bytes] of this object. If the length does not match, or the type of
   /// [other] is not supported, it returns False immediately.
+  ///
+  /// The content comparison is constant-time: it does not exit early on the
+  /// first mismatching byte, making this method safe for comparing MACs and
+  /// message digests.
   bool isEqual(dynamic other) {
     if (identical(this, other)) {
       return true;
@@ -142,24 +146,15 @@ abstract class ByteCollector extends Object {
       );
     } else if (other is String) {
       return isEqual(fromHex(other));
-    } else if (other is List<int>) {
-      if (other.length != bytes.length) {
-        return false;
-      }
-      for (int i = 0; i < bytes.length; ++i) {
-        if (other[i] != bytes[i]) {
-          return false;
-        }
-      }
-      return true;
     } else if (other is Iterable<int>) {
-      int i = 0;
+      int i = 0, diff = 0;
       for (int x in other) {
-        if (i >= bytes.length || x != bytes[i++]) {
+        if (i >= bytes.length) {
           return false;
         }
+        diff |= x ^ bytes[i++];
       }
-      return true;
+      return i == bytes.length && diff == 0;
     }
     return false;
   }

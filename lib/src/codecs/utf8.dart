@@ -34,8 +34,10 @@ class _UTF8Encoder extends BitEncoder {
 
   @override
   Uint8List convert(List<int> input) {
-    List<int> out = <int>[];
     int len = input.length;
+    // worst case: 4 bytes per input element, filled left to right
+    var out = Uint8List(len << 2);
+    int l = 0;
     for (int x, y, p = 0; p < len; ++p) {
       x = input[p];
       // check negative code
@@ -57,24 +59,27 @@ class _UTF8Encoder extends BitEncoder {
       }
       // extract bytes
       if (x <= _range1) {
-        out.add(x & 0x7F);
+        out[l++] = x & 0x7F;
       } else if (x <= _range2) {
-        out.add(0xC0 | ((x >>> 6) & 0x1F));
-        out.add(0x80 | (x & 0x3F));
+        out[l++] = 0xC0 | ((x >>> 6) & 0x1F);
+        out[l++] = 0x80 | (x & 0x3F);
       } else if (x <= _range3) {
-        out.add(0xE0 | ((x >>> 12) & 0xF));
-        out.add(0x80 | ((x >>> 6) & 0x3F));
-        out.add(0x80 | (x & 0x3F));
+        out[l++] = 0xE0 | ((x >>> 12) & 0xF);
+        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
+        out[l++] = 0x80 | (x & 0x3F);
       } else if (x <= _range4) {
-        out.add(0xF0 | ((x >>> 18) & 0x7));
-        out.add(0x80 | ((x >>> 12) & 0x3F));
-        out.add(0x80 | ((x >>> 6) & 0x3F));
-        out.add(0x80 | (x & 0x3F));
+        out[l++] = 0xF0 | ((x >>> 18) & 0x7);
+        out[l++] = 0x80 | ((x >>> 12) & 0x3F);
+        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
+        out[l++] = 0x80 | (x & 0x3F);
       } else {
         throw FormatException('Invalid code $x at $p');
       }
     }
-    return Uint8List.fromList(out);
+    if (l == out.length) {
+      return out;
+    }
+    return out.sublist(0, l);
   }
 }
 

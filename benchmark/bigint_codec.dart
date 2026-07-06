@@ -5,7 +5,7 @@ class BigIntDecodeBenchmark extends BenchmarkBase {
   final int size = 10000;
   BigInt input = BigInt.zero;
 
-  BigIntDecodeBenchmark(String name) : super(name);
+  BigIntDecodeBenchmark(super.name);
 
   @override
   void setup() {

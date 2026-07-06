@@ -21,7 +21,7 @@ Uint8List toUtf8(
   UTF8Codec codec = UTF8Codec.standard,
 }) {
   var out = codec.encoder.convert(input.codeUnits);
-  return Uint8List.fromList(out);
+  return out is Uint8List ? out : Uint8List.fromList(out);
 }
 
 /// Converts 8-bit UTF-8 octet sequence to UTF-8 character code points.

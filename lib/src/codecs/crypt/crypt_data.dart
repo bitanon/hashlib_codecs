@@ -30,13 +30,15 @@ class CryptData {
   /// - [id] The identifier name, must not exceed 32 characters in length and
   ///   must be a sequence of characters in: `[a-z0-9-]`.
   /// - [version] (Optional) The value for the version must be a sequence of
-  ///   characters in: `[0-9]`.
+  ///   characters in: `[0-9]`, without leading zeros.
   /// - [params] (Optional) A map containing name, value pairs of algorithm
   ///   parameters. The names must not exceed 32 characters in length and must
   ///   be a sequence of characters in: `[a-z0-9-]`, the values must be a
   ///   sequence of characters in: `[a-zA-Z0-9/+.-]`.
-  /// - [salt] (Optional) The salt bytes.
-  /// - [hash] (Optional) The output hash bytes.
+  /// - [salt] (Optional) The salt, a sequence of characters in:
+  ///   `[a-zA-Z0-9/+.-]`.
+  /// - [hash] (Optional) The output hash, a B64 string (standard Base64
+  ///   alphabet `[a-zA-Z0-9/+]` without padding).
   const CryptData(
     this.id, {
     this.salt,
@@ -82,9 +84,12 @@ class CryptData {
   /// Validate this PHC string.
   /// Throws [ArgumentError] when any field is invalid.
   void validate() {
-    final digitRe = RegExp(r'^[0-9]+$');
+    // Character sets per the PHC string format specification:
+    // https://github.com/C2SP/C2SP/blob/main/phc-strings.md
+    final versionRe = RegExp(r'^(0|[1-9][0-9]*)$');
     final alnumRe = RegExp(r'^[a-z0-9-]{1,32}$');
-    final base64Re = RegExp(r'^[a-zA-Z0-9/+.-]+$');
+    final valueRe = RegExp(r'^[a-zA-Z0-9/+.-]+$');
+    final b64Re = RegExp(r'^[a-zA-Z0-9/+]+$');
 
     // id
     if (!alnumRe.hasMatch(id)) {
@@ -93,8 +98,9 @@ class CryptData {
     }
 
     // version (optional)
-    if (version != null && !digitRe.hasMatch(version!)) {
-      throw ArgumentError.value(version, 'version', 'must be decimal digits');
+    if (version != null && !versionRe.hasMatch(version!)) {
+      throw ArgumentError.value(
+          version, 'version', 'must be decimal digits without leading zeros');
     }
 
     // params (optional)
@@ -112,7 +118,7 @@ class CryptData {
         }
         if (v.isEmpty) {
           throw ArgumentError.value(v, 'params[$k]', 'value is empty');
-        } else if (!base64Re.hasMatch(v)) {
+        } else if (!valueRe.hasMatch(v)) {
           throw ArgumentError.value(
               v, 'params[$k]', 'value has invalid characters');
         }
@@ -120,15 +126,15 @@ class CryptData {
     }
 
     // salt (optional)
-    if (salt != null && !base64Re.hasMatch(salt!)) {
+    if (salt != null && !valueRe.hasMatch(salt!)) {
       throw ArgumentError.value(
-          salt, 'salt', 'expected base64 string without padding');
+          salt, 'salt', 'must be characters in [a-zA-Z0-9/+.-]');
     }
 
     // hash (optional)
-    if (hash != null && !base64Re.hasMatch(hash!)) {
+    if (hash != null && !b64Re.hasMatch(hash!)) {
       throw ArgumentError.value(
-          hash, 'hash', 'expected base64 string without padding');
+          hash, 'hash', 'expected B64 string without padding');
     }
   }
 }

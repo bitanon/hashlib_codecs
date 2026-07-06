@@ -112,28 +112,25 @@ void main() {
     });
     group('decoding with invalid chars', () {
       test('Hashlib!', () {
-        try {
-          fromBase64("Hashlib!");
-          throw Exception('No error thrown');
-        } on FormatException catch (err) {
-          expect(err.message, equals("Invalid character 33"));
-        }
+        expect(
+          () => fromBase64("Hashlib!"),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid character 33 at 7')),
+        );
       });
       test('a.10', () {
-        try {
-          fromBase64("a.10");
-          throw Exception('No error thrown');
-        } on FormatException catch (err) {
-          expect(err.message, equals("Invalid character 46"));
-        }
+        expect(
+          () => fromBase64("a.10"),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid character 46 at 1')),
+        );
       });
       test('s*methings', () {
-        try {
-          fromBase64("s*methings");
-          throw Exception('No error thrown');
-        } on FormatException catch (err) {
-          expect(err.message, equals("Invalid character 42"));
-        }
+        expect(
+          () => fromBase64("s*methings"),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid character 42 at 1')),
+        );
       });
     });
     test("decoding with PHC string format B64 (16 bytes)", () {

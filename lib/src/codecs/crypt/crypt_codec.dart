@@ -17,7 +17,7 @@ import 'crypt_data.dart';
 /// $<id>[$v=<version>][$<param>=<value>(,<param>=<value>)*][$<salt>[$<hash>]]
 /// ```
 ///
-/// [phc]: https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md
+/// [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 class CryptFormat extends Codec<CryptData, String> {
   const CryptFormat();
 

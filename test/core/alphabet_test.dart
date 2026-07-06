@@ -11,6 +11,8 @@ void main() {
       // bits = 8 so encoder should behave like identity before alphabet map
       final encodeAlphabet = List<int>.generate(256, (i) => i); // identity
       final enc = AlphabetEncoder(bits: 8, alphabet: encodeAlphabet);
+      expect(enc.source, equals(8), reason: 'encoder source');
+      expect(enc.target, equals(8), reason: 'encoder target');
       final data = List<int>.generate(256, (i) => i); // 0..255
       final out = enc.convert(data);
       expect(out, data);
@@ -18,6 +20,8 @@ void main() {
       final decodeAlphabet =
           List<int>.generate(256, (i) => i); // inverse (identity)
       final dec = AlphabetDecoder(bits: 8, alphabet: decodeAlphabet);
+      expect(dec.source, equals(8), reason: 'decoder source');
+      expect(dec.target, equals(8), reason: 'decoder source');
       final back = dec.convert(out);
       expect(back, data);
     });
@@ -26,8 +30,13 @@ void main() {
       final bits = 5;
       final encodeAlphabet = List<int>.generate(32, (i) => i); // identity
       const pad = 255;
-      final enc =
-          AlphabetEncoder(bits: bits, alphabet: encodeAlphabet, padding: pad);
+      final enc = AlphabetEncoder(
+        bits: bits,
+        alphabet: encodeAlphabet,
+        padding: pad,
+      );
+      expect(enc.source, equals(8), reason: 'encoder source');
+      expect(enc.target, equals(bits), reason: 'encoder target');
       final input = [0xAB]; // single byte
       final encoded = enc.convert(input);
       // Expect length padded so that length * bits is multiple of 8.
@@ -41,8 +50,13 @@ void main() {
 
       // Build decoder inverse alphabet (identity) with padding
       final decodeAlphabet = List<int>.generate(256, (i) => i < 32 ? i : -1);
-      final dec =
-          AlphabetDecoder(bits: bits, alphabet: decodeAlphabet, padding: pad);
+      final dec = AlphabetDecoder(
+        bits: bits,
+        alphabet: decodeAlphabet,
+        padding: pad,
+      );
+      expect(dec.source, equals(bits), reason: 'decoder source');
+      expect(dec.target, equals(8), reason: 'decoder target');
       final decoded = dec.convert(encoded);
       expect(decoded, input);
     });
@@ -56,11 +70,7 @@ void main() {
       final input = [1, 2, 3];
       final encoded = enc.convert(input);
       // Manually append extra data after padding that should be ignored
-      final withJunk = [
-        ...encoded,
-        pad, // an explicit early padding (should stop here)
-        10, 11, 12
-      ];
+      final withJunk = [...encoded, pad, pad];
       final decodeAlphabet = List<int>.generate(256, (i) => i < 32 ? i : -1);
       final dec =
           AlphabetDecoder(bits: bits, alphabet: decodeAlphabet, padding: pad);
@@ -68,19 +78,59 @@ void main() {
       expect(decoded, input);
     });
 
+    test('Decoder throws for invalid bit size', () {
+      expect(
+        () => AlphabetDecoder(bits: 1, alphabet: [2]).convert([20, 40, 40, 24]),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The source bit length should be between 2 to 64')),
+      );
+      expect(
+        () =>
+            AlphabetDecoder(bits: 128, alphabet: [2]).convert([20, 40, 40, 24]),
+        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
+            'The source bit length should be between 2 to 64')),
+      );
+    });
+
     test('Decoder throws on invalid character (out of range)', () {
       final dec = AlphabetDecoder(
         bits: 5,
         alphabet: List<int>.generate(32, (i) => i),
       );
-      expect(() => dec.convert([40]), throwsFormatException);
+      expect(
+        () => dec.convert([40]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 40 at 0')),
+      );
     });
 
     test('Decoder throws on invalid character (negative mapping)', () {
       // alphabet[y] < 0 triggers FormatException
       final badAlphabet = List<int>.generate(32, (i) => i == 10 ? -1 : i);
       final dec = AlphabetDecoder(bits: 5, alphabet: badAlphabet);
-      expect(() => dec.convert([10]), throwsFormatException);
+      expect(
+        () => dec.convert([10]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 10 at 0')),
+      );
+    });
+
+    test('Decoder throws for invalid character after padding', () {
+      final dec = AlphabetDecoder(
+        bits: 5,
+        padding: 40,
+        alphabet: List<int>.generate(32, (i) => i),
+      );
+      expect(
+        () => dec.convert([20, 40, 39]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 39 at 2')),
+      );
+      expect(
+        () => dec.convert([20, 40, 40, 24]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 24 at 3')),
+      );
     });
 
     test('Base64 encode/decode (no padding)', () {
@@ -137,22 +187,6 @@ void main() {
       final dec =
           AlphabetDecoder(bits: 6, alphabet: decodeAlphabet, padding: pad);
       final decoded = dec.convert(encoded);
-      expect(decoded, input);
-    });
-
-    test('Base64 decoder ignores data after padding', () {
-      final pad = '='.codeUnitAt(0);
-      final enc = AlphabetEncoder(bits: 6, alphabet: b64codes, padding: pad);
-      final input = 'Ma'.codeUnits;
-      final encoded = enc.convert(input); // TWE=
-      final withJunk = [...encoded, 'A'.codeUnitAt(0), 'B'.codeUnitAt(0)];
-      final decodeAlphabet = List<int>.filled(256, -1);
-      for (var i = 0; i < b64codes.length; i++) {
-        decodeAlphabet[b64codes[i]] = i;
-      }
-      final dec =
-          AlphabetDecoder(bits: 6, alphabet: decodeAlphabet, padding: pad);
-      final decoded = dec.convert(withJunk);
       expect(decoded, input);
     });
 

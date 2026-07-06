@@ -8,7 +8,7 @@ export 'codecs/crypt/crypt.dart';
 /// An instance of [CryptFormat] for encoding and decoding hash algorithm output
 /// with [PHC string format][phc]
 ///
-/// [phc]: https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md
+/// [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 const crypt = CryptFormat();
 
 /// Encodes a hash algorithm output to string following PHC string format.

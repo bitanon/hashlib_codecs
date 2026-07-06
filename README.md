@@ -115,7 +115,7 @@ Available codecs:
 ### Modular Crypt Format (PHC String Format)
 
 > Encoding and Decoding of Hash algorithm output according to the
-> [PHC string format specification](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md).
+> [PHC string format specification](https://github.com/C2SP/C2SP/blob/main/phc-strings.md).
 
 | Type     | Available              |
 | -------- | ---------------------- |
