@@ -89,7 +89,6 @@ class CryptData {
     final versionRe = RegExp(r'^(0|[1-9][0-9]*)$');
     final alnumRe = RegExp(r'^[a-z0-9-]{1,32}$');
     final valueRe = RegExp(r'^[a-zA-Z0-9/+.-]+$');
-    final b64Re = RegExp(r'^[a-zA-Z0-9/+]+$');
 
     // id
     if (!alnumRe.hasMatch(id)) {
@@ -132,9 +131,9 @@ class CryptData {
     }
 
     // hash (optional)
-    if (hash != null && !b64Re.hasMatch(hash!)) {
+    if (hash != null && !valueRe.hasMatch(hash!)) {
       throw ArgumentError.value(
-          hash, 'hash', 'expected B64 string without padding');
+          hash, 'hash', 'must be characters in [a-zA-Z0-9/+.-]');
     }
   }
 }
