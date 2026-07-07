@@ -145,6 +145,12 @@ const _base32DecodingWordSafe = [
 // Base-32 Codec
 // ========================================================
 
+/// Encodes and decodes 8-bit byte sequences as Base-32 text.
+///
+/// Several alphabets are available as `static const` instances: [standard] and
+/// [standardNoPadding] (RFC 4648), [lowercase] and [lowercaseNoPadding], [hex]
+/// and [hexLower] (base32hex), [crockford], [geohash], [z] (z-base-32), and
+/// [wordSafe].
 class Base32Codec extends IterableCodec {
   @override
   final AlphabetEncoder encoder;
@@ -249,7 +255,6 @@ class Base32Codec extends IterableCodec {
   /// Codec instance to encode and decode 8-bit integer sequence to 5-bit
   /// Base-32 character sequence using the alphabet of
   /// [base32hex](https://en.wikipedia.org/wiki/Base32#base32hex):
-  /// :
   /// ```
   /// 0123456789ABCDEFGHIJKLMNOPQRSTUV
   /// ```

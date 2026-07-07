@@ -7,7 +7,8 @@ import 'package:hashlib_codecs/src/base64.dart';
 
 import 'crypt_builder.dart';
 
-/// The PHC string format data
+/// A parsed PHC / Modular Crypt Format string: an algorithm [id] with an
+/// optional [version], [params], [salt], and [hash].
 class CryptData {
   /// The symbolic name for the hash function.
   final String id;
@@ -54,8 +55,8 @@ class CryptData {
   /// - [id] : The identifier name, which must not exceed 32 characters in
   ///   length and must be a sequence of characters in `[a-z0-9-]`.
   ///
-  ///   Good identifiers should be should be explicit (human readable, not a
-  ///   single digit), with a length of about 5 to 10 characters.
+  ///   Good identifiers should be explicit (human readable, not a single
+  ///   digit), with a length of about 5 to 10 characters.
   static CryptDataBuilder builder(String id) => CryptDataBuilder(id);
 
   /// Parse the [salt] using standard Base-64 codec

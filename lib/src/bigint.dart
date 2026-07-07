@@ -46,7 +46,7 @@ BigInt toBigInt(
 /// - [codec] is the [BigIntCodec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
-/// Raises:
+/// Throws:
 /// - [FormatException] when the [input] is negative.
 Uint8List fromBigInt(
   BigInt input, {

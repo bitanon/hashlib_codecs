@@ -11,12 +11,25 @@ export 'codecs/crypt/crypt.dart';
 /// [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 const crypt = CryptFormat();
 
-/// Encodes a hash algorithm output to string following PHC string format.
+/// Encodes [input] into a PHC / Modular Crypt Format string.
+///
+/// Parameters:
+/// - [input] is the [CryptData] to serialize.
+///
+/// Throws:
+/// - [ArgumentError] if any field of [input] is invalid.
 String toCrypt(CryptData input) {
   return crypt.encoder.convert(input);
 }
 
-/// Decodes a string to an hash algorithm config following PHC string format.
+/// Decodes a PHC / Modular Crypt Format string into [CryptData].
+///
+/// Parameters:
+/// - [input] is the crypt string to parse.
+///
+/// Throws:
+/// - [FormatException] if [input] is not a well-formed crypt string.
+/// - [ArgumentError] if a parsed field is invalid.
 CryptData fromCrypt(String input) {
   return crypt.decoder.convert(input);
 }

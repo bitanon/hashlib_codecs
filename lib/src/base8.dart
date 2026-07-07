@@ -11,8 +11,8 @@ import 'codecs/base8.dart';
 /// - [input] is a sequence of 8-bit integers.
 /// - [codec] is the [Base8Codec] to use. Default: [Base8Codec.standard].
 ///
-/// **NOTE:**, This implementation is a bit-wise encoding of the input bytes.
-/// To get the numeric representation of the [input] in binary:
+/// **NOTE:** This implementation is a bit-wise encoding of the input bytes.
+/// To get the numeric representation of the [input] in octal:
 /// ```dart
 /// toBigInt(input).toRadixString(8)
 /// ```
@@ -35,7 +35,7 @@ String toOctal(
 ///
 /// If a partial string is detected, the following bits are assumed to be zeros.
 ///
-/// **NOTE:**, This implementation is a bit-wise decoding of the input bytes.
+/// **NOTE:** This implementation is a bit-wise decoding of the input bytes.
 /// To get the bytes from the numeric representation of the [input]:
 /// ```dart
 /// fromBigInt(BigInt.parse(input, radix: 8));

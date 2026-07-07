@@ -67,6 +67,11 @@ const _base64DecodingBcrypt = [
 // Base-64 Codec
 // ========================================================
 
+/// Encodes and decodes 8-bit byte sequences as Base-64 text.
+///
+/// Several alphabets are available as `static const` instances: [standard] and
+/// [standardNoPadding] (RFC 4648), [urlSafe] and [urlSafeNoPadding], and
+/// [bcrypt].
 class Base64Codec extends IterableCodec {
   @override
   final AlphabetEncoder encoder;

@@ -7,6 +7,7 @@ import 'crypt_data.dart';
 
 /// Convenient builder for [CryptData].
 class CryptDataBuilder {
+  /// The symbolic name of the hash function.
   final String id;
   String? _version;
   String? _salt;
@@ -19,13 +20,14 @@ class CryptDataBuilder {
   /// - [id] : The identifier name, which must not exceed 32 characters in
   ///   length and must be a sequence of characters in `[a-z0-9-]`.
   ///
-  ///   Good identifiers should be should be explicit (human readable, not a
-  ///   single digit), with a length of about 5 to 10 characters.
+  ///   Good identifiers should be explicit (human readable, not a single
+  ///   digit), with a length of about 5 to 10 characters.
   CryptDataBuilder(this.id);
 
   /// Set the algorithm version.
   ///
-  /// The value for the version must be a sequence of characters in: `[0-9]`.
+  /// The value for the version must be a sequence of decimal digits (`[0-9]`)
+  /// without leading zeros.
   ///
   /// It is recommended to use a default version.
   CryptDataBuilder version(String v) {

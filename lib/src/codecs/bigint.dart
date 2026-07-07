@@ -6,7 +6,10 @@ import 'dart:convert' show Codec, Converter;
 const int _zero = 0x30;
 const int _smallA = 0x61;
 
+/// A converter that encodes an 8-bit integer sequence into a [BigInt].
 typedef BigIntEncoder = Converter<Iterable<int>, BigInt>;
+
+/// A converter that decodes a [BigInt] back into an 8-bit integer sequence.
 typedef BigIntDecoder = Converter<BigInt, Iterable<int>>;
 
 // ========================================================
@@ -137,6 +140,11 @@ class _BigIntMSBFirstDecoder extends BigIntDecoder {
 // BigInt Codec
 // ========================================================
 
+/// Encodes an 8-bit byte sequence into a non-negative [BigInt] and decodes it
+/// back into bytes.
+///
+/// See [msbFirst] (big-endian) and [lsbFirst] (little-endian) for the two byte
+/// orderings.
 class BigIntCodec extends Codec<Iterable<int>, BigInt> {
   @override
   final BigIntEncoder encoder;

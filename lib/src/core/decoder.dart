@@ -5,6 +5,15 @@ import 'dart:typed_data';
 
 import 'codec.dart';
 
+/// A generic decoder that repacks a bit stream into fixed-width words.
+///
+/// Treats the encoded input as a continuous stream of [source]-bit words (most
+/// significant bit first) and regroups the bits into [target]-bit words. A
+/// negative value, or a value wider than [source] bits, marks the end of the
+/// input. A leftover non-zero partial word throws a [FormatException]. Both
+/// [source] and [target] must be in the range 2 to 64.
+///
+/// This is the shared engine behind the fixed-width base codecs.
 abstract class BitDecoder extends HashlibConverter {
   /// Creates a new [BitDecoder] instance.
   const BitDecoder();

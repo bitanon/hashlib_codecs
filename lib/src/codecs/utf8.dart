@@ -199,6 +199,11 @@ class _UTF8Decoder extends BitDecoder {
 // UTF-8 Codec
 // ========================================================
 
+/// Encodes UTF-16 code units into a UTF-8 octet sequence and decodes UTF-8
+/// octets back into code points.
+///
+/// Based on [RFC-3629](https://datatracker.ietf.org/doc/html/rfc3629). See
+/// [standard] for the codec instance.
 class UTF8Codec extends IterableCodec {
   @override
   final BitEncoder encoder;

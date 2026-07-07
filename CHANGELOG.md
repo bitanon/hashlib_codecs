@@ -4,6 +4,9 @@
   `bcrypt`, whose base64 alphabet uses `.`. The `hash` field now accepts the
   same characters as the `salt` (`[a-zA-Z0-9/+.-]`), reverting the overly
   strict B64 restriction introduced in `3.3.0`.
+- Document every public API element (100% dartdoc coverage) and correct several
+  inaccurate doc comments, including the `Base8Codec` alphabet (`01234567`) and
+  the octal/binary notes on `toOctal`.
 
 # 3.3.0
 

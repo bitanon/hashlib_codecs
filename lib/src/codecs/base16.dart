@@ -85,6 +85,9 @@ class _Base16Decoder extends ByteDecoder {
 // Base-16 Codec
 // ========================================================
 
+/// Encodes and decodes 8-bit byte sequences as Base-16 (hexadecimal) text.
+///
+/// See [upper] and [lower] for the available alphabet variants.
 class Base16Codec extends IterableCodec {
   @override
   final ByteEncoder encoder;

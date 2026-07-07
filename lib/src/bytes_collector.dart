@@ -40,7 +40,7 @@ abstract class ByteCollector extends Object {
   /// The message digest as a binary string.
   String binary() => toBinary(bytes);
 
-  /// The message digest as a octal string.
+  /// The message digest as an octal string.
   String octal() => toOctal(bytes);
 
   /// The message digest as a hexadecimal string.
@@ -56,7 +56,7 @@ abstract class ByteCollector extends Object {
   String base32({bool upper = true, bool padding = true}) =>
       toBase32(bytes, lower: !upper, padding: padding);
 
-  /// The message digest as a Base-64 string with no padding.
+  /// The message digest as a Base-64 string.
   ///
   /// If [urlSafe] is true, the output will have URL-safe base64 alphabets.
   /// If [padding] is true, the output will have `=` padding at the end.
@@ -71,7 +71,7 @@ abstract class ByteCollector extends Object {
   BigInt bigInt({Endian endian = Endian.little}) =>
       toBigInt(bytes, msbFirst: endian == Endian.big);
 
-  /// Gets unsiged integer of [bitLength]-bit from the message digest.
+  /// Gets an unsigned integer of [bitLength]-bit from the message digest.
   ///
   /// If [endian] is [Endian.little], it will treat the digest bytes as a little
   /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the

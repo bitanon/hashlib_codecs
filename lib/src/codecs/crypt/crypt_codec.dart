@@ -19,6 +19,7 @@ import 'crypt_data.dart';
 ///
 /// [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 class CryptFormat extends Codec<CryptData, String> {
+  /// Creates a new [CryptFormat] instance.
   const CryptFormat();
 
   @override
@@ -30,6 +31,7 @@ class CryptFormat extends Codec<CryptData, String> {
 
 /// The encoder used by the [CryptFormat] codec
 class CryptEncoder extends Converter<CryptData, String> {
+  /// Creates a new [CryptEncoder] instance.
   const CryptEncoder();
 
   @override
@@ -59,6 +61,7 @@ class CryptEncoder extends Converter<CryptData, String> {
 
 /// The decoder used by the [CryptFormat] codec
 class CryptDecoder extends Converter<String, CryptData> {
+  /// Creates a new [CryptDecoder] instance.
   const CryptDecoder();
 
   @override

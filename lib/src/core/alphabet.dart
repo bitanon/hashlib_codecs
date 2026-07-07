@@ -6,7 +6,12 @@ import 'dart:typed_data';
 import 'byte.dart';
 import 'decoder.dart';
 
+/// A [ByteEncoder] that maps each output word to a character code through an
+/// [alphabet] lookup table, optionally appending a [padding] character.
+///
+/// This backs the alphabet-based codecs such as Base-32 and Base-64.
 class AlphabetEncoder extends ByteEncoder {
+  /// The lookup table mapping each output word value to its character code.
   final List<int> alphabet;
 
   /// The padding character.
@@ -58,8 +63,16 @@ class AlphabetEncoder extends ByteEncoder {
   }
 }
 
+/// A [BitDecoder] that maps each input character code to its word value through
+/// an [alphabet] lookup table before regrouping the bits.
+///
+/// This backs the alphabet-based codecs such as Base-32 and Base-64.
 class AlphabetDecoder extends BitDecoder {
+  /// The bit-length of a single word in the encoded input.
   final int bits;
+
+  /// The reverse lookup table mapping a character code to its word value, with
+  /// `-1` for character codes that are not part of the alphabet.
   final List<int> alphabet;
 
   @override

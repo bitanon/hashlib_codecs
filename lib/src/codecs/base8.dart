@@ -125,6 +125,9 @@ class _Base8Decoder extends ByteDecoder {
 // Base-8 Codec
 // ========================================================
 
+/// Encodes and decodes 8-bit byte sequences as Base-8 (octal) text.
+///
+/// See [standard] for the only alphabet variant.
 class Base8Codec extends IterableCodec {
   @override
   final ByteEncoder encoder;
@@ -140,7 +143,7 @@ class Base8Codec extends IterableCodec {
   /// Codec instance to encode and decode 8-bit integer sequence to 3-bit
   /// Base-8 or Octal character sequence using the alphabet:
   /// ```
-  /// 012345678
+  /// 01234567
   /// ```
   static const Base8Codec standard = Base8Codec._(
     encoder: _Base8Encoder(),

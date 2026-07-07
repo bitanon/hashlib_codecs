@@ -86,6 +86,9 @@ class _Base2Decoder extends ByteDecoder {
 // Base-2 Codec
 // ========================================================
 
+/// Encodes and decodes 8-bit byte sequences as Base-2 (binary) text.
+///
+/// See [standard] for the only alphabet variant.
 class Base2Codec extends IterableCodec {
   @override
   final ByteEncoder encoder;
