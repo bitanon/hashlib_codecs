@@ -1,5 +1,6 @@
 /test
 /test_integration
+/shim
 /coverage
 /benchmark
 /doc
