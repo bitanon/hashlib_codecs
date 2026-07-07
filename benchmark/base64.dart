@@ -2,13 +2,18 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:convert' as cvt;
+import 'dart:typed_data';
 
 import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
-class HashlibBase64Encode extends Benchmark {
-  HashlibBase64Encode(int size, int iter) : super('convertlib', size, iter);
+class ConvertlibBase64Encode extends SyncBenchmark {
+  final Uint8List input;
+
+  ConvertlibBase64Encode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('convertlib', size);
 
   @override
   void run() {
@@ -16,8 +21,12 @@ class HashlibBase64Encode extends Benchmark {
   }
 }
 
-class ConvertBase64Encode extends Benchmark {
-  ConvertBase64Encode(int size, int iter) : super('dart:convert', size, iter);
+class ConvertBase64Encode extends SyncBenchmark {
+  final Uint8List input;
+
+  ConvertBase64Encode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('dart:convert', size);
 
   @override
   void run() {
@@ -25,10 +34,13 @@ class ConvertBase64Encode extends Benchmark {
   }
 }
 
-class HashlibBase64Decode extends Benchmark {
+class ConvertlibBase64Decode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  HashlibBase64Decode(int size, int iter) : super('convertlib', size, iter);
+  ConvertlibBase64Decode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('convertlib', size);
 
   @override
   void setup() {
@@ -41,10 +53,13 @@ class HashlibBase64Decode extends Benchmark {
   }
 }
 
-class ConvertBase64Decode extends Benchmark {
+class ConvertBase64Decode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  ConvertBase64Decode(int size, int iter) : super('dart:convert', size, iter);
+  ConvertBase64Decode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('dart:convert', size);
 
   @override
   void setup() {
@@ -57,16 +72,17 @@ class ConvertBase64Decode extends Benchmark {
   }
 }
 
-void main() {
-  const size = 10 << 10;
-  const iter = 100;
-  print('--- Base-64 encoding (${formatSize(size)} x $iter) ---');
-  HashlibBase64Encode(size, iter).measureDiff([
-    ConvertBase64Encode(size, iter),
-  ]);
-  print('');
-  print('--- Base-64 decoding (${formatSize(size)} x $iter) ---');
-  HashlibBase64Decode(size, iter).measureDiff([
-    ConvertBase64Decode(size, iter),
-  ]);
+void main() async {
+  print('--------- Base-64 ----------');
+  for (var size in [1 << 20, 1 << 10, 1 << 5]) {
+    print('---- encode: ${formatSize(size)} ----');
+    await ConvertlibBase64Encode(size).measureDiff([
+      ConvertBase64Encode(size),
+    ]);
+    print('---- decode: ${formatSize(size)} ----');
+    await ConvertlibBase64Decode(size).measureDiff([
+      ConvertBase64Decode(size),
+    ]);
+    print('');
+  }
 }

@@ -9,8 +9,12 @@ import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
-class HashlibBase32Encode extends Benchmark {
-  HashlibBase32Encode(int size, int iter) : super('convertlib', size, iter);
+class ConvertlibBase32Encode extends SyncBenchmark {
+  final Uint8List input;
+
+  ConvertlibBase32Encode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('convertlib', size);
 
   @override
   void run() {
@@ -18,42 +22,39 @@ class HashlibBase32Encode extends Benchmark {
   }
 }
 
-class BaseCodecsBase32Encode extends Benchmark {
-  Uint8List data = Uint8List(0);
+class BaseCodecsBase32Encode extends SyncBenchmark {
+  final Uint8List input;
 
-  BaseCodecsBase32Encode(int size, int iter) : super('base_codecs', size, iter);
-
-  @override
-  void setup() {
-    data = Uint8List.fromList(input);
-  }
+  BaseCodecsBase32Encode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('base_codecs', size);
 
   @override
   void run() {
-    bc.base32RfcEncode(data);
+    bc.base32RfcEncode(input);
   }
 }
 
-class Base32PackageEncode extends Benchmark {
-  Uint8List data = Uint8List(0);
+class Base32PackageEncode extends SyncBenchmark {
+  final Uint8List input;
 
-  Base32PackageEncode(int size, int iter) : super('base32', size, iter);
-
-  @override
-  void setup() {
-    data = Uint8List.fromList(input);
-  }
+  Base32PackageEncode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('base32', size);
 
   @override
   void run() {
-    b32.base32.encode(data);
+    b32.base32.encode(input);
   }
 }
 
-class HashlibBase32Decode extends Benchmark {
+class ConvertlibBase32Decode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  HashlibBase32Decode(int size, int iter) : super('convertlib', size, iter);
+  ConvertlibBase32Decode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('convertlib', size);
 
   @override
   void setup() {
@@ -66,10 +67,13 @@ class HashlibBase32Decode extends Benchmark {
   }
 }
 
-class BaseCodecsBase32Decode extends Benchmark {
+class BaseCodecsBase32Decode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  BaseCodecsBase32Decode(int size, int iter) : super('base_codecs', size, iter);
+  BaseCodecsBase32Decode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('base_codecs', size);
 
   @override
   void setup() {
@@ -82,10 +86,13 @@ class BaseCodecsBase32Decode extends Benchmark {
   }
 }
 
-class Base32PackageDecode extends Benchmark {
+class Base32PackageDecode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  Base32PackageDecode(int size, int iter) : super('base32', size, iter);
+  Base32PackageDecode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('base32', size);
 
   @override
   void setup() {
@@ -98,18 +105,19 @@ class Base32PackageDecode extends Benchmark {
   }
 }
 
-void main() {
-  const size = 10 << 10;
-  const iter = 100;
-  print('--- Base-32 encoding (${formatSize(size)} x $iter) ---');
-  HashlibBase32Encode(size, iter).measureDiff([
-    BaseCodecsBase32Encode(size, iter),
-    Base32PackageEncode(size, iter),
-  ]);
-  print('');
-  print('--- Base-32 decoding (${formatSize(size)} x $iter) ---');
-  HashlibBase32Decode(size, iter).measureDiff([
-    BaseCodecsBase32Decode(size, iter),
-    Base32PackageDecode(size, iter),
-  ]);
+void main() async {
+  print('--------- Base-32 ----------');
+  for (var size in [1 << 20, 1 << 10, 1 << 5]) {
+    print('---- encode: ${formatSize(size)} ----');
+    await ConvertlibBase32Encode(size).measureDiff([
+      BaseCodecsBase32Encode(size),
+      Base32PackageEncode(size),
+    ]);
+    print('---- decode: ${formatSize(size)} ----');
+    await ConvertlibBase32Decode(size).measureDiff([
+      BaseCodecsBase32Decode(size),
+      Base32PackageDecode(size),
+    ]);
+    print('');
+  }
 }

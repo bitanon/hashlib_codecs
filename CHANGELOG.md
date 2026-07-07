@@ -1,3 +1,7 @@
+# 3.4.1
+
+- Refactor existing benchmarks and add missing ones. Dropping `benchmark_harness` dependency in favor of custom benchmarking class with better flexibility.
+
 # 3.4.0
 
 - Rename the package from `hashlib_codecs` to `convertlib`. The public API is

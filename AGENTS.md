@@ -63,9 +63,9 @@ itself; for `UTF8Codec`, encoder = code points → octets).
 ## Hard invariants — never break these
 
 - **Zero runtime dependencies.** `pubspec.yaml` has no `dependencies:` section
-  and never will. Reference packages (`base_codecs`, `base32`, `benchmark_harness`)
-  live under `dev_dependencies` only. If you think you need a package, you need
-  pure Dart instead.
+  and never will. Reference packages (`base_codecs`, `base32`) live under
+  `dev_dependencies` only. If you think you
+  need a package, you need pure Dart instead.
 - **SDK floor is `2.19.0`.** No records, no patterns, no `sealed`/`final`/`base`
   class modifiers, no `switch` expressions, no inline classes. CI runs the full
   test matrix on SDK 2.19 across Linux/macOS/Windows; it will catch you, slowly.

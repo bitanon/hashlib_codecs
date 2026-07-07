@@ -25,15 +25,12 @@ String makeText(int length) {
   return String.fromCharCodes(codes);
 }
 
-class HashlibUtf8Encode extends Benchmark {
-  String text = '';
+class ConvertlibUtf8Encode extends SyncBenchmark {
+  final String text;
 
-  HashlibUtf8Encode(int size, int iter) : super('convertlib', size, iter);
-
-  @override
-  void setup() {
-    text = makeText(size);
-  }
+  ConvertlibUtf8Encode(int size)
+      : text = makeText(size),
+        super('convertlib', size);
 
   @override
   void run() {
@@ -41,15 +38,12 @@ class HashlibUtf8Encode extends Benchmark {
   }
 }
 
-class ConvertUtf8Encode extends Benchmark {
-  String text = '';
+class ConvertUtf8Encode extends SyncBenchmark {
+  final String text;
 
-  ConvertUtf8Encode(int size, int iter) : super('dart:convert', size, iter);
-
-  @override
-  void setup() {
-    text = makeText(size);
-  }
+  ConvertUtf8Encode(int size)
+      : text = makeText(size),
+        super('dart:convert', size);
 
   @override
   void run() {
@@ -57,15 +51,12 @@ class ConvertUtf8Encode extends Benchmark {
   }
 }
 
-class HashlibUtf8Decode extends Benchmark {
-  Uint8List encoded = Uint8List(0);
+class ConvertlibUtf8Decode extends SyncBenchmark {
+  final Uint8List encoded;
 
-  HashlibUtf8Decode(int size, int iter) : super('convertlib', size, iter);
-
-  @override
-  void setup() {
-    encoded = Uint8List.fromList(cvt.utf8.encode(makeText(size)));
-  }
+  ConvertlibUtf8Decode(int size)
+      : encoded = Uint8List.fromList(cvt.utf8.encode(makeText(size))),
+        super('convertlib', size);
 
   @override
   void run() {
@@ -73,15 +64,12 @@ class HashlibUtf8Decode extends Benchmark {
   }
 }
 
-class ConvertUtf8Decode extends Benchmark {
-  Uint8List encoded = Uint8List(0);
+class ConvertUtf8Decode extends SyncBenchmark {
+  final Uint8List encoded;
 
-  ConvertUtf8Decode(int size, int iter) : super('dart:convert', size, iter);
-
-  @override
-  void setup() {
-    encoded = Uint8List.fromList(cvt.utf8.encode(makeText(size)));
-  }
+  ConvertUtf8Decode(int size)
+      : encoded = Uint8List.fromList(cvt.utf8.encode(makeText(size))),
+        super('dart:convert', size);
 
   @override
   void run() {
@@ -89,16 +77,18 @@ class ConvertUtf8Decode extends Benchmark {
   }
 }
 
-void main() {
-  const size = 10 << 10; // code points; ~2.5x that in bytes
-  const iter = 100;
-  print('--- UTF-8 encoding (${formatSize(size)} chars x $iter) ---');
-  HashlibUtf8Encode(size, iter).measureDiff([
-    ConvertUtf8Encode(size, iter),
-  ]);
-  print('');
-  print('--- UTF-8 decoding (${formatSize(size)} chars x $iter) ---');
-  HashlibUtf8Decode(size, iter).measureDiff([
-    ConvertUtf8Decode(size, iter),
-  ]);
+void main() async {
+  // Size counts source code points; throughput is reported per code point.
+  print('--------- UTF-8 ----------');
+  for (var size in [1 << 20, 1 << 10, 1 << 5]) {
+    print('---- encode: ${formatSize(size)} chars ----');
+    await ConvertlibUtf8Encode(size).measureDiff([
+      ConvertUtf8Encode(size),
+    ]);
+    print('---- decode: ${formatSize(size)} chars ----');
+    await ConvertlibUtf8Decode(size).measureDiff([
+      ConvertUtf8Decode(size),
+    ]);
+    print('');
+  }
 }

@@ -1,109 +1,177 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'dart:math';
+import 'dart:async';
 
-import 'package:benchmark_harness/benchmark_harness.dart';
+/// Minimum number of milliseconds each benchmark should run to ensure accuracy.
+const int warmupDurationMillis = 100;
+const int exerciseDurationMillis = 2000;
 
-Random random = Random();
-
-mixin BenchmarkTools {
-  int get size;
-  int get iter;
-  String get name;
-
-  void $showRate(double runtime) {
-    var nbhps = 1e6 * iter / runtime;
-    var rate = nbhps * size;
-    var rtms = runtime.round() / 1000;
-    var speed = formatSpeed(rate);
-    var mark = '${formatSize(size)} x $iter';
-    print('$name($mark): $rtms ms => ${nbhps.round()} rounds @ $speed');
-  }
-
-  void $showDiff(Map<String, double> diff) {
-    var rate = <String, String>{};
-    for (var name in diff.keys) {
-      var runtime = diff[name]!;
-      var hashRate = 1e6 * iter * size / runtime;
-      diff[name] = runtime;
-      rate[name] = formatSpeed(hashRate);
-    }
-    var mine = diff[name]!;
-    var best = diff.values.fold(mine, min);
-    for (var entry in diff.entries) {
-      var message = "${entry.key} : ${rate[entry.key]}";
-      var value = diff[entry.key]!;
-      if (value == best) {
-        message += ' [best]';
-      }
-      if (mine < value) {
-        var p = formatDecimal(value / mine);
-        message += ' => ${p}x slow';
-      } else if (mine > value) {
-        var p = formatDecimal(mine / value);
-        message += ' => ${p}x fast';
-      }
-      print(message);
-    }
-  }
-
-  void measureDiff([List<BenchmarkTools> others = const []]) {
-    var diff = <String, double>{};
-    for (var benchmark in {this, ...others}) {
-      if (benchmark is Benchmark) {
-        diff[benchmark.name] = benchmark.measure();
-      } else {
-        continue;
-      }
-    }
-    $showDiff(diff);
-  }
-}
-
-abstract class Benchmark extends BenchmarkBase with BenchmarkTools {
-  @override
+// ------------ Interface Classes ------------
+abstract class Benchmark {
   final int size;
-  @override
-  final int iter;
-  final List<int> input;
+  final String name;
 
-  Benchmark(super.name, this.size, this.iter) : input = List.filled(size, 0x3f);
+  const Benchmark(this.name, this.size);
 
-  @override
-  void exercise() {
-    for (int i = 0; i < iter; ++i) {
-      run();
-    }
+  /// Measures the score for the benchmark.
+  Future<void> measureRate() async {
+    await showRate(this);
   }
 
-  void measureRate() {
-    $showRate(measure());
+  /// Measures the difference between the benchmark and the others.
+  Future<void> measureDiff([List<Benchmark> others = const []]) async {
+    await showDiff([this, ...others]);
   }
 }
 
-class KDFBenchmarkBase extends BenchmarkBase {
-  KDFBenchmarkBase(super.name);
+class Measurement {
+  Measurement(this._micros, this._iter, this._bytes);
 
-  @override
-  double measure() {
+  final int _iter;
+  final int _bytes;
+  final int _micros;
+
+  /// Total number of iterations.
+  late final rounds = _iter;
+
+  /// Average runtime in microseconds.
+  late final runtimeMicros = _micros / _iter;
+
+  /// Average runtime in milliseconds.
+  late final runtimeMillis = runtimeMicros / 1000;
+
+  /// Average runtime in seconds.
+  late final runtimeSeconds = runtimeMillis / 1000;
+
+  /// Number of iterations per second.
+  late double rate = 1e6 * _iter / _micros;
+
+  /// Throughput or bandwidth (bytes per second).
+  late double speed = _bytes * rate;
+
+  /// Size in human readable string.
+  late final String sizeString = formatSize(_bytes);
+
+  /// Speed in human readable string.
+  late final String speedString = formatSpeed(speed);
+}
+
+// ------------ Main Classes ------------
+
+abstract class SyncBenchmark extends Benchmark {
+  const SyncBenchmark(super.name, super.size);
+
+  /// The benchmark code.
+  void run();
+
+  /// Not measured setup code executed prior to the benchmark runs.
+  void setup() {}
+
+  /// Not measured teardown code executed after the benchmark runs.
+  void teardown() {}
+
+  /// Measures the score for the benchmark and returns it.
+  Measurement measure() {
     final watch = Stopwatch()..start();
+    final warmupMicros = warmupDurationMillis * 1000;
+    final excerciseMicros = exerciseDurationMillis * 1000;
+    final exerciseJitter = excerciseMicros * 0.1;
+
+    // warmup
+    setup();
     run();
-    watch.reset();
-    run();
-    run();
-    run();
-    return (watch.elapsedMicroseconds / 3).floorToDouble();
+
+    // probe: find how many iterations fit in 1ms
+    int iter = 0;
+    int micros = 0;
+    while (micros < warmupMicros) {
+      watch.reset();
+      run();
+      run();
+      micros += watch.elapsedMicroseconds;
+      iter += 2;
+    }
+
+    // calculate batch size for 1ms runtime (min 10)
+    int batch = (1000 * iter / micros).ceil();
+    if (batch < 10) batch = 10;
+
+    // exercise: measure time in batches
+    iter = 0;
+    micros = 0;
+    while (micros + exerciseJitter < excerciseMicros) {
+      watch.reset();
+      for (int i = 0; i < batch; ++i) {
+        run();
+      }
+      micros += watch.elapsedMicroseconds;
+      iter += batch;
+    }
+
+    watch.stop();
+    teardown();
+    return Measurement(micros, iter, size);
   }
 }
 
-Map<String, int> measureDiff(Iterable<BenchmarkBase> benchmarks) {
-  Map<String, int> data = {};
-  for (BenchmarkBase benchmark in benchmarks) {
-    data[benchmark.name] = benchmark.measure().round();
+abstract class AsyncBenchmark extends Benchmark {
+  AsyncBenchmark(super.name, super.size);
+
+  /// The benchmark code.
+  Future<void> run();
+
+  /// Not measured setup code executed prior to the benchmark runs.
+  Future<void> setup() async {}
+
+  /// Not measures teardown code executed after the benchmark runs.
+  Future<void> teardown() async {}
+
+  /// Measures the score for the benchmark and returns it.
+  Future<Measurement> measure() async {
+    final watch = Stopwatch()..start();
+    final warmupMicros = warmupDurationMillis * 1000;
+    final excerciseMicros = exerciseDurationMillis * 1000;
+    final exerciseJitter = excerciseMicros * 0.1;
+
+    // warmup
+    await setup();
+    await run();
+
+    // probe: find how many iterations fit in 1ms
+    int iter = 0;
+    int micros = 0;
+    while (micros < warmupMicros) {
+      watch.reset();
+      await run();
+      await run();
+      micros += watch.elapsedMicroseconds;
+      iter += 2;
+    }
+
+    // calculate batch size for 1ms runtime (min 10)
+    int batch = (1000 * iter / micros).ceil();
+    if (batch < 10) batch = 10;
+
+    // exercise: measure time in batches
+    iter = 0;
+    micros = 0;
+    while (micros + exerciseJitter < excerciseMicros) {
+      watch.reset();
+      for (int i = 0; i < batch; ++i) {
+        await run();
+      }
+      micros += watch.elapsedMicroseconds;
+      iter += batch;
+    }
+
+    watch.stop();
+    await teardown();
+    return Measurement(micros, iter, size);
   }
-  return data;
 }
+
+/// ------------ Utility Functions ------------
 
 String formatDecimal(double value, [int precision = 2]) {
   var res = value.toStringAsFixed(precision);
@@ -123,7 +191,17 @@ String formatDecimal(double value, [int precision = 2]) {
 String formatSize(num value) {
   int i;
   double size = value.toDouble();
-  const suffix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const suffix = [
+    'B',
+    'KB',
+    'MB',
+    'GB',
+    'TB',
+    'PB',
+    'EB',
+    'ZB',
+    'YB',
+  ];
   for (i = 0; size >= 1024; i++) {
     size /= 1024;
   }
@@ -133,13 +211,72 @@ String formatSize(num value) {
 String formatSpeed(num value) {
   int i;
   double size = (value * 8).toDouble();
-  const suffix = ['', ' kbps', ' Mbps', ' Gbps', ' Tbps'];
-  size /= 1000;
-  for (i = 1; size >= 1000; i++) {
+  const suffix = [
+    'bps',
+    'Kbps',
+    'Mbps',
+    'Gbps',
+    'Tbps',
+    'Pbps',
+    'Ebps',
+    'Zbps',
+    'Ybps',
+  ];
+  for (i = 0; size >= 1000; i++) {
     size /= 1000;
   }
   if (size >= 100) {
     size = size.roundToDouble();
   }
-  return '${formatDecimal(size)}${suffix[i]}';
+  return '${formatDecimal(size)} ${suffix[i]}';
+}
+
+Future<Measurement> measure(Benchmark benchmark) async {
+  if (benchmark is SyncBenchmark) {
+    return benchmark.measure();
+  } else if (benchmark is AsyncBenchmark) {
+    return await benchmark.measure();
+  }
+  throw UnimplementedError();
+}
+
+Future<void> showRate(Benchmark benchmark) async {
+  final result = await measure(benchmark);
+  var message = '${benchmark.name}(${result.sizeString}):';
+  message += ' ${result.runtimeMillis} ms';
+  message += ' => ${result.rate.round()} rounds';
+  message += ' @ ${result.speedString}';
+  print(message);
+}
+
+Future<void> showDiff(List<Benchmark> benchmarks) async {
+  if (benchmarks.isEmpty) {
+    return;
+  }
+
+  double best = 0;
+  final diff = <String, Measurement>{};
+  for (final benchmark in {...benchmarks}) {
+    final result = await measure(benchmark);
+    diff[benchmark.name] = result;
+    if (result.speed > best) {
+      best = result.speed;
+    }
+  }
+
+  for (final name in diff.keys) {
+    final result = diff[name]!;
+    var message = "$name : ${result.speedString}";
+    if (result.speed == best) {
+      message += ' [best]';
+    }
+    if (best < result.speed) {
+      var p = formatDecimal(result.speed / best);
+      message += ' => ${p}x fast';
+    } else if (best > result.speed) {
+      var p = formatDecimal(best / result.speed);
+      message += ' => ${p}x slow';
+    }
+    print(message);
+  }
 }

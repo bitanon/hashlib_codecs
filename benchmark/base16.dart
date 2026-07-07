@@ -8,8 +8,12 @@ import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
-class HashlibHexEncode extends Benchmark {
-  HashlibHexEncode(int size, int iter) : super('convertlib', size, iter);
+class ConvertlibHexEncode extends SyncBenchmark {
+  final Uint8List input;
+
+  ConvertlibHexEncode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('convertlib', size);
 
   @override
   void run() {
@@ -17,26 +21,26 @@ class HashlibHexEncode extends Benchmark {
   }
 }
 
-class BaseCodecsHexEncode extends Benchmark {
-  Uint8List data = Uint8List(0);
+class BaseCodecsHexEncode extends SyncBenchmark {
+  final Uint8List input;
 
-  BaseCodecsHexEncode(int size, int iter) : super('base_codecs', size, iter);
-
-  @override
-  void setup() {
-    data = Uint8List.fromList(input);
-  }
+  BaseCodecsHexEncode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('base_codecs', size);
 
   @override
   void run() {
-    bc.base16Encode(data);
+    bc.base16Encode(input);
   }
 }
 
-class HashlibHexDecode extends Benchmark {
+class ConvertlibHexDecode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  HashlibHexDecode(int size, int iter) : super('convertlib', size, iter);
+  ConvertlibHexDecode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('convertlib', size);
 
   @override
   void setup() {
@@ -49,10 +53,13 @@ class HashlibHexDecode extends Benchmark {
   }
 }
 
-class BaseCodecsHexDecode extends Benchmark {
+class BaseCodecsHexDecode extends SyncBenchmark {
+  final Uint8List input;
   String encoded = '';
 
-  BaseCodecsHexDecode(int size, int iter) : super('base_codecs', size, iter);
+  BaseCodecsHexDecode(int size)
+      : input = Uint8List.fromList(List.filled(size, 0x3f)),
+        super('base_codecs', size);
 
   @override
   void setup() {
@@ -65,16 +72,17 @@ class BaseCodecsHexDecode extends Benchmark {
   }
 }
 
-void main() {
-  const size = 10 << 10;
-  const iter = 100;
-  print('--- Base-16 encoding (${formatSize(size)} x $iter) ---');
-  HashlibHexEncode(size, iter).measureDiff([
-    BaseCodecsHexEncode(size, iter),
-  ]);
-  print('');
-  print('--- Base-16 decoding (${formatSize(size)} x $iter) ---');
-  HashlibHexDecode(size, iter).measureDiff([
-    BaseCodecsHexDecode(size, iter),
-  ]);
+void main() async {
+  print('--------- Base-16 ----------');
+  for (var size in [1 << 20, 1 << 10, 1 << 5]) {
+    print('---- encode: ${formatSize(size)} ----');
+    await ConvertlibHexEncode(size).measureDiff([
+      BaseCodecsHexEncode(size),
+    ]);
+    print('---- decode: ${formatSize(size)} ----');
+    await ConvertlibHexDecode(size).measureDiff([
+      BaseCodecsHexDecode(size),
+    ]);
+    print('');
+  }
 }
