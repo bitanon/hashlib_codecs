@@ -1,3 +1,10 @@
+# 3.3.1
+
+- Fix `CryptData.validate` rejecting valid Modular Crypt Format hashes such as
+  `bcrypt`, whose base64 alphabet uses `.`. The `hash` field now accepts the
+  same characters as the `salt` (`[a-zA-Z0-9/+.-]`), reverting the overly
+  strict B64 restriction introduced in `3.3.0`.
+
 # 3.3.0
 
 - [**Breaking Changes**]

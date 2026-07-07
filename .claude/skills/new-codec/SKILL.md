@@ -124,7 +124,8 @@ asserts — they must agree).
 
 ## 8. CHANGELOG.md
 
-Bullet(s) under a new or the upcoming version heading, house style:
+Bullet(s) under the `# _next_` heading at the top (add it if absent; the owner
+renames it to the real version at release), house style:
 `- Adds Base-N codec support` with sub-bullets for `New class:`/`New methods:`.
 
 ## 9. Showcase — `example/hashlib_codecs_example.dart` and `test_integration/main.dart`

@@ -48,6 +48,13 @@ void main() {
         var v = r"$argon2id";
         expect(toCrypt(fromCrypt(v)), equals(v));
       });
+      test('bcrypt string with "." in the hash field', () {
+        // bcrypt is a Modular Crypt Format string whose base64 alphabet uses
+        // '.', so the hash field must accept it.
+        // https://en.wikipedia.org/wiki/Bcrypt#base64_encoding_alphabet
+        var v = r"$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+      });
     });
 
     group('Decoder failure cases', () {
@@ -156,13 +163,15 @@ void main() {
       test('invalid character in hash value', () {
         expectError<ArgumentError>(
           () => fromCrypt(r"$2$salt$er*er"),
-          'Invalid argument (hash): expected B64 string without padding: "er*er"',
+          'Invalid argument (hash): '
+          'must be characters in [a-zA-Z0-9/+.-]: "er*er"',
         );
       });
       test('equal sign with hash value', () {
         expectError<ArgumentError>(
           () => fromCrypt(r"$2$salt$hash="),
-          'Invalid argument (hash): expected B64 string without padding: "hash="',
+          'Invalid argument (hash): '
+          'must be characters in [a-zA-Z0-9/+.-]: "hash="',
         );
       });
       test('extra characters at the end', () {

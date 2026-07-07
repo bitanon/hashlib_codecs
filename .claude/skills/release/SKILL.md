@@ -43,11 +43,13 @@ CI will reject. **Never run `dart pub publish` locally** (only `--dry-run`).
    Propose the number to the owner with a one-line justification. **Wait for
    confirmation.**
 
-3. **Write the CHANGELOG entry.** New `# X.Y.Z` section at the very top of
-   `CHANGELOG.md`, matching house style: `-` bullets, backticks around
-   identifiers, breaking changes led by `**Breaking Changes**:` with
-   `` `old` -> `new` `` rename lists. This text becomes the GitHub release notes
-   verbatim (CI extracts the top section), so write it for readers, not for git.
+3. **Finalize the CHANGELOG entry.** Unreleased changes already sit under a
+   `# _next_` heading at the top of `CHANGELOG.md` — rename that heading to
+   `# X.Y.Z` (if there is no `_next_` section, add one). Match house style: `-`
+   bullets, backticks around identifiers, breaking changes led by
+   `**Breaking Changes**:` with `` `old` -> `new` `` rename lists. This text
+   becomes the GitHub release notes verbatim (CI extracts the top section), so
+   write it for readers, not for git.
 
 4. **Bump `pubspec.yaml`** `version:` to the same X.Y.Z.
 

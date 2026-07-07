@@ -37,8 +37,9 @@ class CryptData {
   ///   sequence of characters in: `[a-zA-Z0-9/+.-]`.
   /// - [salt] (Optional) The salt, a sequence of characters in:
   ///   `[a-zA-Z0-9/+.-]`.
-  /// - [hash] (Optional) The output hash, a B64 string (standard Base64
-  ///   alphabet `[a-zA-Z0-9/+]` without padding).
+  /// - [hash] (Optional) The output hash, a sequence of characters in:
+  ///   `[a-zA-Z0-9/+.-]`. This stays permissive to accept Modular Crypt Format
+  ///   strings such as bcrypt, whose base64 alphabet includes `.`.
   const CryptData(
     this.id, {
     this.salt,
@@ -84,12 +85,13 @@ class CryptData {
   /// Validate this PHC string.
   /// Throws [ArgumentError] when any field is invalid.
   void validate() {
-    // Character sets per the PHC string format specification:
+    // Character sets follow the PHC string format specification, but the salt
+    // and hash stay permissive to accept Modular Crypt Format strings such as
+    // bcrypt (whose base64 alphabet uses '.').
     // https://github.com/C2SP/C2SP/blob/main/phc-strings.md
     final versionRe = RegExp(r'^(0|[1-9][0-9]*)$');
     final alnumRe = RegExp(r'^[a-z0-9-]{1,32}$');
     final valueRe = RegExp(r'^[a-zA-Z0-9/+.-]+$');
-    final b64Re = RegExp(r'^[a-zA-Z0-9/+]+$');
 
     // id
     if (!alnumRe.hasMatch(id)) {
@@ -132,9 +134,9 @@ class CryptData {
     }
 
     // hash (optional)
-    if (hash != null && !b64Re.hasMatch(hash!)) {
+    if (hash != null && !valueRe.hasMatch(hash!)) {
       throw ArgumentError.value(
-          hash, 'hash', 'expected B64 string without padding');
+          hash, 'hash', 'must be characters in [a-zA-Z0-9/+.-]');
     }
   }
 }

@@ -134,6 +134,12 @@ lead with `**Breaking Changes**:` and list renames as `` `old` -> `new` ``.
 Every released version has an entry; the top entry is extracted verbatim into
 the GitHub release notes by CI.
 
+**Put unreleased changes under a `_next_` heading.** Add a `# _next_` heading
+at the top of the CHANGELOG (if one isn't there already) and list your changes
+under it. The owner renames `_next_` to the real `X.Y.Z` and bumps `pubspec.yaml`
+at release time. Never edit a concrete `# X.Y.Z` section below it — those are
+frozen release history.
+
 **Releases.** One commit contains the CHANGELOG entry + `pubspec.yaml` version
 bump (+ the change itself if small). Tag that commit `vX.Y.Z` and push commit
 and tag. CI: verifies tag == pubspec version → full release-test matrix

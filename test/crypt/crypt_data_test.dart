@@ -108,16 +108,17 @@ void main() {
       expect(() => CryptData('id', version: '0').validate(), returnsNormally);
     });
 
-    test('validate accepts "." and "-" in salt but not in hash', () {
-      // Spec: salt characters are [a-zA-Z0-9/+.-]; the hash is strict B64
-      // ([a-zA-Z0-9/+], no padding).
-      // https://github.com/C2SP/C2SP/blob/main/phc-strings.md
+    test('validate accepts "." and "-" in both salt and hash', () {
+      // The salt and hash stay permissive ([a-zA-Z0-9/+.-]) to accept Modular
+      // Crypt Format strings such as bcrypt, whose base64 alphabet uses '.'.
+      // https://en.wikipedia.org/wiki/Bcrypt#base64_encoding_alphabet
       expect(() => CryptData('id', salt: 'le.gacy-salt').validate(),
           returnsNormally);
-      expect(() => CryptData('id', hash: 'aGFz.aA').validate(),
-          throwsArgumentError);
-      expect(() => CryptData('id', hash: 'aGFz-aA').validate(),
-          throwsArgumentError);
+      expect(
+          () => CryptData('id', hash: 'aGFz.aA').validate(), returnsNormally);
+      expect(
+          () => CryptData('id', hash: 'aGFz-aA').validate(), returnsNormally);
+      // Padding ('=') is still not part of the allowed character set.
       expect(() => CryptData('id', hash: 'aGFzaA==').validate(),
           throwsArgumentError);
     });
