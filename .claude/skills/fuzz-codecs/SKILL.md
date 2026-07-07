@@ -1,6 +1,6 @@
 ---
 name: fuzz-codecs
-description: Differential-fuzz every hashlib_codecs codec against external reference implementations (dart:convert, base_codecs, base32) with full-domain inputs and a reproducible seed. Use before releases, after touching any encoder/decoder or alphabet table, or when asked to "fuzz", "cross-check", or "audit" the codecs. Finds the class of bug that roundtrip tests structurally cannot (wrong-alphabet tables, masking errors).
+description: Differential-fuzz every convertlib codec against external reference implementations (dart:convert, base_codecs, base32) with full-domain inputs and a reproducible seed. Use before releases, after touching any encoder/decoder or alphabet table, or when asked to "fuzz", "cross-check", or "audit" the codecs. Finds the class of bug that roundtrip tests structurally cannot (wrong-alphabet tables, masking errors).
 ---
 
 # Differential codec fuzzing
@@ -46,7 +46,7 @@ import 'dart:typed_data';
 
 import 'package:base32/base32.dart' as b32pkg;
 import 'package:base_codecs/base_codecs.dart' as bc;
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:test/test.dart';
 
 const int seed = 1;      // print in failures; change to widen the search

@@ -3,12 +3,12 @@
 
 import 'dart:convert' as cvt;
 
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
 class HashlibBase64Encode extends Benchmark {
-  HashlibBase64Encode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibBase64Encode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void run() {
@@ -28,7 +28,7 @@ class ConvertBase64Encode extends Benchmark {
 class HashlibBase64Decode extends Benchmark {
   String encoded = '';
 
-  HashlibBase64Decode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibBase64Decode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void setup() {

@@ -1,6 +1,6 @@
 ---
 name: release
-description: Cut a hashlib_codecs release end to end - version choice, CHANGELOG, pubspec bump, atomic release commit, vX.Y.Z tag, push, CI watch, pub.dev verification, and the follow-up dependency bump in ~/projects/hashlib. Use when asked to release, publish, ship, cut a version, or tag. Prevents the tag/pubspec-mismatch failure that killed v3.1.1.
+description: Cut a convertlib release end to end - version choice, CHANGELOG, pubspec bump, atomic release commit, vX.Y.Z tag, push, CI watch, pub.dev verification, and the follow-up dependency bump in ~/projects/hashlib. Use when asked to release, publish, ship, cut a version, or tag. Prevents the tag/pubspec-mismatch failure that killed v3.1.1.
 ---
 
 # Release — tag-driven publish to pub.dev
@@ -81,14 +81,14 @@ CI will reject. **Never run `dart pub publish` locally** (only `--dry-run`).
 
 8. **Verify on pub.dev:**
    ```sh
-   curl -s https://pub.dev/api/packages/hashlib_codecs | python3 -c 'import json,sys; print(json.load(sys.stdin)["latest"]["version"])'
+   curl -s https://pub.dev/api/packages/convertlib | python3 -c 'import json,sys; print(json.load(sys.stdin)["latest"]["version"])'
    ```
 
 9. **Bump the dependent.** In `~/projects/hashlib`:
-   - `pubspec.yaml`: `hashlib_codecs: ^X.Y.Z`
+   - `pubspec.yaml`: `convertlib: ^X.Y.Z`
    - bump hashlib's own patch version in the same edit, add its CHANGELOG entry
    - commit in hashlib's style, e.g.
-     `Bump version to A.B.C and update hashlib_codecs dependency to X.Y.Z`
+     `Bump version to A.B.C and update convertlib dependency to X.Y.Z`
    - run `dart pub get && dart test -p vm` there before committing; push only
      with the owner's go-ahead (hashlib has its own release cadence).
 

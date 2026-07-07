@@ -4,7 +4,7 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/src/bytes_collector.dart';
+import 'package:convertlib/src/bytes_collector.dart';
 import 'package:test/test.dart';
 
 class TestCollector extends ByteCollector {

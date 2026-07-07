@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:hashlib_codecs/src/codecs/utf8.dart';
-import 'package:hashlib_codecs/src/utf8.dart';
+import 'package:convertlib/src/codecs/utf8.dart';
+import 'package:convertlib/src/utf8.dart';
 import 'package:test/test.dart';
 
 import './utils.dart';

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/src/core/codec.dart';
-import 'package:hashlib_codecs/src/core/decoder.dart';
-import 'package:hashlib_codecs/src/core/encoder.dart';
+import 'package:convertlib/src/core/codec.dart';
+import 'package:convertlib/src/core/decoder.dart';
+import 'package:convertlib/src/core/encoder.dart';
 import 'package:test/test.dart';
 
 class PlusOneCodec extends IterableCodec {

@@ -3,8 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/src/core/byte.dart';
-import 'package:hashlib_codecs/src/core/codec.dart';
+import 'package:convertlib/src/core/byte.dart';
+import 'package:convertlib/src/core/codec.dart';
 
 const int _zero = 0x30;
 

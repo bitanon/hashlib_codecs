@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'dart:typed_data';
 
 // Import the library under test
-import 'package:hashlib_codecs/src/core/byte.dart';
+import 'package:convertlib/src/core/byte.dart';
 
 // Dummy concrete implementations to enable testing the abstract classes
 class PassthroughByteEncoder extends ByteEncoder {

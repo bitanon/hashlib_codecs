@@ -1,13 +1,13 @@
-# Hashlib Codecs
+# Convertlib
 
-[![plugin version](https://img.shields.io/pub/v/hashlib_codecs?label=pub)](https://pub.dev/packages/hashlib_codecs)
-[![test](https://github.com/bitanon/hashlib_codecs/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/hashlib_codecs/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/bitanon/hashlib_codecs/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/hashlib_codecs)
-[![likes](https://img.shields.io/pub/likes/hashlib_codecs?logo=dart)](https://pub.dev/packages/hashlib_codecs/score)
-[![pub points](https://img.shields.io/pub/points/hashlib_codecs?logo=dart&color=teal)](https://pub.dev/packages/hashlib_codecs/score)
-[![popularity](https://img.shields.io/pub/popularity/hashlib_codecs?logo=dart)](https://pub.dev/packages/hashlib_codecs/score)
+[![plugin version](https://img.shields.io/pub/v/convertlib?label=pub)](https://pub.dev/packages/convertlib)
+[![test](https://github.com/bitanon/convertlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/convertlib/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/bitanon/convertlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/convertlib)
+[![likes](https://img.shields.io/pub/likes/convertlib?logo=dart)](https://pub.dev/packages/convertlib/score)
+[![pub points](https://img.shields.io/pub/points/convertlib?logo=dart&color=teal)](https://pub.dev/packages/convertlib/score)
+[![popularity](https://img.shields.io/pub/popularity/convertlib?logo=dart)](https://pub.dev/packages/convertlib/score)
 [![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
-[![dependencies](https://img.shields.io/badge/dependencies-zero-889)](https://github.com/bitanon/hashlib_codecs/blob/master/pubspec.yaml)
+[![dependencies](https://img.shields.io/badge/dependencies-zero-889)](https://github.com/bitanon/convertlib/blob/master/pubspec.yaml)
 
 This library contains implementations of fast and error resilient codecs in pure Dart.
 
@@ -150,17 +150,17 @@ A container for digest bytes produced by a hash or encoding function. Available 
 The following import will give you access to all of the algorithms in this package.
 
 ```dart
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 ```
 
-Check the [API Reference](https://pub.dev/documentation/hashlib_codecs/latest/hashlib_codecs/hashlib_codecs-library.html) for details.
+Check the [API Reference](https://pub.dev/documentation/convertlib/latest/convertlib/convertlib-library.html) for details.
 
 ## Usage
 
 Examples can be found inside the `example` folder.
 
 ```dart
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 void main() {
   var inp = [0x3, 0xF1];

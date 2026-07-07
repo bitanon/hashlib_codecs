@@ -1,8 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib_codecs/src/core/alphabet.dart';
-import 'package:hashlib_codecs/src/core/codec.dart';
+import 'package:convertlib/src/core/alphabet.dart';
+import 'package:convertlib/src/core/codec.dart';
 
 // ========================================================
 // Base-64 Alphabets

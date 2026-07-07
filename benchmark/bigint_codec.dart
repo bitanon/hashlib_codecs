@@ -1,5 +1,5 @@
 import 'package:benchmark_harness/benchmark_harness.dart';
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 class BigIntDecodeBenchmark extends BenchmarkBase {
   final int size = 10000;

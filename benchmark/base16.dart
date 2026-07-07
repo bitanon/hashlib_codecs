@@ -4,12 +4,12 @@
 import 'dart:typed_data';
 
 import 'package:base_codecs/base_codecs.dart' as bc;
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
 class HashlibHexEncode extends Benchmark {
-  HashlibHexEncode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibHexEncode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void run() {
@@ -36,7 +36,7 @@ class BaseCodecsHexEncode extends Benchmark {
 class HashlibHexDecode extends Benchmark {
   String encoded = '';
 
-  HashlibHexDecode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibHexDecode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void setup() {

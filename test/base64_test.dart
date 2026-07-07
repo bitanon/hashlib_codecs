@@ -1,6 +1,6 @@
 import 'dart:convert' as cvt;
 
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:test/test.dart';
 
 import './utils.dart';

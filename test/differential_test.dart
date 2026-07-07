@@ -1,7 +1,7 @@
 // Copyright (c) 2026, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-// Differential tests: every property here checks hashlib_codecs against an
+// Differential tests: every property here checks convertlib against an
 // expected value produced OUTSIDE this package — `dart:convert`, the
 // `base_codecs` and `base32` packages, integer arithmetic, or an alphabet
 // string from the governing spec (RFC-4648, RFC-3629, or the Wikipedia
@@ -14,7 +14,7 @@ import 'dart:typed_data';
 
 import 'package:base32/base32.dart' as b32pkg;
 import 'package:base_codecs/base_codecs.dart' as bc;
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:test/test.dart';
 
 // Fixed seed keeps failures reproducible; bump [rounds] for deeper sweeps.

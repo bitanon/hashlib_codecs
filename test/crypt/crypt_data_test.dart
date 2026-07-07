@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:hashlib_codecs/src/codecs/crypt/crypt_data.dart';
+import 'package:convertlib/src/codecs/crypt/crypt_data.dart';
 
 void main() {
   group('CryptData', () {

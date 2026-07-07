@@ -1,4 +1,4 @@
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 void main() {
   var input = [0x3, 0xF1];

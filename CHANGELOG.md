@@ -1,3 +1,12 @@
+# 3.4.0
+
+- Rename the package from `hashlib_codecs` to `convertlib`. The public API is
+  unchanged: update the dependency to `convertlib` and imports to
+  `package:convertlib/convertlib.dart`.
+- The `hashlib_codecs` package continues to be published as a thin re-export of
+  `convertlib` for backward compatibility, and will be discontinued after a
+  migration period.
+
 # 3.3.1
 
 - Fix `CryptData.validate` rejecting valid Modular Crypt Format hashes such as

@@ -1,6 +1,6 @@
 ---
 name: preflight
-description: Run the exact checks hashlib_codecs CI runs, locally, before any commit or release. Use before committing, when asked "is this ready", "run the checks", or as the first step of a release. Catches format drift, analyzer infos, vm/node test failures, and integration breakage without waiting 20 minutes for the GitHub Actions matrix.
+description: Run the exact checks convertlib CI runs, locally, before any commit or release. Use before committing, when asked "is this ready", "run the checks", or as the first step of a release. Catches format drift, analyzer infos, vm/node test failures, and integration breakage without waiting 20 minutes for the GitHub Actions matrix.
 ---
 
 # Preflight — mirror CI locally

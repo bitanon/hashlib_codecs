@@ -1,5 +1,5 @@
 import 'package:base_codecs/base_codecs.dart' as base_codecs;
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:test/test.dart';
 
 import './utils.dart';

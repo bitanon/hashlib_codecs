@@ -1,5 +1,5 @@
-import 'package:hashlib_codecs/src/base64.dart';
-import 'package:hashlib_codecs/src/codecs/crypt/crypt_builder.dart';
+import 'package:convertlib/src/base64.dart';
+import 'package:convertlib/src/codecs/crypt/crypt_builder.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:hashlib_codecs/src/core/encoder.dart';
+import 'package:convertlib/src/core/encoder.dart';
 import 'package:test/test.dart';
 
 class Bits3to8Encoder extends BitEncoder {

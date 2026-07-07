@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/src/base64.dart';
+import 'package:convertlib/src/base64.dart';
 
 import 'crypt_builder.dart';
 

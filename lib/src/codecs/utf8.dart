@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 /*
   Char. number range  | UTF-8 octet sequence

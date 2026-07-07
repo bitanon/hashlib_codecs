@@ -1,6 +1,6 @@
 ---
 name: new-codec
-description: Scaffold a new codec or a new alphabet variant for hashlib_codecs the house way - generated alphabet tables, codec class with static const instances, top-level to/from functions, the six standard test groups with differential checks, README/CHANGELOG/example updates, and exports. Use when adding any new encoding (a new baseN, a new alphabet like base58/base85/z85, or a new format codec).
+description: Scaffold a new codec or a new alphabet variant for convertlib the house way - generated alphabet tables, codec class with static const instances, top-level to/from functions, the six standard test groups with differential checks, README/CHANGELOG/example updates, and exports. Use when adding any new encoding (a new baseN, a new alphabet like base58/base85/z85, or a new format codec).
 ---
 
 # New codec — the full checklist, in order
@@ -42,8 +42,8 @@ Follow the house pattern exactly:
 // Copyright (c) 2026, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
-import 'package:hashlib_codecs/src/core/alphabet.dart';
-import 'package:hashlib_codecs/src/core/codec.dart';
+import 'package:convertlib/src/core/alphabet.dart';
+import 'package:convertlib/src/core/codec.dart';
 
 const int _padding = 0x3d;
 // ignore: constant_identifier_names
@@ -128,7 +128,7 @@ Bullet(s) under the `# _next_` heading at the top (add it if absent; the owner
 renames it to the real version at release), house style:
 `- Adds Base-N codec support` with sub-bullets for `New class:`/`New methods:`.
 
-## 9. Showcase — `example/hashlib_codecs_example.dart` and `test_integration/main.dart`
+## 9. Showcase — `example/convertlib_example.dart` and `test_integration/main.dart`
 
 Add a couple of representative calls to each. The integration program is CI's
 public-API smoke test; a codec absent from it is a codec CI never imports.

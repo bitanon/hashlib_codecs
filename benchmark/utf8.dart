@@ -4,7 +4,7 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
@@ -28,7 +28,7 @@ String makeText(int length) {
 class HashlibUtf8Encode extends Benchmark {
   String text = '';
 
-  HashlibUtf8Encode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibUtf8Encode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void setup() {
@@ -60,7 +60,7 @@ class ConvertUtf8Encode extends Benchmark {
 class HashlibUtf8Decode extends Benchmark {
   Uint8List encoded = Uint8List(0);
 
-  HashlibUtf8Decode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibUtf8Decode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void setup() {

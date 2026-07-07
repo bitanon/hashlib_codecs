@@ -3,10 +3,10 @@
 Operating manual for AI coding agents working in this repository. This file
 lives at the repo root and applies to the entire repository.
 
-`hashlib_codecs` is a **zero-dependency, pure Dart** codec library (base2/8/16/32/64,
-UTF-8, BigInt, PHC/crypt string format) published to pub.dev as `hashlib_codecs` by
-Sudipto Chandra (github: `bitanon/hashlib_codecs`). It is the foundation of a package family:
-`hashlib` depends on it (`hashlib_codecs: ^x.y.z`), and `hashlib`'s `HashDigest`
+`convertlib` is a **zero-dependency, pure Dart** codec library (base2/8/16/32/64,
+UTF-8, BigInt, PHC/crypt string format) published to pub.dev as `convertlib` by
+Sudipto Chandra (github: `bitanon/convertlib`). It is the foundation of a package family:
+`hashlib` depends on it (`convertlib: ^x.y.z`), and `hashlib`'s `HashDigest`
 extends `ByteCollector` from this package. The product here is three things, in
 order: **correctness, speed, and a perfect pub.dev score**. Everything below serves
 those three.
@@ -52,7 +52,7 @@ Data flows through exactly three layers. Put new code in the right one:
    optional `codec:` override, and a private `_codecFromParameters()` that maps
    bool flags to a `static const` instance.
 
-**The export list**: `lib/hashlib_codecs.dart` exports only
+**The export list**: `lib/convertlib.dart` exports only
 `src/codecs_base.dart`, which holds an **alphabetized** export list. A new public
 file that is not added there does not exist as far as users are concerned.
 
@@ -145,7 +145,7 @@ bump (+ the change itself if small). Tag that commit `vX.Y.Z` and push commit
 and tag. CI: verifies tag == pubspec version → full release-test matrix
 (stable/2.19/beta × 3 OS × vm/node + pana) → `dart pub publish` → GitHub
 release. After a release, bump the dependency in `~/projects/hashlib`
-(`hashlib_codecs: ^X.Y.Z`) as its own commit there. Use the `release` skill.
+(`convertlib: ^X.Y.Z`) as its own commit there. Use the `release` skill.
 
 **Conventions added by this manual** (owner may veto; follow until then):
 
@@ -202,7 +202,7 @@ codebase wrong. Read this list before writing code, not after.
    `lib/src/codecs_base.dart`, shipping a package where the new API is
    invisible. **Rule: every new public file gets an alphabetically-placed export
    line in `codecs_base.dart` in the same commit, verified by importing it in a
-   test via `package:hashlib_codecs/hashlib_codecs.dart` (not via a deep
+   test via `package:convertlib/convertlib.dart` (not via a deep
    `src/` import).**
 8. **The info-level fail.** Local `dart analyze` looks clean but CI runs
    `--fatal-infos`, and pana requires dartdoc on public API. **Rule: run

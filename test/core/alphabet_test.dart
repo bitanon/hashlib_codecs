@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:hashlib_codecs/src/core/alphabet.dart';
+import 'package:convertlib/src/core/alphabet.dart';
 
 final b64codes =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'

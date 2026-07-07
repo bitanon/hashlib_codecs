@@ -5,12 +5,12 @@ import 'dart:typed_data';
 
 import 'package:base32/base32.dart' as b32;
 import 'package:base_codecs/base_codecs.dart' as bc;
-import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:convertlib/convertlib.dart';
 
 import '_base.dart';
 
 class HashlibBase32Encode extends Benchmark {
-  HashlibBase32Encode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibBase32Encode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void run() {
@@ -53,7 +53,7 @@ class Base32PackageEncode extends Benchmark {
 class HashlibBase32Decode extends Benchmark {
   String encoded = '';
 
-  HashlibBase32Decode(int size, int iter) : super('hashlib_codecs', size, iter);
+  HashlibBase32Decode(int size, int iter) : super('convertlib', size, iter);
 
   @override
   void setup() {

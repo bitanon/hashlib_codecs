@@ -1,8 +1,8 @@
-name: hashlib_codecs
+name: convertlib
 description: Fast and error resilient codecs. Currently supporting
   Binary(Base2), Hexadecimal(Base16), Base32, Base64, BigInt.
-homepage: https://github.com/bitanon/hashlib_codecs
-version: 3.3.1
+homepage: https://github.com/bitanon/convertlib
+version: 3.4.0
 
 environment:
   sdk: ">=2.19.0 <4.0.0"
