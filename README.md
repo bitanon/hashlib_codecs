@@ -1,10 +1,10 @@
 # convertlib
 
-[![plugin version](https://img.shields.io/pub/v/convertlib?label=pub)](https://pub.dev/packages/convertlib)
+[![package version](https://img.shields.io/pub/v/convertlib?label=pub)](https://pub.dev/packages/convertlib)
 [![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
-[![codecov](https://codecov.io/gh/bitanon/convertlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/convertlib)
 [![likes](https://img.shields.io/pub/likes/convertlib?logo=dart)](https://pub.dev/packages/convertlib/score)
 [![pub points](https://img.shields.io/pub/points/convertlib?logo=dart&color=teal)](https://pub.dev/packages/convertlib/score)
+[![codecov](https://codecov.io/gh/bitanon/convertlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/convertlib)
 [![test](https://github.com/bitanon/convertlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/convertlib/actions/workflows/test.yml)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bitanon/convertlib)
 
