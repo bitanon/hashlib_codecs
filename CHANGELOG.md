@@ -1,3 +1,9 @@
+# 3.5.1
+
+- Widen `fromUtf8` to accept any `List<int>` input instead of requiring a
+  `Uint8List`. Non-`Uint8List` inputs are copied to a `Uint8List` before
+  decoding.
+
 # 3.5.0
 
 - [**Breaking Changes**]

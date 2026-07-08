@@ -2,7 +2,7 @@ name: convertlib
 description: Fast and error resilient codecs. Currently supporting
   Binary(Base2), Hexadecimal(Base16), Base32, Base64, BigInt.
 homepage: https://github.com/bitanon/convertlib
-version: 3.5.0
+version: 3.5.1
 
 environment:
   sdk: ">=2.19.0 <4.0.0"
