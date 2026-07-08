@@ -140,34 +140,34 @@
   <tr>
     <td rowspan="3">Base-32</td>
     <td>convertlib</td>
-    <td><code>████████████████</code> <br> <small><b>3.47 Gbps</b> &#127775;</small></td>
-    <td><code>████████████████</code> <br> <small><b>3.95 Gbps</b> &#127775;</small></td>
-    <td><code>████████████████</code> <br> <small><b>3.12 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>4.1 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>4.1 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>3.38 Gbps</b> &#127775;</small></td>
   </tr>
   <tr>
     <td>base_codecs</td>
-    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>285 Mbps &#128315;12.19x</small></td>
-    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>287 Mbps &#128315;13.76x</small></td>
-    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>258 Mbps &#128315;12.13x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>254 Mbps &#128315;16.12x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>254 Mbps &#128315;16.16x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>230 Mbps &#128315;14.69x</small></td>
   </tr>
   <tr>
     <td>base32</td>
-    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>177 Mbps &#128315;19.61x</small></td>
-    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>191 Mbps &#128315;20.67x</small></td>
-    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>152 Mbps &#128315;20.52x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>179 Mbps &#128315;22.93x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>200 Mbps &#128315;20.48x</small></td>
+    <td><code>█░░░░░░░░░░░░░░░</code> <br> <small>157 Mbps &#128315;21.59x</small></td>
   </tr>
   <tr>
     <td rowspan="2">Base-64</td>
     <td>convertlib</td>
-    <td><code>████████████████</code> <br> <small><b>4.92 Gbps</b> &#127775;</small></td>
-    <td><code>████████████████</code> <br> <small><b>4.95 Gbps</b> &#127775;</small></td>
-    <td><code>████████████████</code> <br> <small><b>3.87 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>5.26 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>5.15 Gbps</b> &#127775;</small></td>
+    <td><code>████████████████</code> <br> <small><b>4.14 Gbps</b> &#127775;</small></td>
   </tr>
   <tr>
     <td>dart:convert</td>
-    <td><code>████████████░░░░</code> <br> <small>3.55 Gbps &#128315;1.39x</small></td>
-    <td><code>███████████░░░░░</code> <br> <small>3.47 Gbps &#128315;1.43x</small></td>
-    <td><code>████████████░░░░</code> <br> <small>2.99 Gbps &#128315;1.29x</small></td>
+    <td><code>███████████░░░░░</code> <br> <small>3.62 Gbps &#128315;1.45x</small></td>
+    <td><code>███████████░░░░░</code> <br> <small>3.63 Gbps &#128315;1.42x</small></td>
+    <td><code>████████████░░░░</code> <br> <small>2.99 Gbps &#128315;1.38x</small></td>
   </tr>
   <tr>
     <td rowspan="2">UTF-8</td>

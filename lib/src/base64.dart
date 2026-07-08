@@ -73,6 +73,5 @@ Uint8List fromBase64(
   bool padding = true,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  var out = codec.decoder.convert(input.codeUnits);
-  return Uint8List.fromList(out);
+  return codec.decoder.convert(input.codeUnits);
 }

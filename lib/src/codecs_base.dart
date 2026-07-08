@@ -15,6 +15,8 @@ export 'codecs/base64.dart';
 export 'codecs/base8.dart';
 export 'codecs/bigint.dart';
 export 'codecs/utf8.dart';
+export 'core/alphabet.dart';
+export 'core/byte.dart';
 export 'core/codec.dart';
 export 'core/decoder.dart';
 export 'core/encoder.dart';

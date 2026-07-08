@@ -3,7 +3,6 @@
 
 import 'dart:typed_data';
 
-import '../../convertlib.dart';
 import '../core/alphabet.dart';
 import '../core/codec.dart';
 

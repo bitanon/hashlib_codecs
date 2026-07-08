@@ -3,7 +3,9 @@
 
 import 'dart:typed_data';
 
-import '../../convertlib.dart';
+import '../core/codec.dart';
+import '../core/decoder.dart';
+import '../core/encoder.dart';
 
 /*
   Char. number range  | UTF-8 octet sequence

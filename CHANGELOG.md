@@ -1,8 +1,15 @@
 # _next_
 
+- [**Breaking Changes**]
+  - Renames the exported base class `CipherlibConverter` -> `BitConverter`.
 - Add missing dartdoc to the `Base32Encoder`, `Base32Decoder`, `Base64Encoder`,
   and `Base64Decoder` constructors and the `UTF8Encoder` and `UTF8Decoder`
   classes.
+- Speed up `fromBase32` and `fromBase64` by returning the decoder output
+  directly instead of copying it into a fresh `Uint8List`.
+- Export the `ByteEncoder`, `ByteDecoder`, `AlphabetEncoder`, and
+  `AlphabetDecoder` base classes, which were part of the public API surface but
+  not reachable through `package:convertlib/convertlib.dart`.
 
 # 3.5.1
 
