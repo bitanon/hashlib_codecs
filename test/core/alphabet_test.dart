@@ -85,14 +85,16 @@ void main() {
     test('Decoder throws for invalid bit size', () {
       expect(
         () => AlphabetDecoder(bits: 1, alphabet: [2]).convert([20, 40, 40, 24]),
-        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
-            'The source bit length should be between 2 to 64')),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'source')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
       );
       expect(
         () =>
             AlphabetDecoder(bits: 128, alphabet: [2]).convert([20, 40, 40, 24]),
-        throwsA(isA<ArgumentError>().having((e) => e.message, 'message',
-            'The source bit length should be between 2 to 64')),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'source')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
       );
     });
 

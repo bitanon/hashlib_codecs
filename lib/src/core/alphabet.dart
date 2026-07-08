@@ -122,7 +122,7 @@ class AlphabetDecoder extends ByteDecoder {
     final len = encoded.length;
     final sb = source;
     if (sb < 2 || sb > 64) {
-      throw ArgumentError('The source bit length should be between 2 to 64');
+      throw ArgumentError.value(source, 'source', 'should be between 2 to 64');
     }
 
     int i, x, y, p, n, l;
