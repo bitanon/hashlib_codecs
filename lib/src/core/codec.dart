@@ -4,8 +4,7 @@
 import 'dart:convert' show Codec, Converter;
 import 'dart:typed_data';
 
-import 'decoder.dart';
-import 'encoder.dart';
+import 'bit.dart';
 
 /// Base class for encoding from and to 8-bit integer sequence
 abstract class IterableCodec extends Codec<Iterable<int>, Iterable<int>> {
@@ -30,10 +29,9 @@ abstract class IterableCodec extends Codec<Iterable<int>, Iterable<int>> {
 }
 
 /// Base class for bit-wise encoder and decoder implementation
-abstract class CipherlibConverter
-    extends Converter<Iterable<int>, Iterable<int>> {
-  /// Creates a new [CipherlibConverter] instance.
-  const CipherlibConverter();
+abstract class BitConverter extends Converter<Iterable<int>, Iterable<int>> {
+  /// Creates a new [BitConverter] instance.
+  const BitConverter();
 
   /// The bit-length of the input array elements.
   /// The value should be between 2 to 64.
@@ -47,5 +45,5 @@ abstract class CipherlibConverter
   /// of numbers with bit-length of [target]. The [input] array will be treated
   /// as a sequence of bits to convert.
   @override
-  Iterable<int> convert(Iterable<int> input);
+  Iterable<int> convert(covariant Iterable<int> input);
 }

@@ -4,8 +4,7 @@
 import 'dart:typed_data';
 
 import '../core/codec.dart';
-import '../core/decoder.dart';
-import '../core/encoder.dart';
+import '../core/bit.dart';
 
 /*
   Char. number range  | UTF-8 octet sequence

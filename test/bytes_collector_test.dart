@@ -111,6 +111,21 @@ void main() {
           (0x08070605 << 32) | 0x04030201,
         );
       }, tags: ['vm-only']);
+
+      // Regression for values wider than 32 bits. On the web `<<`/`|` operate
+      // on 32-bit ints, so the accumulator used to truncate above 2^32. The
+      // expected values are computed independently (as decimal place-values)
+      // and are < 2^53, so they are exactly representable as web doubles; this
+      // test runs on vm AND node.
+      test('window wider than 32 bits is exact on all platforms', () {
+        final boundary = TestCollector(Uint8List.fromList([1, 0, 0, 0, 0]));
+        expect(boundary.number(40, Endian.big), 4294967296); // 2^32
+        expect(boundary.number(40, Endian.little), 1);
+
+        final c = TestCollector(Uint8List.fromList([1, 2, 3, 4, 5]));
+        expect(c.number(40, Endian.big), 4328719365); // 0x0102030405
+        expect(c.number(40, Endian.little), 21542142465); // 0x0504030201
+      });
     });
 
     test('ascii and utf8', () {

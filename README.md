@@ -41,7 +41,7 @@ text. It carries no runtime dependencies of its own.
 
 ```yaml
 dependencies:
-  convertlib: ^3.5.0
+  convertlib: ^3.5.2
 ```
 
 or run `dart pub add convertlib`. A single import exposes every codec:

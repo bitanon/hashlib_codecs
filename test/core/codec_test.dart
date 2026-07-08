@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:convertlib/src/core/codec.dart';
-import 'package:convertlib/src/core/decoder.dart';
-import 'package:convertlib/src/core/encoder.dart';
+import 'package:convertlib/convertlib.dart';
 import 'package:test/test.dart';
 
 class PlusOneCodec extends IterableCodec {
@@ -22,7 +20,7 @@ class PlusOneCodec extends IterableCodec {
   BitDecoder get decoder => throw UnimplementedError();
 }
 
-class IdentityConverter extends CipherlibConverter {
+class IdentityConverter extends BitConverter {
   @override
   final int source;
 

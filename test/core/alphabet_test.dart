@@ -1,9 +1,13 @@
+import 'dart:convert' as cvt;
+
 import 'package:test/test.dart';
 import 'package:convertlib/src/core/alphabet.dart';
 
 final b64codes =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
         .codeUnits;
+
+final b32codes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'.codeUnits;
 
 void main() {
   group('AlphabetEncoder / AlphabetDecoder', () {
@@ -214,6 +218,106 @@ void main() {
         padding: '='.codeUnitAt(0),
       );
       expect(() => dec.convert('?'.codeUnits), throwsFormatException);
+    });
+  });
+
+  group('AlphabetEncoder correctness (external oracle)', () {
+    final pad = '='.codeUnitAt(0);
+
+    // RFC 4648 test vectors (Section 10) - the expected values come from the
+    // RFC, not from round-tripping our own output.
+    test('base64 known-answer vectors (padded)', () {
+      final enc = AlphabetEncoder(bits: 6, alphabet: b64codes, padding: pad);
+      const vectors = {
+        '': '',
+        'f': 'Zg==',
+        'fo': 'Zm8=',
+        'foo': 'Zm9v',
+        'foob': 'Zm9vYg==',
+        'fooba': 'Zm9vYmE=',
+        'foobar': 'Zm9vYmFy',
+      };
+      vectors.forEach((input, expected) {
+        expect(
+          String.fromCharCodes(enc.convert(input.codeUnits)),
+          expected,
+          reason: 'input "$input"',
+        );
+      });
+    });
+
+    test('base32 known-answer vectors (padded)', () {
+      final enc = AlphabetEncoder(bits: 5, alphabet: b32codes, padding: pad);
+      const vectors = {
+        '': '',
+        'f': 'MY======',
+        'fo': 'MZXQ====',
+        'foo': 'MZXW6===',
+        'foob': 'MZXW6YQ=',
+        'fooba': 'MZXW6YTB',
+        'foobar': 'MZXW6YTBOI======',
+      };
+      vectors.forEach((input, expected) {
+        expect(
+          String.fromCharCodes(enc.convert(input.codeUnits)),
+          expected,
+          reason: 'input "$input"',
+        );
+      });
+    });
+
+    // Differential check against dart:convert over every length up to 120,
+    // covering all `length % 3` remainder classes (0, 1, 2 -> 0, 1, 2 pads).
+    test('base64 padded matches dart:convert across lengths 0..120', () {
+      final enc = AlphabetEncoder(bits: 6, alphabet: b64codes, padding: pad);
+      for (var len = 0; len <= 120; len++) {
+        final data = List<int>.generate(len, (i) => (i * 37 + 11) & 0xFF);
+        expect(
+          String.fromCharCodes(enc.convert(data)),
+          cvt.base64.encode(data),
+          reason: 'length $len',
+        );
+      }
+    });
+
+    // The padding == null branch must emit exactly the unpadded output.
+    test('base64 unpadded matches dart:convert (=stripped) across lengths', () {
+      final enc = AlphabetEncoder(bits: 6, alphabet: b64codes);
+      for (var len = 0; len <= 120; len++) {
+        final data = List<int>.generate(len, (i) => (i * 29 + 5) & 0xFF);
+        expect(
+          String.fromCharCodes(enc.convert(data)),
+          cvt.base64.encode(data).replaceAll('=', ''),
+          reason: 'length $len',
+        );
+      }
+    });
+
+    test('Encoder throws for invalid bit size', () {
+      expect(
+        () => AlphabetEncoder(bits: 1, alphabet: [0, 1]).convert([0]),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'target')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
+      );
+      expect(
+        () => AlphabetEncoder(bits: 128, alphabet: [0, 1]).convert([0]),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'target')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
+      );
+    });
+
+    // The unpadded output length must equal ceil(len * 8 / bits) with no
+    // padding character ever appended.
+    test('base32 unpadded output length is exactly ceil(len*8/5)', () {
+      final enc = AlphabetEncoder(bits: 5, alphabet: b32codes);
+      for (var len = 0; len <= 40; len++) {
+        final data = List<int>.generate(len, (i) => (i * 13 + 7) & 0xFF);
+        final out = enc.convert(data);
+        expect(out.length, (len * 8 + 4) ~/ 5, reason: 'length $len');
+        expect(out.contains(pad), isFalse, reason: 'length $len has no pad');
+      }
     });
   });
 }

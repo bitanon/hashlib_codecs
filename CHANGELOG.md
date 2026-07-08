@@ -1,15 +1,24 @@
-# _next_
+# 3.5.2
 
-- [**Breaking Changes**]
-  - Renames the exported base class `CipherlibConverter` -> `BitConverter`.
+- Renames internal abstract class `CipherlibConverter` -> `BitConverter`.
 - Add missing dartdoc to the `Base32Encoder`, `Base32Decoder`, `Base64Encoder`,
   and `Base64Decoder` constructors and the `UTF8Encoder` and `UTF8Decoder`
   classes.
 - Speed up `fromBase32` and `fromBase64` by returning the decoder output
   directly instead of copying it into a fresh `Uint8List`.
+- Speed up the generic `AlphabetEncoder` by fusing the alphabet lookup into the
+  bit-regrouping loop and writing straight into a single correctly-sized buffer,
+  removing an extra allocation and two full passes over the output. Output is
+  byte-identical (verified against `dart:convert` and RFC 4648 vectors).
 - Export the `ByteEncoder`, `ByteDecoder`, `AlphabetEncoder`, and
   `AlphabetDecoder` base classes, which were part of the public API surface but
   not reachable through `package:convertlib/convertlib.dart`.
+- Move `BitEncoder` and `BitDecoder` into the same file.
+- `AlphabetDecoder` extends `ByteDecoder` now intead of `BitDecoder`.
+- Fix `ByteCollector.number` truncating values wider than 32 bits on the web,
+  where bitwise operators are limited to 32 bits. It now accumulates with
+  multiplication and is exact up to `2^53` on the web (a web `int` cannot
+  represent larger values). Output on the VM is unchanged.
 
 # 3.5.1
 
@@ -20,8 +29,8 @@
 # 3.5.0
 
 - [**Breaking Changes**]
-  - Renames internal abstract class `HashlibConverter` to `CipherlibConverter`.
   - Removes `encodeString`, `decodeString` from `IterableCodec`.
+- Renames internal abstract class `HashlibConverter` to `CipherlibConverter`.
 - Fix `CryptDataBuilder.param` to throw an `ArgumentError` when the value is
   `null`, instead of a raw `TypeError`.
 - Speed up Base-64 and Base-32 **encoding** with specialized single-pass encoders.

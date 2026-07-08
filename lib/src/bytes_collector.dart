@@ -76,6 +76,10 @@ abstract class ByteCollector extends Object {
   /// If [endian] is [Endian.little], it will treat the digest bytes as a little
   /// endian number; Otherwise, if [endian] is [Endian.big], it will treat the
   /// digest bytes as a big endian number.
+  ///
+  /// On the web, an `int` is a 64-bit floating point number, so results above
+  /// `2^53` cannot be represented exactly. Keep [bitLength] at 53 or below for
+  /// exact values on that platform.
   int number([int bitLength = 64, Endian endian = Endian.big]) {
     if (bitLength < 8 || bitLength > 64 || (bitLength & 7) > 0) {
       throw ArgumentError(
@@ -85,17 +89,16 @@ abstract class ByteCollector extends Object {
     } else {
       bitLength >>>= 3;
     }
+    // Accumulate with `* 256 +` rather than `<< 8 |` to support the web
     int result = 0;
     int n = bytes.length;
     if (endian == Endian.little) {
       for (int i = (n > bitLength ? bitLength : n) - 1; i >= 0; i--) {
-        result <<= 8;
-        result |= bytes[i];
+        result = result * 256 + bytes[i];
       }
     } else {
       for (int i = n > bitLength ? n - bitLength : 0; i < n; i++) {
-        result <<= 8;
-        result |= bytes[i];
+        result = result * 256 + bytes[i];
       }
     }
     return result;

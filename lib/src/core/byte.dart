@@ -3,8 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'decoder.dart';
-import 'encoder.dart';
+import 'bit.dart';
 
 /// A [BitEncoder] whose input words are 8-bit bytes.
 ///
@@ -30,7 +29,7 @@ abstract class ByteEncoder extends BitEncoder {
   int get target => bits;
 
   @override
-  Uint8List convert(List<int> input);
+  Uint8List convert(covariant List<int> input);
 }
 
 /// A [BitDecoder] whose output words are 8-bit bytes.
@@ -57,5 +56,5 @@ abstract class ByteDecoder extends BitDecoder {
   final int target = 8;
 
   @override
-  Uint8List convert(List<int> encoded);
+  Uint8List convert(covariant List<int> encoded);
 }

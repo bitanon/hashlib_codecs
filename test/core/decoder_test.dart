@@ -1,5 +1,5 @@
+import 'package:convertlib/convertlib.dart';
 import 'package:test/test.dart';
-import 'package:convertlib/src/core/decoder.dart';
 
 // Minimal concrete decoders for testing:
 class Bits3to8Decoder extends BitDecoder {

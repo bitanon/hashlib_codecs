@@ -2,7 +2,7 @@ name: convertlib
 description: Fast and error resilient codecs. Supports Base2, Base8, Base16,
   Base32, Base64, BigInt, UTF-8, and the PHC/crypt string format.
 homepage: https://github.com/bitanon/convertlib
-version: 3.5.1
+version: 3.5.2
 
 topics:
   - codec

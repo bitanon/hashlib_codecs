@@ -1,10 +1,9 @@
-// Copyright (c) 2023, Sudipto Chandra
+// Copyright (c) 2026, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:typed_data';
 
 import 'byte.dart';
-import 'decoder.dart';
 
 /// A [ByteEncoder] that maps each output word to a character code through an
 /// [alphabet] lookup table, optionally appending a [padding] character.
@@ -38,45 +37,61 @@ class AlphabetEncoder extends ByteEncoder {
 
   @override
   Uint8List convert(List<int> input) {
-    int i, n;
-    var encoded = super.convert(input) as Uint8List;
-    n = encoded.length;
-    for (i = 0; i < n; ++i) {
-      encoded[i] = alphabet[encoded[i]];
-    }
-    if (padding == null) {
-      return encoded;
+    final table = alphabet;
+    final pad = padding;
+    final tb = target;
+    final len = input.length;
+    if (tb < 2 || tb > 64) {
+      throw ArgumentError.value(target, 'target', 'should be between 2 to 64');
     }
 
-    n = encoded.length;
-    for (i = n * target; (i & 7) != 0; i += target) {
-      n++;
+    // number of output words = ceil(total input bits / tb)
+    int n = len << 3;
+    int outLen = (n + tb - 1) ~/ tb;
+    if (pad != null) {
+      final low = tb & -tb;
+      final period = low < 8 ? 8 ~/ low : 1;
+      outLen = ((outLen + period - 1) ~/ period) * period;
     }
-    var out = Uint8List(n);
-    for (i = 0; i < encoded.length; ++i) {
-      out[i] = encoded[i];
+    var out = Uint8List(outLen);
+
+    // regroup the input bytes and map each word through the alphabet
+    int i, p, l;
+    p = n = l = 0;
+    for (i = 0; i < len; ++i) {
+      p = (p << 8) | (input[i] & 0xFF);
+      n += 8;
+      while (n >= tb) {
+        n -= tb;
+        out[l++] = table[p >>> n];
+        p &= (1 << n) - 1;
+      }
     }
-    for (; i < n; ++i) {
-      out[i] = padding!;
+
+    // if a partial word remains, left-align it, zero-padding the low bits
+    if (n > 0) {
+      out[l++] = table[p << (tb - n)];
     }
+
+    // fill the remaining slots with the padding character
+    if (pad != null) {
+      while (l < outLen) {
+        out[l++] = pad;
+      }
+    }
+
     return out;
   }
 }
 
-/// A [BitDecoder] that maps each input character code to its word value through
+/// A [ByteDecoder] that maps each input character code to its word value through
 /// an [alphabet] lookup table before regrouping the bits.
 ///
 /// This backs the alphabet-based codecs such as Base-32 and Base-64.
-class AlphabetDecoder extends BitDecoder {
-  /// The bit-length of a single word in the encoded input.
-  final int bits;
-
+class AlphabetDecoder extends ByteDecoder {
   /// The reverse lookup table mapping a character code to its word value, with
   /// `-1` for character codes that are not part of the alphabet.
   final List<int> alphabet;
-
-  @override
-  final int target = 8;
 
   /// The padding character.
   ///
@@ -91,7 +106,7 @@ class AlphabetDecoder extends BitDecoder {
   /// - If [padding] is not null, conversion will stop immediately upon
   ///   encountering this character.
   const AlphabetDecoder({
-    required this.bits,
+    required super.bits,
     required this.alphabet,
     this.padding,
   });
@@ -101,21 +116,23 @@ class AlphabetDecoder extends BitDecoder {
 
   @override
   Uint8List convert(List<int> encoded) {
-    int i, x, y, p, n, l, sb;
-    sb = bits;
+    final table = alphabet;
+    final tlen = table.length;
+    final pad = padding;
+    final len = encoded.length;
+    final sb = source;
     if (sb < 2 || sb > 64) {
       throw ArgumentError('The source bit length should be between 2 to 64');
     }
 
-    var out = Uint8List((encoded.length * sb) >>> 3);
+    int i, x, y, p, n, l;
+    var out = Uint8List((len * sb) >>> 3);
 
-    // fuse the alphabet lookup with the bit regrouping to avoid building an
-    // intermediate list per call
     p = n = l = 0;
-    for (i = 0; i < encoded.length; ++i) {
+    for (i = 0; i < len; ++i) {
       y = encoded[i];
-      if (y == padding) break;
-      if (y < 0 || y >= alphabet.length || (x = alphabet[y]) < 0) {
+      if (y == pad) break;
+      if (y < 0 || y >= tlen || (x = table[y]) < 0) {
         throw FormatException('Invalid character $y at $i');
       }
       p = (p << sb) ^ x;
@@ -127,20 +144,15 @@ class AlphabetDecoder extends BitDecoder {
       }
     }
 
-    // conversion stops at the first padding character, but the rest of
-    // the input must still be padding or alphabet characters
-    for (; i < encoded.length; ++i) {
+    for (; i < len; ++i) {
       y = encoded[i];
-      if (y != padding) {
+      if (y != pad) {
         throw FormatException('Invalid character $y at $i');
       }
     }
-
-    // p > 0 means that there is a non-zero partial word remaining
     if (p > 0) {
       throw FormatException('Invalid length');
     }
-
     if (l < out.length) {
       return out.sublist(0, l);
     }
