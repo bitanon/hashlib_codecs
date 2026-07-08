@@ -175,24 +175,79 @@ void main() {
       var res = toBase64(out, padding: false);
       expect(res, inp);
     });
+    group('RFC 4648 known-answer vectors', () {
+      // RFC 4648 Section 10 "foobar" test vectors for Base64 (standard
+      // alphabet). Input is the ASCII string passed as `input.codeUnits`.
+      const vectors = <List<String>>[
+        // [input, padded, unpadded]
+        ['', '', ''],
+        ['f', 'Zg==', 'Zg'],
+        ['fo', 'Zm8=', 'Zm8'],
+        ['foo', 'Zm9v', 'Zm9v'],
+        ['foob', 'Zm9vYg==', 'Zm9vYg'],
+        ['fooba', 'Zm9vYmE=', 'Zm9vYmE'],
+        ['foobar', 'Zm9vYmFy', 'Zm9vYmFy'],
+      ];
+      for (var v in vectors) {
+        var input = v[0];
+        var padded = v[1];
+        var unpadded = v[2];
+        test('encoding "$input" => "$padded" (padded)', () {
+          expect(toBase64(input.codeUnits), equals(padded));
+        });
+        test('encoding "$input" => "$unpadded" (no padding)', () {
+          expect(toBase64(input.codeUnits, padding: false), equals(unpadded));
+        });
+        test('decoding "$padded" => "$input" (padded)', () {
+          expect(fromBase64(padded), equals(input.codeUnits));
+        });
+        test('decoding "$unpadded" => "$input" (no padding)', () {
+          expect(fromBase64(unpadded), equals(input.codeUnits));
+        });
+      }
+    });
     group('decoding with invalid length', () {
       test('H', () {
-        expect(() => fromBase64("H"), throwsFormatException);
+        expect(
+          () => fromBase64("H"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid length')),
+        );
       });
       test('Ha', () {
-        expect(() => fromBase64("Ha"), throwsFormatException);
+        expect(
+          () => fromBase64("Ha"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid length')),
+        );
       });
       test('HaB', () {
-        expect(() => fromBase64("HaB"), throwsFormatException);
+        expect(
+          () => fromBase64("HaB"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid length')),
+        );
       });
       test('Hashl', () {
-        expect(() => fromBase64("Hashl"), throwsFormatException);
+        expect(
+          () => fromBase64("Hashl"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid length')),
+        );
       });
       test('Hashli', () {
-        expect(() => fromBase64("Hashli"), throwsFormatException);
+        expect(
+          () => fromBase64("Hashli"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid length')),
+        );
       });
       test('Hashlib', () {
-        expect(() => fromBase64("Hashlib"), throwsFormatException);
+        expect(
+          () => fromBase64("Hashlib"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid length')),
+        );
       });
     });
   });

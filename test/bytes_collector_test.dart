@@ -72,9 +72,13 @@ void main() {
 
       test('invalid bit length throws', () {
         final c = TestCollector(Uint8List(1));
-        expect(() => c.number(7), throwsArgumentError);
-        expect(() => c.number(65), throwsArgumentError);
-        expect(() => c.number(12), throwsArgumentError);
+        const msg = 'Invalid bit length. '
+            'It must be a number between 8 to 64 and a multiple of 8.';
+        final matcher = throwsA(
+            isA<ArgumentError>().having((e) => e.message, 'message', msg));
+        expect(() => c.number(7), matcher);
+        expect(() => c.number(65), matcher);
+        expect(() => c.number(12), matcher);
       });
 
       test('8-bit window', () {

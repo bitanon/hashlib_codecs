@@ -71,12 +71,22 @@ void main() {
   group('BitEncoder argument checks', () {
     test('rejects invalid source bit length', () {
       final enc = const BadSourceEncoder();
-      expect(() => enc.convert(const []), throwsA(isA<ArgumentError>()));
+      expect(
+        () => enc.convert(const []),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'source')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
+      );
     });
 
     test('rejects invalid target bit length', () {
       final enc = const BadTargetEncoder();
-      expect(() => enc.convert(const []), throwsA(isA<ArgumentError>()));
+      expect(
+        () => enc.convert(const []),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'target')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
+      );
     });
   });
 }

@@ -33,6 +33,8 @@ Uint8List>`, and `fromBigInt` no longer copies the decoded bytes.
   `ArgumentError.value`, matching `AlphabetEncoder`.
 - Add `benchmark/alphabet.dart` covering the generic `AlphabetEncoder` and
   `AlphabetDecoder` engine.
+- Add `benchmark/bit.dart` covering the generic `BitEncoder` and `BitDecoder`.
+- Add tests from official / well-known sources and cover corner cases.
 
 # 3.5.1
 

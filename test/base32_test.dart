@@ -329,73 +329,142 @@ void main() {
       });
       group(' with invalid chars', () {
         test('"Error!"', () {
-          expect(() => fromBase32("Error!"), throwsFormatException);
+          expect(
+            () => fromBase32("Error!"),
+            throwsA(isA<FormatException>().having(
+                (e) => e.message, 'message', 'Invalid character 33 at 5')),
+          );
         });
         test('"-10"', () {
-          expect(() => fromBase32("-10"), throwsFormatException);
+          expect(
+            () => fromBase32("-10"),
+            throwsA(isA<FormatException>().having(
+                (e) => e.message, 'message', 'Invalid character 45 at 0')),
+          );
         });
         test('"s*mething"', () {
-          expect(() => fromBase32("s*mething"), throwsFormatException);
+          expect(
+            () => fromBase32("s*mething"),
+            throwsA(isA<FormatException>().having(
+                (e) => e.message, 'message', 'Invalid character 42 at 1')),
+          );
+        });
+        // Digits 0, 1, 8 and 9 are not part of the RFC 4648 base32 alphabet.
+        test('"01" (digit 0 = code 48)', () {
+          expect(
+            () => fromBase32("01"),
+            throwsA(isA<FormatException>().having(
+                (e) => e.message, 'message', 'Invalid character 48 at 0')),
+          );
+        });
+        test('"89" (digit 8 = code 56)', () {
+          expect(
+            () => fromBase32("89"),
+            throwsA(isA<FormatException>().having(
+                (e) => e.message, 'message', 'Invalid character 56 at 0')),
+          );
         });
       });
       group('with invalid length', () {
-        test('"1"', () {
-          expect(() => fromBase32("1"), throwsFormatException);
-        });
-        test('"12"', () {
-          expect(() => fromBase32("12"), throwsFormatException);
-        });
-        test('"123"', () {
-          expect(() => fromBase32("123"), throwsFormatException);
-        });
-        test('"1234"', () {
-          expect(() => fromBase32("1234"), throwsFormatException);
-        });
-        test('"12345"', () {
-          expect(() => fromBase32("12345"), throwsFormatException);
-        });
-        test('"123456"', () {
-          expect(() => fromBase32("123456"), throwsFormatException);
-        });
-        test('"1234567"', () {
-          expect(() => fromBase32("1234567"), throwsFormatException);
-        });
-        test('"123456789"', () {
-          expect(() => fromBase32("123456789"), throwsFormatException);
-        });
-        test('"1234567890"', () {
-          expect(() => fromBase32("1234567890"), throwsFormatException);
-        });
-        test('"12345678901"', () {
-          expect(() => fromBase32("12345678901"), throwsFormatException);
-        });
-        test('"123456789012"', () {
-          expect(() => fromBase32("123456789012"), throwsFormatException);
-        });
-        test('"1234567890123"', () {
-          expect(() => fromBase32("1234567890123"), throwsFormatException);
-        });
-        test('"12345678901234"', () {
-          expect(() => fromBase32("12345678901234"), throwsFormatException);
-        });
-        test('"123456789012345"', () {
-          expect(() => fromBase32("123456789012345"), throwsFormatException);
-        });
-        // Valid alphabet characters, but a length that leaves a non-zero
-        // partial word — reaches the length check, not the invalid-char check.
-        test('"B" (valid char, incomplete group)', () {
+        // All valid alphabet characters, but the number of characters leaves a
+        // non-zero partial word, so decoding reaches the length check. Base-32
+        // packs 8 characters into 5 bytes; a tail of 1, 3, or 6 characters
+        // (in any group) can never form a whole number of bytes.
+        test('"B" (1 char)', () {
           expect(
             () => fromBase32("B"),
             throwsA(isA<FormatException>()
                 .having((e) => e.message, 'message', 'Invalid length')),
           );
         });
-        test('"MZX" (valid chars, incomplete group)', () {
+        test('"MZX" (3 chars)', () {
           expect(
             () => fromBase32("MZX"),
             throwsA(isA<FormatException>()
                 .having((e) => e.message, 'message', 'Invalid length')),
           );
+        });
+        test('"MZXW6Y" (6 chars)', () {
+          expect(
+            () => fromBase32("MZXW6Y"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid length')),
+          );
+        });
+        test('"MZXW6YTBO" (full group + 1)', () {
+          expect(
+            () => fromBase32("MZXW6YTBO"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid length')),
+          );
+        });
+        test('"MZXW6YTBOI2" (full group + 3)', () {
+          expect(
+            () => fromBase32("MZXW6YTBOI2"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid length')),
+          );
+        });
+        test('"MZXW6YTBOI2XX2" (full group + 6)', () {
+          expect(
+            () => fromBase32("MZXW6YTBOI2XX2"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid length')),
+          );
+        });
+      });
+    });
+
+    // RFC 4648 §10 provides these test vectors for the base32hex (extended
+    // hex) alphabet. Reached via `Base32Codec.hex`.
+    // https://datatracker.ietf.org/doc/html/rfc4648#section-10
+    group('base32-hex RFC 4648 §10 vectors', () {
+      // Each entry: input ASCII string -> padded base32hex encoding.
+      const vectors = <String, String>{
+        '': '',
+        'f': 'CO======',
+        'fo': 'CPNG====',
+        'foo': 'CPNMU===',
+        'foob': 'CPNMUOG=',
+        'fooba': 'CPNMUOJ1',
+        'foobar': 'CPNMUOJ1E8======',
+      };
+      group('encoding (with padding)', () {
+        vectors.forEach((input, expected) {
+          test('"$input" -> "$expected"', () {
+            var a = toBase32(input.codeUnits, codec: Base32Codec.hex);
+            expect(a, equals(expected));
+          });
+        });
+      });
+      group('encoding (no padding)', () {
+        vectors.forEach((input, expected) {
+          var unpadded = expected.replaceAll('=', '');
+          test('"$input" -> "$unpadded"', () {
+            var a = toBase32(
+              input.codeUnits,
+              codec: Base32Codec.hex,
+              padding: false,
+            );
+            expect(a, equals(unpadded));
+          });
+        });
+      });
+      group('decoding (with padding)', () {
+        vectors.forEach((input, expected) {
+          test('"$expected" -> "$input"', () {
+            var a = fromBase32(expected, codec: Base32Codec.hex);
+            expect(a, equals(input.codeUnits));
+          });
+        });
+      });
+      group('decoding (no padding)', () {
+        vectors.forEach((input, expected) {
+          var unpadded = expected.replaceAll('=', '');
+          test('"$unpadded" -> "$input"', () {
+            var a = fromBase32(unpadded, codec: Base32Codec.hex);
+            expect(a, equals(input.codeUnits));
+          });
         });
       });
     });

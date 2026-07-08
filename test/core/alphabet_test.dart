@@ -219,7 +219,11 @@ void main() {
         alphabet: decodeAlphabet,
         padding: '='.codeUnitAt(0),
       );
-      expect(() => dec.convert('?'.codeUnits), throwsFormatException);
+      expect(
+        () => dec.convert('?'.codeUnits),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 63 at 0')),
+      );
     });
   });
 

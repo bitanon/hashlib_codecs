@@ -139,27 +139,51 @@ void main() {
       });
 
       test('Negative code unit throws FormatException', () {
-        expect(() => encoder.convert([-1]), throwsFormatException);
+        expect(
+          () => encoder.convert([-1]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Negative code -1 at 0')),
+        );
       });
 
       test('with unpaired low surrogate', () {
-        expect(() => encoder.convert([0xDC00]), throwsFormatException);
+        expect(
+          () => encoder.convert([0xDC00]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Unpaired low surrogate 56320 at 0')),
+        );
       });
 
       test('with unpaired high surrogate', () {
-        expect(() => encoder.convert([0xD801]), throwsFormatException);
+        expect(
+          () => encoder.convert([0xD801]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Unpaired high surrogate 55297 at 0')),
+        );
       });
 
       test('with invalid surrogate pair with low value', () {
-        expect(() => encoder.convert([0xD805, 0xDB00]), throwsFormatException);
+        expect(
+          () => encoder.convert([0xD805, 0xDB00]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid surrogate pair (55301, 56064) at 1')),
+        );
       });
 
       test('with invalid surrogate pair with high value', () {
-        expect(() => encoder.convert([0xD805, 0xEFFF]), throwsFormatException);
+        expect(
+          () => encoder.convert([0xD805, 0xEFFF]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid surrogate pair (55301, 61439) at 1')),
+        );
       });
 
       test('with value exceeding range', () {
-        expect(() => encoder.convert([0x110000]), throwsFormatException);
+        expect(
+          () => encoder.convert([0x110000]),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid code 1114112 at 0')),
+        );
       });
 
       test('with empty input for decoder returns empty list', () {
@@ -193,96 +217,161 @@ void main() {
       test(
           'convert with insufficient input after the first 4-byte '
           'continuation', () {
-        expect(() => decoder.convert([0xF0, 0x90]), throwsFormatException);
+        expect(
+          () => decoder.convert([0xF0, 0x90]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Insufficient input')),
+        );
       });
 
       test('with insufficient input for 2-byte sequence', () {
-        expect(() => decoder.convert([0xC2]), throwsFormatException);
+        expect(
+          () => decoder.convert([0xC2]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Insufficient input')),
+        );
       });
 
       test('with invalid continuation byte at 1 for 2-byte sequence', () {
-        expect(() => decoder.convert([0xC2, 0xC2]), throwsFormatException);
+        expect(
+          () => decoder.convert([0xC2, 0xC2]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 194 at 1')),
+        );
       });
 
       test('with insufficient input for 3-byte sequence', () {
-        expect(() => decoder.convert([0xE1, 0x80]), throwsFormatException);
+        expect(
+          () => decoder.convert([0xE1, 0x80]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Insufficient input')),
+        );
       });
 
       test('with invalid continuation byte at 1 for 3-byte sequence', () {
         expect(
-            () => decoder.convert([0xE1, 0x41, 0x80]), throwsFormatException);
+          () => decoder.convert([0xE1, 0x41, 0x80]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 65 at 1')),
+        );
       });
 
       test('with invalid continuation byte at 2 for 3-byte sequence', () {
         expect(
-            () => decoder.convert([0xE1, 0x80, 0x41]), throwsFormatException);
+          () => decoder.convert([0xE1, 0x80, 0x41]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 65 at 2')),
+        );
       });
 
       test('with overlong 3-byte sequence', () {
         expect(
-            () => decoder.convert([0xE0, 0x80, 0xAF]), throwsFormatException);
+          () => decoder.convert([0xE0, 0x80, 0xAF]),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Overlong 3-byte sequence at 0')),
+        );
       });
 
       test('with invalid surrogate for 3-byte', () {
         expect(
-            () => decoder.convert([0xED, 0xA1, 0x80]), throwsFormatException);
+          () => decoder.convert([0xED, 0xA1, 0x80]),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid surrogate 55360 at 0')),
+        );
       });
 
       test('with insufficient input for 4-byte sequence', () {
         expect(
-            () => decoder.convert([0xF0, 0x90, 0x80]), throwsFormatException);
+          () => decoder.convert([0xF0, 0x90, 0x80]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Insufficient input')),
+        );
       });
 
       test('with invalid 4-byte lead', () {
-        expect(() => decoder.convert([0xF5, 0x80, 0x80, 0x80]),
-            throwsFormatException);
+        expect(
+          () => decoder.convert([0xF5, 0x80, 0x80, 0x80]),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid 4-byte lead 245 at 0')),
+        );
       });
 
       test('with overlong 4-byte sequence', () {
-        expect(() => decoder.convert([0xF0, 0x8F, 0x80, 0x80]),
-            throwsFormatException);
+        expect(
+          () => decoder.convert([0xF0, 0x8F, 0x80, 0x80]),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Overlong 4-byte sequence at 0')),
+        );
       });
 
       test('with invalid continuation byte at 1 for 4-byte sequence', () {
-        expect(() => decoder.convert([0xF0, 0x41, 0x80, 0x80]),
-            throwsFormatException);
+        expect(
+          () => decoder.convert([0xF0, 0x41, 0x80, 0x80]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 65 at 1')),
+        );
       });
 
       test('with invalid continuation byte at 2 for 4-byte sequence', () {
-        expect(() => decoder.convert([0xF0, 0x90, 0x41, 0x80]),
-            throwsFormatException);
+        expect(
+          () => decoder.convert([0xF0, 0x90, 0x41, 0x80]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 65 at 2')),
+        );
       });
 
       test('with invalid continuation byte at 3 for 4-byte sequence', () {
-        expect(() => decoder.convert([0xF0, 0x90, 0x80, 0x41]),
-            throwsFormatException);
+        expect(
+          () => decoder.convert([0xF0, 0x90, 0x80, 0x41]),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 65 at 3')),
+        );
       });
 
       test('with value above U+10FFFF', () {
-        expect(() => decoder.convert([0xF4, 0x90, 0x80, 0x80]),
-            throwsFormatException);
+        expect(
+          () => decoder.convert([0xF4, 0x90, 0x80, 0x80]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Above U+10FFFF at 3')),
+        );
       });
 
       test('with invalid UTF-8 sequence throws FormatException', () {
         // Invalid continuation byte (should start with 10xxxxxx)
         var invalid = [0xC2, 0x41];
-        expect(() => decoder.convert(invalid), throwsFormatException);
+        expect(
+          () => decoder.convert(invalid),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid continuation byte 65 at 1')),
+        );
       });
 
       test('with overlong encoding is rejected', () {
         // Overlong encoding for ASCII 'A' (should be 0x41, not 0xC1 0x81)
         var overlong = [0xC1, 0x81];
-        expect(() => decoder.convert(overlong), throwsFormatException);
+        expect(
+          () => decoder.convert(overlong),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Overlong 2-byte sequence at 0')),
+        );
       });
 
       test('with code points above Unicode range are rejected', () {
         // 0x11FFFF is above valid Unicode range
         var invalid = [0xF4, 0x90, 0x80, 0x80];
-        expect(() => decoder.convert(invalid), throwsFormatException);
+        expect(
+          () => decoder.convert(invalid),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Above U+10FFFF at 3')),
+        );
       });
 
       test('with 5 or more bytes', () {
-        expect(() => decoder.convert([0xF8]), throwsFormatException);
+        expect(
+          () => decoder.convert([0xF8]),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid code 248 at 0')),
+        );
       });
     });
 
@@ -292,48 +381,112 @@ void main() {
       // placed both in the bulk region (surrounded by ASCII, so a full
       // 4-byte read is in range) and at the very end (the checked tail).
       const ascii = [0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48];
+      // The bad sequence starts at index 8 (after the ASCII prefix). In the
+      // bulk region a trailing ASCII byte follows, so a truncated multi-byte
+      // sequence reports the following ASCII byte as an invalid continuation;
+      // at the tail the same sequence runs out of input instead.
       final badSequences = {
-        'truncated 2-byte sequence': [0xC2],
-        'invalid continuation byte for 2-byte sequence': [0xC2, 0xC2],
-        'overlong 2-byte sequence': [0xC1, 0x81],
-        'lone continuation byte': [0x80],
-        'truncated 3-byte sequence': [0xE1, 0x80],
-        'invalid continuation byte at 1 for 3-byte sequence': [
-          0xE1, 0x41, 0x80, //
-        ],
-        'invalid continuation byte at 2 for 3-byte sequence': [
-          0xE1, 0x80, 0x41, //
-        ],
-        'overlong 3-byte sequence': [0xE0, 0x80, 0xAF],
-        'surrogate in 3-byte sequence': [0xED, 0xA1, 0x80],
-        'truncated 4-byte sequence': [0xF0, 0x90, 0x80],
-        'invalid 4-byte lead': [0xF5, 0x80, 0x80, 0x80],
-        'overlong 4-byte sequence': [0xF0, 0x8F, 0x80, 0x80],
-        'invalid continuation byte at 1 for 4-byte sequence': [
-          0xF0, 0x41, 0x80, 0x80, //
-        ],
-        'invalid continuation byte at 2 for 4-byte sequence': [
-          0xF0, 0x90, 0x41, 0x80, //
-        ],
-        'invalid continuation byte at 3 for 4-byte sequence': [
-          0xF0, 0x90, 0x80, 0x41, //
-        ],
-        'above U+10FFFF': [0xF4, 0x90, 0x80, 0x80],
-        '5 or more byte lead': [0xF8],
+        'truncated 2-byte sequence': _BadSeq(
+          [0xC2],
+          'Invalid continuation byte 65 at 9',
+          'Insufficient input',
+        ),
+        'invalid continuation byte for 2-byte sequence': _BadSeq(
+          [0xC2, 0xC2],
+          'Invalid continuation byte 194 at 9',
+          'Invalid continuation byte 194 at 9',
+        ),
+        'overlong 2-byte sequence': _BadSeq(
+          [0xC1, 0x81],
+          'Overlong 2-byte sequence at 8',
+          'Overlong 2-byte sequence at 8',
+        ),
+        'lone continuation byte': _BadSeq(
+          [0x80],
+          'Invalid code 128 at 8',
+          'Invalid code 128 at 8',
+        ),
+        'truncated 3-byte sequence': _BadSeq(
+          [0xE1, 0x80],
+          'Invalid continuation byte 65 at 10',
+          'Insufficient input',
+        ),
+        'invalid continuation byte at 1 for 3-byte sequence': _BadSeq(
+          [0xE1, 0x41, 0x80],
+          'Invalid continuation byte 65 at 9',
+          'Invalid continuation byte 65 at 9',
+        ),
+        'invalid continuation byte at 2 for 3-byte sequence': _BadSeq(
+          [0xE1, 0x80, 0x41],
+          'Invalid continuation byte 65 at 10',
+          'Invalid continuation byte 65 at 10',
+        ),
+        'overlong 3-byte sequence': _BadSeq(
+          [0xE0, 0x80, 0xAF],
+          'Overlong 3-byte sequence at 8',
+          'Overlong 3-byte sequence at 8',
+        ),
+        'surrogate in 3-byte sequence': _BadSeq(
+          [0xED, 0xA1, 0x80],
+          'Invalid surrogate 55360 at 8',
+          'Invalid surrogate 55360 at 8',
+        ),
+        'truncated 4-byte sequence': _BadSeq(
+          [0xF0, 0x90, 0x80],
+          'Invalid continuation byte 65 at 11',
+          'Insufficient input',
+        ),
+        'invalid 4-byte lead': _BadSeq(
+          [0xF5, 0x80, 0x80, 0x80],
+          'Invalid 4-byte lead 245 at 8',
+          'Invalid 4-byte lead 245 at 8',
+        ),
+        'overlong 4-byte sequence': _BadSeq(
+          [0xF0, 0x8F, 0x80, 0x80],
+          'Overlong 4-byte sequence at 8',
+          'Overlong 4-byte sequence at 8',
+        ),
+        'invalid continuation byte at 1 for 4-byte sequence': _BadSeq(
+          [0xF0, 0x41, 0x80, 0x80],
+          'Invalid continuation byte 65 at 9',
+          'Invalid continuation byte 65 at 9',
+        ),
+        'invalid continuation byte at 2 for 4-byte sequence': _BadSeq(
+          [0xF0, 0x90, 0x41, 0x80],
+          'Invalid continuation byte 65 at 10',
+          'Invalid continuation byte 65 at 10',
+        ),
+        'invalid continuation byte at 3 for 4-byte sequence': _BadSeq(
+          [0xF0, 0x90, 0x80, 0x41],
+          'Invalid continuation byte 65 at 11',
+          'Invalid continuation byte 65 at 11',
+        ),
+        'above U+10FFFF': _BadSeq(
+          [0xF4, 0x90, 0x80, 0x80],
+          'Above U+10FFFF at 11',
+          'Above U+10FFFF at 11',
+        ),
+        '5 or more byte lead': _BadSeq(
+          [0xF8],
+          'Invalid code 248 at 8',
+          'Invalid code 248 at 8',
+        ),
       };
-      badSequences.forEach((name, seq) {
+      badSequences.forEach((name, bad) {
         test('$name in bulk region', () {
-          var input = [...ascii, ...seq, ...ascii];
+          var input = [...ascii, ...bad.seq, ...ascii];
           expect(
             () => fromUtf8(Uint8List.fromList(input)),
-            throwsFormatException,
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', bad.bulkMessage)),
           );
         });
         test('$name at the tail', () {
-          var input = [...ascii, ...seq];
+          var input = [...ascii, ...bad.seq];
           expect(
             () => fromUtf8(Uint8List.fromList(input)),
-            throwsFormatException,
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', bad.tailMessage)),
           );
         });
       });
@@ -372,27 +525,47 @@ void main() {
       // `encodeString` instead of `convert`.
       test('unpaired low surrogate throws', () {
         var text = String.fromCharCodes([0x41, 0xDC00, 0x42]);
-        expect(() => toUtf8(text), throwsFormatException);
+        expect(
+          () => toUtf8(text),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Unpaired low surrogate 56320 at 1')),
+        );
       });
 
       test('unpaired high surrogate in the middle throws', () {
         var text = String.fromCharCodes([0x41, 0xD801, 0x42]);
-        expect(() => toUtf8(text), throwsFormatException);
+        expect(
+          () => toUtf8(text),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid surrogate pair (55297, 66) at 2')),
+        );
       });
 
       test('unpaired high surrogate at the end throws', () {
         var text = String.fromCharCodes([0x41, 0xD801]);
-        expect(() => toUtf8(text), throwsFormatException);
+        expect(
+          () => toUtf8(text),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Unpaired high surrogate 55297 at 1')),
+        );
       });
 
       test('invalid surrogate pair with low value throws', () {
         var text = String.fromCharCodes([0xD805, 0xDB00]);
-        expect(() => toUtf8(text), throwsFormatException);
+        expect(
+          () => toUtf8(text),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid surrogate pair (55301, 56064) at 1')),
+        );
       });
 
       test('invalid surrogate pair with high value throws', () {
         var text = String.fromCharCodes([0xD805, 0xEFFF]);
-        expect(() => toUtf8(text), throwsFormatException);
+        expect(
+          () => toUtf8(text),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid surrogate pair (55301, 61439) at 1')),
+        );
       });
 
       test('codec encodeString matches encoder convert', () {
@@ -404,5 +577,127 @@ void main() {
         }
       });
     });
+
+    group('RFC 3629 & Kuhn stress-test vectors', () {
+      // Canonical known-answer vectors. Valid encodings are taken from
+      // RFC 3629 (https://www.rfc-editor.org/rfc/rfc3629) and Markus Kuhn's
+      // UTF-8 decoder capability and stress test
+      // (https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt). The
+      // expected byte sequences are the canonical UTF-8 encodings; the
+      // malformed sequences below MUST be rejected.
+
+      // Well-known single-character encodings (code point -> canonical bytes).
+      final validVectors = <String, List<int>>{
+        'U+0024 DOLLAR SIGN': [0x24],
+        'U+00A3 POUND SIGN': [0xC2, 0xA3],
+        'U+20AC EURO SIGN': [0xE2, 0x82, 0xAC],
+        'U+0939 DEVANAGARI LETTER HA': [0xE0, 0xA4, 0xB9],
+        'U+D55C HANGUL SYLLABLE HAN': [0xED, 0x95, 0x9C],
+        'U+10348 GOTHIC LETTER HWAIR': [0xF0, 0x90, 0x8D, 0x88],
+      };
+      final validCodePoints = <String, int>{
+        'U+0024 DOLLAR SIGN': 0x24,
+        'U+00A3 POUND SIGN': 0xA3,
+        'U+20AC EURO SIGN': 0x20AC,
+        'U+0939 DEVANAGARI LETTER HA': 0x0939,
+        'U+D55C HANGUL SYLLABLE HAN': 0xD55C,
+        'U+10348 GOTHIC LETTER HWAIR': 0x10348,
+      };
+      validVectors.forEach((name, bytes) {
+        test('$name encodes to canonical bytes', () {
+          var text = String.fromCharCodes([validCodePoints[name]!]);
+          expect(toUtf8(text), equals(bytes));
+        });
+        test('$name decodes from canonical bytes', () {
+          expect(
+            fromUtf8(Uint8List.fromList(bytes)),
+            equals(String.fromCharCodes([validCodePoints[name]!])),
+          );
+        });
+      });
+
+      test('Kuhn "κόσμε" round-trips against canonical bytes', () {
+        // κ U+03BA, ό U+1F79, σ U+03C3, μ U+03BC, ε U+03B5.
+        const codePoints = [0x03BA, 0x1F79, 0x03C3, 0x03BC, 0x03B5];
+        const bytes = [
+          0xCE, 0xBA, //
+          0xE1, 0xBD, 0xB9, //
+          0xCF, 0x83, //
+          0xCE, 0xBC, //
+          0xCE, 0xB5,
+        ];
+        var text = String.fromCharCodes(codePoints);
+        expect(toUtf8(text), equals(bytes));
+        expect(fromUtf8(Uint8List.fromList(bytes)), equals(text));
+      });
+
+      // RFC 3629 sequence-length boundaries: the first and last code point of
+      // each of the four UTF-8 sequence lengths, with explicit byte vectors.
+      final boundaryVectors = <String, List<int>>{
+        'U+0000 (first 1-byte)': [0x00],
+        'U+007F (last 1-byte)': [0x7F],
+        'U+0080 (first 2-byte)': [0xC2, 0x80],
+        'U+07FF (last 2-byte)': [0xDF, 0xBF],
+        'U+0800 (first 3-byte)': [0xE0, 0xA0, 0x80],
+        'U+FFFF (last 3-byte)': [0xEF, 0xBF, 0xBF],
+        'U+10000 (first 4-byte)': [0xF0, 0x90, 0x80, 0x80],
+        'U+10FFFF (last 4-byte)': [0xF4, 0x8F, 0xBF, 0xBF],
+      };
+      final boundaryCodePoints = <String, int>{
+        'U+0000 (first 1-byte)': 0x0000,
+        'U+007F (last 1-byte)': 0x007F,
+        'U+0080 (first 2-byte)': 0x0080,
+        'U+07FF (last 2-byte)': 0x07FF,
+        'U+0800 (first 3-byte)': 0x0800,
+        'U+FFFF (last 3-byte)': 0xFFFF,
+        'U+10000 (first 4-byte)': 0x10000,
+        'U+10FFFF (last 4-byte)': 0x10FFFF,
+      };
+      boundaryVectors.forEach((name, bytes) {
+        test('$name has canonical byte encoding', () {
+          var text = String.fromCharCodes([boundaryCodePoints[name]!]);
+          expect(toUtf8(text), equals(bytes));
+          expect(
+            fromUtf8(Uint8List.fromList(bytes)),
+            equals(text),
+          );
+        });
+      });
+
+      // Malformed sequences from Kuhn's stress test that MUST be rejected.
+      // [0xE0,0x80,0xAF] (overlong '/') is omitted here as it is already
+      // asserted verbatim in the Decoder / decodeToString groups.
+      final malformed = <String, List<int>>{
+        "overlong 2-byte '/' (0xC0 0xAF)": [0xC0, 0xAF],
+        "overlong 4-byte '/' (0xF0 0x80 0x80 0xAF)": [0xF0, 0x80, 0x80, 0xAF],
+        'overlong NUL (0xC0 0x80)': [0xC0, 0x80],
+        'lone 2-byte start byte (0xC0)': [0xC0],
+        'lone 3-byte start byte (0xE0)': [0xE0],
+        'lone 4-byte start byte (0xF0)': [0xF0],
+        'max overlong 2-byte (0xC1 0xBF)': [0xC1, 0xBF],
+        'max overlong 3-byte (0xE0 0x9F 0xBF)': [0xE0, 0x9F, 0xBF],
+        'max overlong 4-byte (0xF0 0x8F 0xBF 0xBF)': [0xF0, 0x8F, 0xBF, 0xBF],
+        'UTF-16 surrogate U+D800 (0xED 0xA0 0x80)': [0xED, 0xA0, 0x80],
+        'UTF-16 surrogate U+DFFF (0xED 0xBF 0xBF)': [0xED, 0xBF, 0xBF],
+      };
+      malformed.forEach((name, bytes) {
+        test('$name is rejected', () {
+          expect(
+            () => fromUtf8(Uint8List.fromList(bytes)),
+            throwsA(isA<FormatException>()),
+          );
+        });
+      });
+    });
   });
+}
+
+/// A malformed UTF-8 byte sequence together with the exact [FormatException]
+/// message it should produce when placed in the bulk region (followed by more
+/// bytes) versus at the tail of the input.
+class _BadSeq {
+  final List<int> seq;
+  final String bulkMessage;
+  final String tailMessage;
+  const _BadSeq(this.seq, this.bulkMessage, this.tailMessage);
 }

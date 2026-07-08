@@ -45,6 +45,38 @@ void main() {
         expect(fromOctal(output), equals(input));
       });
     });
+    group('[0] <=> 000', () {
+      final input = <int>[0];
+      final output = "000";
+      test('encoding', () {
+        expect(toOctal(input), equals(output));
+      });
+      test('decoding', () {
+        expect(fromOctal(output), equals(input));
+      });
+    });
+    group('[0xFF] <=> 377', () {
+      // 0xFF is 255, and 255 in octal is 377 (int.toRadixString(8)).
+      final input = <int>[0xFF];
+      final output = "377";
+      test('encoding', () {
+        expect(toOctal(input), equals(output));
+      });
+      test('decoding', () {
+        expect(fromOctal(output), equals(input));
+      });
+    });
+    group('[0xFF, 0xFF] <=> 177777', () {
+      // 0xFFFF is 65535, and 65535 in octal is 177777 (int.toRadixString(8)).
+      final input = <int>[0xFF, 0xFF];
+      final output = "177777";
+      test('encoding', () {
+        expect(toOctal(input), equals(output));
+      });
+      test('decoding', () {
+        expect(fromOctal(output), equals(input));
+      });
+    });
     group('[7] <=> 007', () {
       final input = <int>[7];
       final output = "007";
@@ -109,13 +141,25 @@ void main() {
         expect(fromOctal(input), equals(output));
       });
       test('182', () {
-        expect(() => fromOctal("182"), throwsFormatException);
+        expect(
+          () => fromOctal("182"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid character at 1')),
+        );
       });
       test('-10', () {
-        expect(() => fromOctal("-10"), throwsFormatException);
+        expect(
+          () => fromOctal("-10"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid character at 0')),
+        );
       });
       test('01a1', () {
-        expect(() => fromOctal("01a1"), throwsFormatException);
+        expect(
+          () => fromOctal("01a1"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid character at 2')),
+        );
       });
     });
   });

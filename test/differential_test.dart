@@ -109,8 +109,11 @@ void main() {
         if (ref != null) {
           expect(fromUtf8(b), ref, reason: 'round=$i input=$b');
         } else {
-          expect(() => fromUtf8(b), throwsFormatException,
-              reason: 'round=$i input=$b');
+          expect(
+            () => fromUtf8(b),
+            throwsFormatException,
+            reason: 'round=$i input=$b',
+          );
         }
       }
     });

@@ -12,6 +12,18 @@ void main() {
       test('[1] => 00000001', () {
         expect(toBinary([1]), "00000001");
       });
+      test('[0] => 00000000', () {
+        expect(toBinary([0]), "00000000");
+      });
+      test('[0x80] => 10000000', () {
+        expect(toBinary([0x80]), "10000000");
+      });
+      test('[0xFF] => 11111111', () {
+        expect(toBinary([0xFF]), "11111111");
+      });
+      test('[0xFF, 0x00] => 1111111100000000', () {
+        expect(toBinary([0xFF, 0x00]), "1111111100000000");
+      });
       test('[7] => 00000111', () {
         expect(toBinary([7]), "00000111");
       });
@@ -35,6 +47,18 @@ void main() {
       });
       test('1010 => [10]', () {
         expect(fromBinary("1010"), [10]);
+      });
+      test('00000000 => [0]', () {
+        expect(fromBinary("00000000"), [0]);
+      });
+      test('10000000 => [0x80]', () {
+        expect(fromBinary("10000000"), [0x80]);
+      });
+      test('11111111 => [0xFF]', () {
+        expect(fromBinary("11111111"), [0xFF]);
+      });
+      test('1111111100000000 => [0xFF, 0x00]', () {
+        expect(fromBinary("1111111100000000"), [0xFF, 0x00]);
       });
       test('01010 => [10]', () {
         expect(fromBinary("01010"), [10]);
@@ -74,13 +98,25 @@ void main() {
     });
     group('decoding with invalid chars', () {
       test('0158', () {
-        expect(() => fromBinary("0158"), throwsFormatException);
+        expect(
+          () => fromBinary("0158"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid character at 2')),
+        );
       });
       test('-10', () {
-        expect(() => fromBinary("-10"), throwsFormatException);
+        expect(
+          () => fromBinary("-10"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid character at 0')),
+        );
       });
       test('01a1', () {
-        expect(() => fromBinary("01a1"), throwsFormatException);
+        expect(
+          () => fromBinary("01a1"),
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Invalid character at 2')),
+        );
       });
     });
   });

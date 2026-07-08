@@ -55,27 +55,49 @@ void main() {
 
     test('should throw ArgumentError for invalid id', () {
       expect(
-          () => CryptDataBuilder('INVALID_ID!').build(), throwsArgumentError);
+          () => CryptDataBuilder('INVALID_ID!').build(),
+          throwsA(isA<ArgumentError>()
+              .having((e) => e.name, 'name', 'id')
+              .having((e) => e.message, 'message',
+                  'must be [a-z0-9-] and under 32 characters')));
     });
 
     test('should throw ArgumentError for invalid version', () {
-      expect(() => CryptDataBuilder('algo').version('v1').build(),
-          throwsArgumentError);
+      expect(
+          () => CryptDataBuilder('algo').version('v1').build(),
+          throwsA(isA<ArgumentError>()
+              .having((e) => e.name, 'name', 'version')
+              .having((e) => e.message, 'message',
+                  'must be decimal digits without leading zeros')));
     });
 
     test('should throw ArgumentError when param value is null', () {
       final builder = CryptDataBuilder('algo');
-      expect(() => builder.param('rounds', null), throwsArgumentError);
+      expect(
+          () => builder.param('rounds', null),
+          throwsA(isA<ArgumentError>()
+              .having((e) => e.name, 'name', 'value')
+              .having((e) => e.message, 'message', 'Must not be null')));
     });
 
     test('should throw ArgumentError for invalid param name', () {
       final builder = CryptDataBuilder('algo').param('invalid*name', 'value');
-      expect(() => builder.build(), throwsArgumentError);
+      expect(
+          () => builder.build(),
+          throwsA(isA<ArgumentError>()
+              .having((e) => e.name, 'name', 'params.key')
+              .having((e) => e.message, 'message',
+                  'must be [a-z0-9-] and under 32 chars')));
     });
 
     test('should throw ArgumentError for invalid param value', () {
       final builder = CryptDataBuilder('algo').param('valid', 'bad value!');
-      expect(() => builder.build(), throwsArgumentError);
+      expect(
+          () => builder.build(),
+          throwsA(isA<ArgumentError>()
+              .having((e) => e.name, 'name', 'params[valid]')
+              .having((e) => e.message, 'message',
+                  'value has invalid characters')));
     });
 
     test('should allow chaining', () {

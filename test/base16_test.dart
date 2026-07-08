@@ -130,15 +130,60 @@ void main() {
       });
       group('with invalid chars', () {
         test('Error', () {
-          expect(() => fromHex("Error"), throwsFormatException);
+          expect(
+            () => fromHex("Error"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid character at 4')),
+          );
         });
         test('-10', () {
-          expect(() => fromHex("-10"), throwsFormatException);
+          expect(
+            () => fromHex("-10"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid character at 0')),
+          );
         });
         test('something', () {
-          expect(() => fromHex("something"), throwsFormatException);
+          expect(
+            () => fromHex("something"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid character at 8')),
+          );
         });
       });
+    });
+
+    group('RFC 4648 known-answer vectors', () {
+      // RFC 4648 Section 10 "foobar" test vectors. The RFC shows Base16 in
+      // UPPERCASE; our `toHex` defaults to lowercase, `upper: true` gives
+      // uppercase. Input is the ASCII string passed as `input.codeUnits`.
+      const vectors = <List<String>>[
+        // [input, lower, upper]
+        ['', '', ''],
+        ['f', '66', '66'],
+        ['fo', '666f', '666F'],
+        ['foo', '666f6f', '666F6F'],
+        ['foob', '666f6f62', '666F6F62'],
+        ['fooba', '666f6f6261', '666F6F6261'],
+        ['foobar', '666f6f626172', '666F6F626172'],
+      ];
+      for (var v in vectors) {
+        var input = v[0];
+        var lower = v[1];
+        var upper = v[2];
+        test('encoding "$input" => "$lower" (lower)', () {
+          expect(toHex(input.codeUnits), equals(lower));
+        });
+        test('encoding "$input" => "$upper" (upper)', () {
+          expect(toHex(input.codeUnits, upper: true), equals(upper));
+        });
+        test('decoding "$lower" => "$input" (lower)', () {
+          expect(fromHex(lower), equals(input.codeUnits));
+        });
+        test('decoding "$upper" => "$input" (upper)', () {
+          expect(fromHex(upper), equals(input.codeUnits));
+        });
+      }
     });
 
     group('compare against package: base_codecs', () {

@@ -46,14 +46,21 @@ void main() {
     test('throws FormatException on non-zero partial word (short input)', () {
       // Only 1 symbol → partial word remains → must throw.
       final dec = const Bits3to8Decoder();
-      expect(() => dec.convert([1]), throwsA(isA<FormatException>()));
+      expect(
+        () => dec.convert([1]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid length')),
+      );
     });
 
     test('throws FormatException when invalid appears mid-group', () {
       // 5 symbols (15 bits) then invalid → leaves partial word → throw.
       final dec = const Bits3to8Decoder();
-      expect(() => dec.convert([0, 1, 2, 3, 4, 9, 6, 7]),
-          throwsA(isA<FormatException>()));
+      expect(
+        () => dec.convert([0, 1, 2, 3, 4, 9, 6, 7]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid length')),
+      );
     });
 
     test('negative symbol terminates (after full group is OK)', () {
@@ -66,12 +73,22 @@ void main() {
   group('BitDecoder argument checks', () {
     test('rejects invalid source bit length', () {
       final dec = const BadSourceDecoder();
-      expect(() => dec.convert(const []), throwsA(isA<ArgumentError>()));
+      expect(
+        () => dec.convert(const []),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'source')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
+      );
     });
 
     test('rejects invalid target bit length', () {
       final dec = const BadTargetDecoder();
-      expect(() => dec.convert(const []), throwsA(isA<ArgumentError>()));
+      expect(
+        () => dec.convert(const []),
+        throwsA(isA<ArgumentError>()
+            .having((e) => e.name, 'name', 'target')
+            .having((e) => e.message, 'message', 'should be between 2 to 64')),
+      );
     });
   });
 }

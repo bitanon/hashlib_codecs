@@ -23,10 +23,18 @@ void main() {
       expect(a, equals(o));
     });
     test('encoding empty list to raise error for LSB first', () {
-      expect(() => toBigInt([]), throwsFormatException);
+      expect(
+        () => toBigInt([]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Empty input')),
+      );
     });
     test('decoding negative to raise error for LSB first', () {
-      expect(() => fromBigInt(-BigInt.two), throwsFormatException);
+      expect(
+        () => fromBigInt(-BigInt.two),
+        throwsA(isA<FormatException>().having(
+            (e) => e.message, 'message', 'Negative numbers are not supported')),
+      );
     });
     test('encoding empty list to raise error for LSB first', () {
       expect(() {
@@ -34,7 +42,9 @@ void main() {
           [],
           codec: BigIntCodec.msbFirst,
         );
-      }, throwsFormatException);
+      },
+          throwsA(isA<FormatException>()
+              .having((e) => e.message, 'message', 'Empty input')));
     });
     test('decoding negative to raise error for MSB first', () {
       expect(() {
@@ -42,7 +52,9 @@ void main() {
           -BigInt.two,
           codec: BigIntCodec.msbFirst,
         );
-      }, throwsFormatException);
+      },
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Negative numbers are not supported')));
     });
     test('encoding [0] => 0', () {
       var inp = <int>[0];
@@ -98,6 +110,24 @@ void main() {
         // zero bytes are not restored. Documents the canonical-form behavior.
         var value = toBigInt([1, 0, 0]);
         expect(fromBigInt(value), equals([1]));
+      });
+      test('256 both endians and directions (BigInt.parse oracle)', () {
+        // Big-endian 0x0100 = 256; little-endian is the reversed byte order.
+        var value = BigInt.parse('256');
+        expect(toBigInt([0x01, 0x00], msbFirst: true), equals(value));
+        expect(toBigInt([0x00, 0x01], msbFirst: false), equals(value));
+        expect(fromBigInt(value, msbFirst: true), equals([0x01, 0x00]));
+        expect(fromBigInt(value, msbFirst: false), equals([0x00, 0x01]));
+      });
+      test('2^64 both endians and directions (BigInt.parse oracle)', () {
+        // 0x01 followed by eight zero bytes = 2^64; LSB-first reverses it.
+        var value = BigInt.parse('18446744073709551616');
+        var msb = <int>[0x01, 0, 0, 0, 0, 0, 0, 0, 0];
+        var lsb = <int>[0, 0, 0, 0, 0, 0, 0, 0, 0x01];
+        expect(toBigInt(msb, msbFirst: true), equals(value));
+        expect(toBigInt(lsb, msbFirst: false), equals(value));
+        expect(fromBigInt(value, msbFirst: true), equals(msb));
+        expect(fromBigInt(value, msbFirst: false), equals(lsb));
       });
       test('agrees with BigInt.parse over random inputs', () {
         // External oracle: build the big-endian hex string and parse it.
