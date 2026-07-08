@@ -80,9 +80,11 @@ void main() {
       expect(() => data.validate(), throwsArgumentError);
     });
 
-    test('validate fails for empty param value', () {
+    test('validate allows empty param value (PHC spec permits it)', () {
+      // The PHC string format spec states parameter values MAY be empty.
+      // https://github.com/C2SP/C2SP/blob/main/phc-strings.md
       final data = CryptData('id', params: {'x': ''});
-      expect(() => data.validate(), throwsArgumentError);
+      expect(() => data.validate(), returnsNormally);
     });
 
     test('validate fails for invalid param value', () {

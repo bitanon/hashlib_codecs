@@ -19,6 +19,17 @@
   where bitwise operators are limited to 32 bits. It now accumulates with
   multiplication and is exact up to `2^53` on the web (a web `int` cannot
   represent larger values). Output on the VM is unchanged.
+- Allow empty parameter values in the PHC/crypt string format, as permitted by
+  the specification (e.g. `$id$data=`). `CryptData.validate` no longer rejects
+  an empty parameter value; salt and hash must still be non-empty.
+- `BigIntCodec` decoders now return a `Uint8List`; the `BigIntDecoder` typedef
+  narrows from `Converter<BigInt, Iterable<int>>` to `Converter<BigInt,
+  Uint8List>`, and `fromBigInt` no longer copies the decoded bytes.
+- Tighten `ByteCollector.isEqual` parameter type from `dynamic` to `Object?`.
+- Standardize the `AlphabetDecoder` invalid-bit-length error on
+  `ArgumentError.value`, matching `AlphabetEncoder`.
+- Add `benchmark/alphabet.dart` covering the generic `AlphabetEncoder` and
+  `AlphabetDecoder` engine.
 
 # 3.5.1
 

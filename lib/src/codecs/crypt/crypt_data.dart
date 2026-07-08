@@ -35,7 +35,7 @@ class CryptData {
   /// - [params] (Optional) A map containing name, value pairs of algorithm
   ///   parameters. The names must not exceed 32 characters in length and must
   ///   be a sequence of characters in: `[a-z0-9-]`, the values must be a
-  ///   sequence of characters in: `[a-zA-Z0-9/+.-]`.
+  ///   sequence of characters in: `[a-zA-Z0-9/+.-]` and may be empty.
   /// - [salt] (Optional) The salt, a sequence of characters in:
   ///   `[a-zA-Z0-9/+.-]`.
   /// - [hash] (Optional) The output hash, a sequence of characters in:
@@ -93,6 +93,7 @@ class CryptData {
     final versionRe = RegExp(r'^(0|[1-9][0-9]*)$');
     final alnumRe = RegExp(r'^[a-z0-9-]{1,32}$');
     final valueRe = RegExp(r'^[a-zA-Z0-9/+.-]+$');
+    final paramValueRe = RegExp(r'^[a-zA-Z0-9/+.-]*$');
 
     // id
     if (!alnumRe.hasMatch(id)) {
@@ -119,9 +120,7 @@ class CryptData {
           throw ArgumentError.value(
               k, 'params.key', 'reserved; use version field instead');
         }
-        if (v.isEmpty) {
-          throw ArgumentError.value(v, 'params[$k]', 'value is empty');
-        } else if (!valueRe.hasMatch(v)) {
+        if (!paramValueRe.hasMatch(v)) {
           throw ArgumentError.value(
               v, 'params[$k]', 'value has invalid characters');
         }

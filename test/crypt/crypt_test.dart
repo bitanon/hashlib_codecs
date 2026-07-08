@@ -48,6 +48,20 @@ void main() {
         var v = r"$argon2id";
         expect(toCrypt(fromCrypt(v)), equals(v));
       });
+      test('with an empty parameter value (PHC spec permits it)', () {
+        // The PHC spec allows empty parameter values; the string must survive
+        // a decode/encode round-trip unchanged.
+        // https://github.com/C2SP/C2SP/blob/main/phc-strings.md
+        var v = r"$argon2id$m=65536,data=$gZiV/M1gPc22ElAH/Jh1Hw";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+        expect(fromCrypt(v).getParam('data'), equals(''));
+      });
+      test('with an empty parameter value among others', () {
+        // Empty value as the first of several parameters must round-trip.
+        var v = r"$argon2id$sd=,t=2";
+        expect(toCrypt(fromCrypt(v)), equals(v));
+        expect(fromCrypt(v).getParam('sd'), equals(''));
+      });
       test('bcrypt string with "." in the hash field', () {
         // bcrypt is a Modular Crypt Format string whose base64 alphabet uses
         // '.', so the hash field must accept it.
@@ -114,12 +128,6 @@ void main() {
         expectError<ArgumentError>(
           () => fromCrypt(r"$argon2id$=1"),
           'Invalid argument (params.key): must be [a-z0-9-] and under 32 chars: ""',
-        );
-      });
-      test('empty parameter value', () {
-        expectError<ArgumentError>(
-          () => fromCrypt(r"$argon2id$sd=,3=2"),
-          'Invalid argument (params[sd]): value is empty: ""',
         );
       });
       test('parameter value with invalid character', () {
