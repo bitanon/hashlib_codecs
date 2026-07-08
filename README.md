@@ -476,15 +476,15 @@ your input and the expected output.
   <tr>
     <td rowspan="2">UTF-8</td>
     <td>convertlib</td>
-    <td><code>██████████░░░░░░</code> <br> <small>1.66 Gbps </small></td>
-    <td><code>██████████░░░░░░</code> <br> <small>1.71 Gbps </small></td>
-    <td><code>█████████░░░░░░░</code> <br> <small>1.3 Gbps </small></td>
+    <td><code>███████████████░</code> <br> <small>1.64 Gbps </small></td>
+    <td><code>███████████████░</code> <br> <small>1.69 Gbps </small></td>
+    <td><code>████████████░░░░</code> <br> <small>1.29 Gbps </small></td>
   </tr>
   <tr>
     <td>dart:convert</td>
-    <td><code>████████████████</code> <br> <small><b>2.59 Gbps</b> &#128314;1.57x</small></td>
-    <td><code>████████████████</code> <br> <small><b>2.71 Gbps</b> &#128314;1.58x</small></td>
-    <td><code>████████████████</code> <br> <small><b>2.23 Gbps</b> &#128314;1.72x</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.75 Gbps</b> &#128314;1.07x</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.84 Gbps</b> &#128314;1.09x</small></td>
+    <td><code>████████████████</code> <br> <small><b>1.73 Gbps</b> &#128314;1.34x</small></td>
   </tr>
 </tbody>
 </table>

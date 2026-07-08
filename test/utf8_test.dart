@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:convertlib/src/codecs/utf8.dart';
 import 'package:convertlib/src/utf8.dart';
@@ -33,8 +34,14 @@ void main() {
       // Regression for a missing `& 0x3F` in the 2-byte decoder path:
       // C4 80 must decode to U+0100, not U+0180. Expected values verified
       // against RFC-3629 and `dart:convert`.
-      expect(fromUtf8([0xC4, 0x80]), String.fromCharCodes([0x100]));
-      expect(toUtf8(String.fromCharCodes([0x100])), [0xC4, 0x80]);
+      expect(
+        fromUtf8(Uint8List.fromList([0xC4, 0x80])),
+        String.fromCharCodes([0x100]),
+      );
+      expect(
+        toUtf8(String.fromCharCodes([0x100])),
+        [0xC4, 0x80],
+      );
       // Cover both sides of every flag-bit boundary in the 2-byte range.
       for (var cp in [0x80, 0xA9, 0xFF, 0x100, 0x141, 0x180, 0x7C0, 0x7FF]) {
         var s = String.fromCharCodes([cp]);
@@ -317,11 +324,17 @@ void main() {
       badSequences.forEach((name, seq) {
         test('$name in bulk region', () {
           var input = [...ascii, ...seq, ...ascii];
-          expect(() => fromUtf8(input), throwsFormatException);
+          expect(
+            () => fromUtf8(Uint8List.fromList(input)),
+            throwsFormatException,
+          );
         });
         test('$name at the tail', () {
           var input = [...ascii, ...seq];
-          expect(() => fromUtf8(input), throwsFormatException);
+          expect(
+            () => fromUtf8(Uint8List.fromList(input)),
+            throwsFormatException,
+          );
         });
       });
 
@@ -350,7 +363,7 @@ void main() {
       test('codec decodeToString decodes to a String', () {
         // Exercises the `UTF8Codec.decodeToString` convenience method.
         var text = 'Aé中😀';
-        expect(UTF8Codec.standard.decodeToString(toUtf8(text)), equals(text));
+        expect(UTF8Codec.standard.decoder.decode(toUtf8(text)), equals(text));
       });
     });
 
@@ -385,7 +398,7 @@ void main() {
       test('codec encodeString matches encoder convert', () {
         for (int i = 0; i < 100; ++i) {
           var text = String.fromCharCodes(randomCodePoints(i));
-          expect(UTF8Codec.standard.encodeString(text),
+          expect(UTF8Codec.standard.encoder.encode(text),
               equals(UTF8Codec.standard.encoder.convert(text.codeUnits)),
               reason: '#$i');
         }

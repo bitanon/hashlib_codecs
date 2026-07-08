@@ -35,7 +35,7 @@ Uint8List toUtf8(
 @pragma('vm:prefer-inline')
 @pragma('dart2js:tryInline')
 String fromUtf8(
-  List<int> input, {
+  Uint8List input, {
   UTF8Codec codec = UTF8Codec.standard,
 }) =>
     codec.decoder.decode(input);

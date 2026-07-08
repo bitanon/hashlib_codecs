@@ -146,15 +146,14 @@ class UTF8Decoder extends BitDecoder {
   /// This is a faster equivalent of `String.fromCharCodes(convert(...))`
   /// that emits UTF-16 code units in a single pass. Throws a [FormatException]
   /// if [input] is not a valid UTF-8 octet sequence.
-  String decode(List<int> input) {
-    var bytes = input is Uint8List ? input : Uint8List.fromList(input);
-    int len = bytes.length;
+  String decode(Uint8List input) {
+    int len = input.length;
     if (len == 0) return '';
 
     int x, y, n = 0, p = 0;
     var units = Uint16List(len);
     while (p < len) {
-      x = bytes[p];
+      x = input[p];
       // Case: 1-byte ASCII run
       if (x <= 0x7F) {
         units[n++] = x;
@@ -162,17 +161,17 @@ class UTF8Decoder extends BitDecoder {
       }
       // Case: 2-bytes
       else if ((x & 0xE0) == 0xC0) {
-        units[n++] = _decode2(bytes, len, p, x);
+        units[n++] = _decode2(input, len, p, x);
         p += 2;
       }
       // Case: 3-bytes
       else if ((x & 0xF0) == 0xE0) {
-        units[n++] = _decode3(bytes, len, p, x);
+        units[n++] = _decode3(input, len, p, x);
         p += 3;
       }
       // Case: 4-bytes UTF-16 surrogate pair
       else if ((x & 0xF8) == 0xF0) {
-        y = _decode4(bytes, len, p, x) - 0x10000;
+        y = _decode4(input, len, p, x) - 0x10000;
         units[n++] = 0xD800 | (y >> 10);
         units[n++] = 0xDC00 | (y & 0x3FF);
         p += 4;
@@ -311,14 +310,6 @@ class UTF8Codec extends IterableCodec {
     required this.encoder,
     required this.decoder,
   });
-
-  /// Encodes the UTF-16 code units of [input] into a UTF-8 octet sequence.
-  @pragma('vm:prefer-inline')
-  Uint8List encodeString(String input) => encoder.encode(input);
-
-  /// Decodes a valid UTF-8 octet sequence in [input] directly to a [String].
-  @pragma('vm:prefer-inline')
-  String decodeToString(List<int> input) => decoder.decode(input);
 
   /// Codec instance to encode and decode UTF-8 character code units to 8-bit
   /// UTF-8 octet sequence.

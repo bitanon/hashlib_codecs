@@ -77,7 +77,7 @@ Map<String, List<Benchmark>> buildDecoders(int size) {
     ],
     "UTF-8": [
       utf8.ConvertlibUtf8Decode(size),
-      utf8.DartConvertUtf8Encode(size),
+      utf8.DartConvertUtf8Decode(size),
     ],
   };
 }
