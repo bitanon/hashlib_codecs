@@ -38,10 +38,10 @@ class ConvertlibUtf8Encode extends SyncBenchmark {
   }
 }
 
-class ConvertUtf8Encode extends SyncBenchmark {
+class DartConvertUtf8Encode extends SyncBenchmark {
   final String text;
 
-  ConvertUtf8Encode(int size)
+  DartConvertUtf8Encode(int size)
       : text = makeText(size),
         super('dart:convert', size);
 
@@ -64,10 +64,10 @@ class ConvertlibUtf8Decode extends SyncBenchmark {
   }
 }
 
-class ConvertUtf8Decode extends SyncBenchmark {
+class DartConvertUtf8Decode extends SyncBenchmark {
   final Uint8List encoded;
 
-  ConvertUtf8Decode(int size)
+  DartConvertUtf8Decode(int size)
       : encoded = Uint8List.fromList(cvt.utf8.encode(makeText(size))),
         super('dart:convert', size);
 
@@ -81,13 +81,13 @@ void main() async {
   // Size counts source code points; throughput is reported per code point.
   print('--------- UTF-8 ----------');
   for (var size in [1 << 20, 1 << 10, 1 << 5]) {
-    print('---- encode: ${formatSize(size)} chars ----');
+    print('---- encode: ${formatSize(size)} message ----');
     await ConvertlibUtf8Encode(size).measureDiff([
-      ConvertUtf8Encode(size),
+      DartConvertUtf8Encode(size),
     ]);
-    print('---- decode: ${formatSize(size)} chars ----');
+    print('---- decode: ${formatSize(size)} message ----');
     await ConvertlibUtf8Decode(size).measureDiff([
-      ConvertUtf8Decode(size),
+      DartConvertUtf8Decode(size),
     ]);
     print('');
   }

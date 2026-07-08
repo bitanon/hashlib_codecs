@@ -48,7 +48,7 @@ Map<String, List<Benchmark>> buildEncoders(int size) {
     ],
     "UTF-8": [
       utf8.ConvertlibUtf8Encode(size),
-      utf8.ConvertUtf8Encode(size),
+      utf8.DartConvertUtf8Encode(size),
     ],
   };
 }
@@ -77,7 +77,7 @@ Map<String, List<Benchmark>> buildDecoders(int size) {
     ],
     "UTF-8": [
       utf8.ConvertlibUtf8Decode(size),
-      utf8.ConvertUtf8Decode(size),
+      utf8.DartConvertUtf8Encode(size),
     ],
   };
 }
@@ -163,8 +163,6 @@ Future<void> measureTable(
   dump('</thead>');
   dump('<tbody>');
 
-  int bestRuns = 0;
-  int totalRuns = 0;
   for (var name in maps.first.keys) {
     // measure every (library, column) and find the fastest library per column
     var results = <List<Measurement>>[];
@@ -194,10 +192,6 @@ Future<void> measureTable(
         var mine = results[ci].first.speed;
         var cell = formatCell(results[ci][li], best[ci], mine, li == 0);
         dump('    <td>$cell</td>');
-        totalRuns++;
-        if (best[ci] == mine) {
-          bestRuns++;
-        }
       }
       dump('  </tr>');
     }
@@ -205,7 +199,6 @@ Future<void> measureTable(
   dump('</tbody>');
   dump('</table>');
   dump('');
-  dump('> This package comes on top $bestRuns out of $totalRuns times.');
 }
 
 Future<void> measureSection(

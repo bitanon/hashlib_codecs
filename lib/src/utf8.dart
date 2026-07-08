@@ -16,13 +16,13 @@ import 'codecs/utf8.dart';
 ///
 /// Unlike the encoder from `dart:convert`, which replaces unpaired surrogates
 /// with the replacement character `U+FFFD`, this implementation rejects them.
+@pragma('vm:prefer-inline')
+@pragma('dart2js:tryInline')
 Uint8List toUtf8(
   String input, {
   UTF8Codec codec = UTF8Codec.standard,
-}) {
-  var out = codec.encoder.convert(input.codeUnits);
-  return out is Uint8List ? out : Uint8List.fromList(out);
-}
+}) =>
+    codec.encoder.convert(input.codeUnits);
 
 /// Converts 8-bit UTF-8 octet sequence to UTF-8 character code points.
 ///
@@ -32,10 +32,10 @@ Uint8List toUtf8(
 ///
 /// Throws:
 /// - [FormatException] if the [input] is not a valid UTF-8 octet sequence.
+@pragma('vm:prefer-inline')
+@pragma('dart2js:tryInline')
 String fromUtf8(
   List<int> input, {
   UTF8Codec codec = UTF8Codec.standard,
-}) {
-  var out = codec.decoder.convert(input);
-  return String.fromCharCodes(out);
-}
+}) =>
+    codec.decoder.decode(input);

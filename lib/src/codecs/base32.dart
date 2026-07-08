@@ -1,6 +1,8 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
 import 'package:convertlib/src/core/alphabet.dart';
 import 'package:convertlib/src/core/codec.dart';
 
@@ -142,6 +144,209 @@ const _base32DecodingWordSafe = [
 ];
 
 // ========================================================
+// Base-32 Encoder
+// ========================================================
+
+/// A specialized single-pass [AlphabetEncoder] for Base-32.
+///
+/// Processes the input 5 bytes at a time into 8 characters, writing directly
+/// into a single correctly-sized (and, if applicable, padded) output buffer.
+/// This avoids the multiple regroup/lookup/pad passes of the generic engine.
+///
+/// Every intermediate value stays within 8 bits and every result within 5 bits,
+/// so no 40-bit accumulator is used and the code is safe on the JavaScript
+/// platform (where `<<` operates on 32-bit integers).
+class Base32Encoder extends AlphabetEncoder {
+  const Base32Encoder({
+    required super.alphabet,
+    super.padding,
+  }) : super(bits: 5);
+
+  @override
+  Uint8List convert(List<int> input) {
+    const tailChars = [0, 2, 4, 5, 7];
+    final table = alphabet;
+    final pad = padding;
+    int n = input.length;
+    int full = n ~/ 5;
+    int rem = n - full * 5;
+
+    int outLen;
+    if (pad != null) {
+      outLen = (full + (rem == 0 ? 0 : 1)) << 3;
+    } else {
+      outLen = (full << 3) + tailChars[rem];
+    }
+    var out = Uint8List(outLen);
+
+    int i = 0, j = 0, b0, b1, b2, b3, b4;
+    for (int g = 0; g < full; ++g) {
+      b0 = input[i++] & 0xFF;
+      b1 = input[i++] & 0xFF;
+      b2 = input[i++] & 0xFF;
+      b3 = input[i++] & 0xFF;
+      b4 = input[i++] & 0xFF;
+      out[j++] = table[b0 >> 3];
+      out[j++] = table[((b0 & 0x7) << 2) | (b1 >> 6)];
+      out[j++] = table[(b1 >> 1) & 0x1F];
+      out[j++] = table[((b1 & 0x1) << 4) | (b2 >> 4)];
+      out[j++] = table[((b2 & 0xF) << 1) | (b3 >> 7)];
+      out[j++] = table[(b3 >> 2) & 0x1F];
+      out[j++] = table[((b3 & 0x3) << 3) | (b4 >> 5)];
+      out[j++] = table[b4 & 0x1F];
+    }
+
+    if (rem > 0) {
+      b0 = input[i] & 0xFF;
+      b1 = rem > 1 ? input[i + 1] & 0xFF : 0;
+      b2 = rem > 2 ? input[i + 2] & 0xFF : 0;
+      b3 = rem > 3 ? input[i + 3] & 0xFF : 0;
+      out[j++] = table[b0 >> 3];
+      out[j++] = table[((b0 & 0x7) << 2) | (b1 >> 6)];
+      if (rem >= 2) {
+        out[j++] = table[(b1 >> 1) & 0x1F];
+        out[j++] = table[((b1 & 0x1) << 4) | (b2 >> 4)];
+      }
+      if (rem >= 3) {
+        out[j++] = table[((b2 & 0xF) << 1) | (b3 >> 7)];
+      }
+      if (rem >= 4) {
+        out[j++] = table[(b3 >> 2) & 0x1F];
+        out[j++] = table[(b3 & 0x3) << 3];
+      }
+      if (pad != null) {
+        while (j < outLen) {
+          out[j++] = pad;
+        }
+      }
+    }
+
+    return out;
+  }
+}
+
+// ========================================================
+// Base-32 Decoder
+// ========================================================
+
+/// A specialized [AlphabetDecoder] for Base-32.
+///
+/// Strips trailing padding once, then decodes complete 8-character groups into
+/// 5 bytes with straight-line code, leaving only the final partial group to the
+/// bit-accumulator. This keeps the hot path free of the generic decoder's
+/// per-character inner loop and padding bookkeeping.
+///
+/// Every intermediate value stays within 8 bits, so it is safe on the
+/// JavaScript platform (where `<<` operates on 32-bit integers).
+class Base32Decoder extends AlphabetDecoder {
+  const Base32Decoder({
+    required super.alphabet,
+    super.padding,
+  }) : super(bits: 5);
+
+  @override
+  Uint8List convert(List<int> encoded) {
+    final table = alphabet;
+    final pad = padding;
+    final tlen = table.length;
+    int len = encoded.length;
+
+    // Padding is only valid as a trailing suffix, strip it here. A padding
+    // character anywhere else is rejected as an invalid character.
+    if (pad != null) {
+      while (len > 0 && encoded[len - 1] == pad) {
+        len--;
+      }
+    }
+
+    int i = 0, l = 0;
+    int y0, y1, y2, y3, y4, y5, y6, y7;
+    int c0, c1, c2, c3, c4, c5, c6, c7;
+
+    var out = Uint8List((len * 5) >> 3);
+
+    // Fast path: complete 8-character groups into 5 bytes.
+    int fastEnd = len - (len & 7);
+    while (i < fastEnd) {
+      y0 = encoded[i];
+      y1 = encoded[i + 1];
+      y2 = encoded[i + 2];
+      y3 = encoded[i + 3];
+      y4 = encoded[i + 4];
+      y5 = encoded[i + 5];
+      y6 = encoded[i + 6];
+      y7 = encoded[i + 7];
+      if (y0 < 0 ||
+          y1 < 0 ||
+          y2 < 0 ||
+          y3 < 0 ||
+          y4 < 0 ||
+          y5 < 0 ||
+          y6 < 0 ||
+          y7 < 0 ||
+          y0 >= tlen ||
+          y1 >= tlen ||
+          y2 >= tlen ||
+          y3 >= tlen ||
+          y4 >= tlen ||
+          y5 >= tlen ||
+          y6 >= tlen ||
+          y7 >= tlen) {
+        break; // invalid character
+      }
+      c0 = table[y0];
+      c1 = table[y1];
+      c2 = table[y2];
+      c3 = table[y3];
+      c4 = table[y4];
+      c5 = table[y5];
+      c6 = table[y6];
+      c7 = table[y7];
+      if (c0 < 0 ||
+          c1 < 0 ||
+          c2 < 0 ||
+          c3 < 0 ||
+          c4 < 0 ||
+          c5 < 0 ||
+          c6 < 0 ||
+          c7 < 0) {
+        break; // invalid character
+      }
+      out[l++] = (c0 << 3) | (c1 >> 2);
+      out[l++] = ((c1 & 0x3) << 6) | (c2 << 1) | (c3 >> 4);
+      out[l++] = ((c3 & 0xF) << 4) | (c4 >> 1);
+      out[l++] = ((c4 & 0x1) << 7) | (c5 << 2) | (c6 >> 3);
+      out[l++] = ((c6 & 0x7) << 5) | c7;
+      i += 8;
+    }
+
+    // Tail: the final partial group (and any group the fast path rejected).
+    // No padding remains, so this only regroups bits and validates characters.
+    int p = 0, n = 0, x, y;
+    for (; i < len; ++i) {
+      y = encoded[i];
+      if (y < 0 || y >= tlen || (x = table[y]) < 0) {
+        throw FormatException('Invalid character $y at $i');
+      }
+      p = (p << 5) ^ x;
+      n += 5;
+      while (n >= 8) {
+        n -= 8;
+        out[l++] = p >>> n;
+        p &= (1 << n) - 1;
+      }
+    }
+
+    // A non-zero partial word means the input was not a valid length.
+    if (p > 0) {
+      throw FormatException('Invalid length');
+    }
+
+    return out;
+  }
+}
+
+// ========================================================
 // Base-32 Codec
 // ========================================================
 
@@ -153,10 +358,10 @@ const _base32DecodingWordSafe = [
 /// [wordSafe].
 class Base32Codec extends IterableCodec {
   @override
-  final AlphabetEncoder encoder;
+  final Base32Encoder encoder;
 
   @override
-  final AlphabetDecoder decoder;
+  final Base32Decoder decoder;
 
   const Base32Codec._({
     required this.encoder,
@@ -172,13 +377,11 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base32Codec standard = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       padding: _padding,
       alphabet: _base32EncodingRfc4648,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       padding: _padding,
       alphabet: _base32DecodingRfc4648,
     ),
@@ -197,12 +400,10 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base32Codec standardNoPadding = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       alphabet: _base32EncodingRfc4648,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       alphabet: _base32DecodingRfc4648,
     ),
   );
@@ -219,13 +420,11 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base32Codec lowercase = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       padding: _padding,
       alphabet: _base32EncodingRfc4648Lower,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       padding: _padding,
       alphabet: _base32DecodingRfc4648,
     ),
@@ -242,12 +441,10 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base32Codec lowercaseNoPadding = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       alphabet: _base32EncodingRfc4648Lower,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       alphabet: _base32DecodingRfc4648,
     ),
   );
@@ -261,13 +458,11 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base32Codec hex = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       padding: _padding,
       alphabet: _base32EncodingHexUpper,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       padding: _padding,
       alphabet: _base32DecodingHex,
     ),
@@ -282,13 +477,11 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base32Codec hexLower = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       padding: _padding,
       alphabet: _base32EncodingHexLower,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       padding: _padding,
       alphabet: _base32DecodingHex,
     ),
@@ -306,12 +499,10 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base32Codec crockford = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       alphabet: _base32EncodingCrockford,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       alphabet: _base32DecodingCrockford,
     ),
   );
@@ -328,13 +519,11 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base32Codec geohash = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       padding: _padding,
       alphabet: _base32EncodingGeoHash,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       padding: _padding,
       alphabet: _base32DecodingGeoHash,
     ),
@@ -352,12 +541,10 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base32Codec z = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       alphabet: _base32EncodingZ,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       alphabet: _base32DecodingZ,
     ),
   );
@@ -374,13 +561,11 @@ class Base32Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base32Codec wordSafe = Base32Codec._(
-    encoder: AlphabetEncoder(
-      bits: 5,
+    encoder: Base32Encoder(
       padding: _padding,
       alphabet: _base32EncodingWordSafe,
     ),
-    decoder: AlphabetDecoder(
-      bits: 5,
+    decoder: Base32Decoder(
       padding: _padding,
       alphabet: _base32DecodingWordSafe,
     ),

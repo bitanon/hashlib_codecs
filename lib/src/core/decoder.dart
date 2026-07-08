@@ -14,7 +14,7 @@ import 'codec.dart';
 /// [source] and [target] must be in the range 2 to 64.
 ///
 /// This is the shared engine behind the fixed-width base codecs.
-abstract class BitDecoder extends HashlibConverter {
+abstract class BitDecoder extends CipherlibConverter {
   /// Creates a new [BitDecoder] instance.
   const BitDecoder();
 

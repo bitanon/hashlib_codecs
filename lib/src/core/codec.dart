@@ -18,29 +18,22 @@ abstract class IterableCodec extends Codec<Iterable<int>, Iterable<int>> {
   @override
   BitDecoder get decoder;
 
-  /// Encodes an [input] string using this codec
-  @pragma('vm:prefer-inline')
-  Iterable<int> encodeString(String input) => encode(input.codeUnits);
-
-  /// Decodes an [encoded] string using this codec
-  @pragma('vm:prefer-inline')
-  Iterable<int> decodeString(String encoded) => decode(encoded.codeUnits);
-
   /// Encodes an [input] buffer using this codec
   @pragma('vm:prefer-inline')
-  Iterable<int> encodeBuffer(ByteBuffer input) => encode(input.asUint8List());
+  Iterable<int> encodeBuffer(covariant ByteBuffer input) =>
+      encode(input.asUint8List());
 
   /// Decodes an [encoded] buffer using this codec
   @pragma('vm:prefer-inline')
-  Iterable<int> decodeBuffer(ByteBuffer encoded) =>
+  Iterable<int> decodeBuffer(covariant ByteBuffer encoded) =>
       decode(encoded.asUint8List());
 }
 
 /// Base class for bit-wise encoder and decoder implementation
-abstract class HashlibConverter
+abstract class CipherlibConverter
     extends Converter<Iterable<int>, Iterable<int>> {
-  /// Creates a new [HashlibConverter] instance.
-  const HashlibConverter();
+  /// Creates a new [CipherlibConverter] instance.
+  const CipherlibConverter();
 
   /// The bit-length of the input array elements.
   /// The value should be between 2 to 64.

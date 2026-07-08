@@ -1,6 +1,9 @@
 // Copyright (c) 2023, Sudipto Chandra
 // All rights reserved. Check LICENSE file for details.
 
+import 'dart:typed_data';
+
+import 'package:convertlib/convertlib.dart';
 import 'package:convertlib/src/core/alphabet.dart';
 import 'package:convertlib/src/core/codec.dart';
 
@@ -64,6 +67,167 @@ const _base64DecodingBcrypt = [
 ];
 
 // ========================================================
+// Base-64 Encoder
+// ========================================================
+
+/// A specialized single-pass [AlphabetEncoder] for Base-64.
+///
+/// Processes the input 3 bytes at a time into 4 characters, writing directly
+/// into a single correctly-sized (and, if applicable, padded) output buffer.
+/// This avoids the multiple regroup/lookup/pad passes of the generic engine.
+class Base64Encoder extends AlphabetEncoder {
+  const Base64Encoder({
+    required super.alphabet,
+    super.padding,
+  }) : super(bits: 6);
+
+  @override
+  Uint8List convert(List<int> input) {
+    final table = alphabet;
+    final pad = padding;
+    int n = input.length;
+    int full = n ~/ 3;
+    int rem = n - full * 3;
+
+    int outLen;
+    if (pad != null) {
+      outLen = (full + (rem == 0 ? 0 : 1)) << 2;
+    } else {
+      outLen = (full << 2) + (rem == 0 ? 0 : rem + 1);
+    }
+    var out = Uint8List(outLen);
+
+    int i = 0, j = 0, b0, b1, b2;
+    for (int g = 0; g < full; ++g) {
+      b0 = input[i++] & 0xFF;
+      b1 = input[i++] & 0xFF;
+      b2 = input[i++] & 0xFF;
+      out[j++] = table[b0 >> 2];
+      out[j++] = table[((b0 & 0x3) << 4) | (b1 >> 4)];
+      out[j++] = table[((b1 & 0xF) << 2) | (b2 >> 6)];
+      out[j++] = table[b2 & 0x3F];
+    }
+
+    if (rem == 1) {
+      b0 = input[i] & 0xFF;
+      out[j++] = table[b0 >> 2];
+      out[j++] = table[(b0 & 0x3) << 4];
+      if (pad != null) {
+        out[j++] = pad;
+        out[j++] = pad;
+      }
+    } else if (rem == 2) {
+      b0 = input[i] & 0xFF;
+      b1 = input[i + 1] & 0xFF;
+      out[j++] = table[b0 >> 2];
+      out[j++] = table[((b0 & 0x3) << 4) | (b1 >> 4)];
+      out[j++] = table[(b1 & 0xF) << 2];
+      if (pad != null) {
+        out[j++] = pad;
+      }
+    }
+
+    return out;
+  }
+}
+
+// ========================================================
+// Base-64 Decoder
+// ========================================================
+
+/// A specialized [AlphabetDecoder] for Base-64.
+///
+/// Strips trailing padding once, then decodes complete 4-character groups into
+/// 3 bytes with straight-line code, leaving only the final partial group to the
+/// bit-accumulator. This keeps the hot path free of the generic decoder's
+/// per-character inner loop and padding bookkeeping.
+///
+/// Every intermediate value stays within 8 bits, so it is safe on the
+/// JavaScript platform.
+class Base64Decoder extends AlphabetDecoder {
+  const Base64Decoder({
+    required super.alphabet,
+    super.padding,
+  }) : super(bits: 6);
+
+  @override
+  Uint8List convert(List<int> encoded) {
+    final table = alphabet;
+    final pad = padding;
+    final tlen = table.length;
+    int len = encoded.length;
+
+    // Padding is only valid as a trailing suffix, strip it here. A padding
+    // character anywhere else is rejected as an invalid character.
+    // decode table maps it to -1).
+    if (pad != null) {
+      while (len > 0 && encoded[len - 1] == pad) {
+        len--;
+      }
+    }
+
+    int i = 0, l = 0;
+    int y0, y1, y2, y3, c0, c1, c2, c3;
+
+    var out = Uint8List((len * 6) >> 3);
+
+    // Fast path: complete 4-character groups into 3 bytes.
+    int fastEnd = len - (len & 3);
+    while (i < fastEnd) {
+      y0 = encoded[i];
+      y1 = encoded[i + 1];
+      y2 = encoded[i + 2];
+      y3 = encoded[i + 3];
+      if (y0 < 0 ||
+          y1 < 0 ||
+          y2 < 0 ||
+          y3 < 0 ||
+          y0 >= tlen ||
+          y1 >= tlen ||
+          y2 >= tlen ||
+          y3 >= tlen) {
+        break;
+      }
+      c0 = table[y0];
+      c1 = table[y1];
+      c2 = table[y2];
+      c3 = table[y3];
+      if (c0 < 0 || c1 < 0 || c2 < 0 || c3 < 0) {
+        break;
+      }
+      out[l++] = (c0 << 2) | (c1 >> 4);
+      out[l++] = ((c1 & 0xF) << 4) | (c2 >> 2);
+      out[l++] = ((c2 & 0x3) << 6) | c3;
+      i += 4;
+    }
+
+    // Tail: the final partial group (and any group the fast path rejected).
+    // No padding remains, so this only regroups bits and validates characters.
+    int p = 0, n = 0, x, y;
+    for (; i < len; ++i) {
+      y = encoded[i];
+      if (y < 0 || y >= tlen || (x = table[y]) < 0) {
+        throw FormatException('Invalid character $y at $i');
+      }
+      p = (p << 6) ^ x;
+      n += 6;
+      while (n >= 8) {
+        n -= 8;
+        out[l++] = p >>> n;
+        p &= (1 << n) - 1;
+      }
+    }
+
+    // A non-zero partial word means the input was not a valid length.
+    if (p > 0) {
+      throw FormatException('Invalid length');
+    }
+
+    return out;
+  }
+}
+
+// ========================================================
 // Base-64 Codec
 // ========================================================
 
@@ -74,10 +238,10 @@ const _base64DecodingBcrypt = [
 /// [bcrypt].
 class Base64Codec extends IterableCodec {
   @override
-  final AlphabetEncoder encoder;
+  final Base64Encoder encoder;
 
   @override
-  final AlphabetDecoder decoder;
+  final Base64Decoder decoder;
 
   const Base64Codec._({
     required this.encoder,
@@ -93,13 +257,11 @@ class Base64Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base64Codec standard = Base64Codec._(
-    encoder: AlphabetEncoder(
-      bits: 6,
+    encoder: Base64Encoder(
       padding: _padding,
       alphabet: _base64EncodingRfc4648,
     ),
-    decoder: AlphabetDecoder(
-      bits: 6,
+    decoder: Base64Decoder(
       padding: _padding,
       alphabet: _base64DecodingRfc4648,
     ),
@@ -114,12 +276,10 @@ class Base64Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base64Codec standardNoPadding = Base64Codec._(
-    encoder: AlphabetEncoder(
-      bits: 6,
+    encoder: Base64Encoder(
       alphabet: _base64EncodingRfc4648,
     ),
-    decoder: AlphabetDecoder(
-      bits: 6,
+    decoder: Base64Decoder(
       alphabet: _base64DecodingRfc4648,
     ),
   );
@@ -134,13 +294,11 @@ class Base64Codec extends IterableCodec {
   ///
   /// It is padded with `=`
   static const Base64Codec urlSafe = Base64Codec._(
-    encoder: AlphabetEncoder(
-      bits: 6,
+    encoder: Base64Encoder(
       padding: _padding,
       alphabet: _base64EncodingRfc4648UrlSafe,
     ),
-    decoder: AlphabetDecoder(
-      bits: 6,
+    decoder: Base64Decoder(
       padding: _padding,
       alphabet: _base64DecodingRfc4648,
     ),
@@ -156,12 +314,10 @@ class Base64Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base64Codec urlSafeNoPadding = Base64Codec._(
-    encoder: AlphabetEncoder(
-      bits: 6,
+    encoder: Base64Encoder(
       alphabet: _base64EncodingRfc4648UrlSafe,
     ),
-    decoder: AlphabetDecoder(
-      bits: 6,
+    decoder: Base64Decoder(
       alphabet: _base64DecodingRfc4648,
     ),
   );
@@ -175,12 +331,10 @@ class Base64Codec extends IterableCodec {
   ///
   /// It is not padded.
   static const Base64Codec bcrypt = Base64Codec._(
-    encoder: AlphabetEncoder(
-      bits: 6,
+    encoder: Base64Encoder(
       alphabet: _base64EncodingBcrypt,
     ),
-    decoder: AlphabetDecoder(
-      bits: 6,
+    decoder: Base64Decoder(
       alphabet: _base64DecodingBcrypt,
     ),
   );

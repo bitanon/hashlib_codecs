@@ -1,6 +1,18 @@
-# 3.4.1
+# 3.5.0
 
-- Refactor existing benchmarks and add missing ones. Dropping `benchmark_harness` dependency in favor of custom benchmarking class with better flexibility.
+- [**Breaking Changes**]
+  - Renames internal abstract class `HashlibConverter` to `CipherlibConverter`.
+  - Removes `encodeString`, `decodeString` from `IterableCodec`.
+- Speed up Base-64 and Base-32 **encoding** with specialized single-pass encoders.
+  Base-64 encoding now outperforms `dart:convert`.
+- Speed up Base-64 and Base-32 **decoding** with specialized single-pass decoders.
+  Base-64 decoding now outperforms `dart:convert`.
+- Speed up `toUtf8` using `Uint8List` buffer instead of plain `List<int>`.
+  UTF-8 encoding now outperforms `dart:convert`.
+- Speed up `fromUtf8` with a dedicated byte-to-string decoder.
+  UTF-8 decoding now matches closely with `dart:convert`.
+- Refactor existing benchmarks and add missing ones. Dropping `benchmark_harness`
+  dependency in favor of custom benchmarking class with better flexibility.
 
 # 3.4.0
 

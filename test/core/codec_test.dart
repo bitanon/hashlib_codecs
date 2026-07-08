@@ -22,7 +22,7 @@ class PlusOneCodec extends IterableCodec {
   BitDecoder get decoder => throw UnimplementedError();
 }
 
-class IdentityConverter extends HashlibConverter {
+class IdentityConverter extends CipherlibConverter {
   @override
   final int source;
 
@@ -38,20 +38,9 @@ void main() {
   group('IterableCodec convenience methods', () {
     const codec = PlusOneCodec();
 
-    test('encodeString increments code units', () {
-      final out = codec.encodeString('ABC').toList();
-      expect(out, [66, 67, 68]);
-    });
-
-    test('decodeString decrements code units', () {
-      final out = codec.decodeString('BCD').toList();
-      expect(out, [66 - 1, 67 - 1, 68 - 1]);
-      expect(String.fromCharCodes(out), 'ABC');
-    });
-
     test('round trip with unicode', () {
       final s = String.fromCharCodes([104, 233, 0xD8, 0x3D, 0xDE, 0x42]);
-      final enc = codec.encodeString(s).toList();
+      final enc = codec.encode(s.codeUnits).toList();
       final dec = codec.decode(enc).toList();
       expect(String.fromCharCodes(dec), s);
     });
@@ -69,7 +58,7 @@ void main() {
     });
 
     test('empty inputs', () {
-      expect(codec.encodeString('').toList(), isEmpty);
+      expect(codec.encode([]).toList(), isEmpty);
       expect(codec.decode(const <int>[]).toList(), isEmpty);
     });
   });

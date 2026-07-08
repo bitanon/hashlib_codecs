@@ -14,17 +14,12 @@ import 'package:convertlib/convertlib.dart';
   0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 */
 
-const int _range1 = 0x0000007F;
-const int _range2 = 0x000007FF;
-const int _range3 = 0x0000FFFF;
-const int _range4 = 0x0010FFFF;
-
 // ========================================================
 // UTF-8 Encoder and Decoder
 // ========================================================
 
-class _UTF8Encoder extends BitEncoder {
-  const _UTF8Encoder();
+class UTF8Encoder extends BitEncoder {
+  const UTF8Encoder();
 
   @override
   int get source => 32;
@@ -35,56 +30,70 @@ class _UTF8Encoder extends BitEncoder {
   @override
   Uint8List convert(List<int> input) {
     int len = input.length;
-    // worst case: 4 bytes per input element, filled left to right
+    int l = 0, p = 0, x, y, c;
     var out = Uint8List(len << 2);
-    int l = 0;
-    for (int x, y, p = 0; p < len; ++p) {
+    while (p < len) {
       x = input[p];
-      // check negative code
+      // Case: negative code
       if (x < 0) {
         throw FormatException('Negative code $x at $p');
       }
-      // UTF-16 surrogate pairs
-      if (x >= 0xD800 && x <= 0xDBFF) {
-        if (p + 1 >= len) {
-          throw FormatException('Unpaired high surrogate $x at $p');
-        }
-        y = input[++p];
-        if (y < 0xDC00 || y > 0xDFFF) {
-          throw FormatException('Invalid surrogate pair $x,$y at ${p - 1}');
-        }
-        x = 0x10000 + (((x - 0xD800) << 10) | (y - 0xDC00));
-      } else if (x >= 0xDC00 && x <= 0xDFFF) {
-        throw FormatException('Unpaired low surrogate $x at $p');
-      }
-      // extract bytes
-      if (x <= _range1) {
-        out[l++] = x & 0x7F;
-      } else if (x <= _range2) {
-        out[l++] = 0xC0 | ((x >>> 6) & 0x1F);
-        out[l++] = 0x80 | (x & 0x3F);
-      } else if (x <= _range3) {
-        out[l++] = 0xE0 | ((x >>> 12) & 0xF);
-        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
-        out[l++] = 0x80 | (x & 0x3F);
-      } else if (x <= _range4) {
-        out[l++] = 0xF0 | ((x >>> 18) & 0x7);
-        out[l++] = 0x80 | ((x >>> 12) & 0x3F);
-        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
-        out[l++] = 0x80 | (x & 0x3F);
-      } else {
+      // Case: Exceeds range
+      else if (x > 0x0010FFFF) {
         throw FormatException('Invalid code $x at $p');
       }
+      // Case: 1-byte ASCII run
+      else if (x <= 0x7F) {
+        out[l++] = x;
+        p++;
+      }
+      // Case: 2-byte
+      else if (x <= 0x7FF) {
+        out[l++] = 0xC0 | (x >>> 6);
+        out[l++] = 0x80 | (x & 0x3F);
+        p++;
+      }
+      // Case: 3-byte
+      else if (x < 0xD800 || x > 0xDFFF) {
+        out[l++] = 0xE0 | (x >>> 12);
+        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
+        out[l++] = 0x80 | (x & 0x3F);
+        p++;
+      }
+      // Case: 4-byte from a UTF-16 surrogate pair
+      else if (x <= 0xDBFF) {
+        p++;
+        if (p >= len) {
+          throw FormatException('Unpaired high surrogate $x at ${p - 1}');
+        }
+        y = input[p];
+        if (y < 0xDC00 || y > 0xDFFF) {
+          throw FormatException('Invalid surrogate pair ($x, $y) at $p');
+        }
+        c = 0x10000 + (((x - 0xD800) << 10) | (y - 0xDC00));
+        out[l++] = 0xF0 | (c >>> 18);
+        out[l++] = 0x80 | ((c >>> 12) & 0x3F);
+        out[l++] = 0x80 | ((c >>> 6) & 0x3F);
+        out[l++] = 0x80 | (c & 0x3F);
+        p++;
+      } else {
+        throw FormatException('Unpaired low surrogate $x at $p');
+      }
     }
+
     if (l == out.length) {
       return out;
     }
     return out.sublist(0, l);
   }
+
+  /// Encodes the UTF-16 code units of [input] into a UTF-8 octet sequence.
+  @pragma('vm:prefer-inline')
+  Uint8List encode(String input) => convert(input.codeUnits);
 }
 
-class _UTF8Decoder extends BitDecoder {
-  const _UTF8Decoder();
+class UTF8Decoder extends BitDecoder {
+  const UTF8Decoder();
 
   @override
   int get source => 8;
@@ -94,104 +103,191 @@ class _UTF8Decoder extends BitDecoder {
 
   @override
   List<int> convert(List<int> encoded) {
-    List<int> out = <int>[];
-    int len = encoded.length;
-    for (int x, y, z, p = 0; p < len; ++p) {
-      x = encoded[p];
+    var bytes = encoded is Uint8List ? encoded : Uint8List.fromList(encoded);
+    int len = bytes.length;
+    var out = Uint32List(len);
 
-      // Case: 1-byte
+    int x, n = 0, p = 0;
+    while (p < len) {
+      x = bytes[p];
+      // Case: 1-byte ASCII run
       if (x <= 0x7F) {
-        out.add(x);
+        out[n++] = x;
+        p++;
       }
       // Case: 2-bytes
       else if ((x & 0xE0) == 0xC0) {
-        if (x < 0xC2) {
-          throw FormatException('Overlong 2-byte sequence at $p');
-        }
-        if (p + 1 >= len) {
-          throw FormatException('Insufficient input');
-        }
-
-        z = encoded[++p];
-        if (((z & 0xC0) != 0x80)) {
-          throw FormatException('Invalid continuation byte $z at $p');
-        }
-
-        y = ((x & 0x1F) << 6) | (z & 0x3F);
-        out.add(y);
+        out[n++] = _decode2(bytes, len, p, x);
+        p += 2;
       }
-      // Case: 3-bytes
+      // Case: 3-bytes UTF-16
       else if ((x & 0xF0) == 0xE0) {
-        if (p + 2 >= len) {
-          throw FormatException('Insufficient input');
-        }
-
-        z = encoded[++p];
-        if (((z & 0xC0) != 0x80)) {
-          throw FormatException('Invalid continuation byte $z at $p');
-        } else if (x == 0xE0 && z < 0xA0) {
-          throw FormatException('Overlong 3-byte sequence at ${p - 1}');
-        }
-
-        y = (x & 0xF) << 12;
-        y |= (z & 0x3F) << 6;
-
-        z = encoded[++p];
-        if (((z & 0xC0) != 0x80)) {
-          throw FormatException('Invalid continuation byte $z at $p');
-        }
-
-        y |= z & 0x3F;
-        if (y >= 0xD800 && y <= 0xDFFF) {
-          throw FormatException('Invalid surrogate $y at ${p - 2}');
-        }
-
-        out.add(y);
+        out[n++] = _decode3(bytes, len, p, x);
+        p += 3;
       }
-      // Case: 4-byte
+      // Case: 4-byte UTF-16 surrogate pair
       else if ((x & 0xF8) == 0xF0) {
-        if (x > 0xF4) {
-          throw FormatException('Invalid 4-byte lead $x at $p');
-        }
-        if (p + 3 >= len) {
-          throw FormatException('Insufficient input');
-        }
-
-        z = encoded[++p];
-        if (((z & 0xC0) != 0x80)) {
-          throw FormatException('Invalid continuation byte $z at $p');
-        } else if (x == 0xF0 && z < 0x90) {
-          throw FormatException('Overlong 4-byte sequence at ${p - 1}');
-        }
-
-        y = (x & 0x7) << 18;
-        y |= (z & 0x3F) << 12;
-
-        z = encoded[++p];
-        if (((z & 0xC0) != 0x80)) {
-          throw FormatException('Invalid continuation byte $z at $p');
-        }
-
-        y |= (z & 0x3F) << 6;
-
-        z = encoded[++p];
-        if (((z & 0xC0) != 0x80)) {
-          throw FormatException('Invalid continuation byte $z at $p');
-        }
-
-        y |= z & 0x3F;
-        if (y > _range4) {
-          throw FormatException('Above U+10FFFF at ${p - 3}');
-        }
-
-        out.add(y);
+        out[n++] = _decode4(bytes, len, p, x);
+        p += 4;
       }
       // Case: 5 or more bytes
       else {
         throw FormatException('Invalid code $x at $p');
       }
     }
-    return out;
+    if (n == len) {
+      return out;
+    }
+    return out.sublist(0, n);
+  }
+
+  /// Decodes a valid UTF-8 octet sequence in [input] directly to a [String].
+  ///
+  /// This is a faster equivalent of `String.fromCharCodes(convert(...))`
+  /// that emits UTF-16 code units in a single pass. Throws a [FormatException]
+  /// if [input] is not a valid UTF-8 octet sequence.
+  String decode(List<int> input) {
+    var bytes = input is Uint8List ? input : Uint8List.fromList(input);
+    int len = bytes.length;
+    if (len == 0) return '';
+
+    int x, y, n = 0, p = 0;
+    var units = Uint16List(len);
+    while (p < len) {
+      x = bytes[p];
+      // Case: 1-byte ASCII run
+      if (x <= 0x7F) {
+        units[n++] = x;
+        p++;
+      }
+      // Case: 2-bytes
+      else if ((x & 0xE0) == 0xC0) {
+        units[n++] = _decode2(bytes, len, p, x);
+        p += 2;
+      }
+      // Case: 3-bytes
+      else if ((x & 0xF0) == 0xE0) {
+        units[n++] = _decode3(bytes, len, p, x);
+        p += 3;
+      }
+      // Case: 4-bytes UTF-16 surrogate pair
+      else if ((x & 0xF8) == 0xF0) {
+        y = _decode4(bytes, len, p, x) - 0x10000;
+        units[n++] = 0xD800 | (y >> 10);
+        units[n++] = 0xDC00 | (y & 0x3FF);
+        p += 4;
+      }
+      // Case: 5 or more bytes
+      else {
+        throw FormatException('Invalid code $x at $p');
+      }
+    }
+    return String.fromCharCodes(units, 0, n);
+  }
+
+  // Decodes the 2-byte sequence with lead byte [x] at index [p] of [b], and
+  // returns the scalar value. Throws [FormatException] on a malformed sequence.
+  @pragma('vm:prefer-inline')
+  static int _decode2(Uint8List b, int len, int p, int x) {
+    int y, z;
+    if (x < 0xC2) {
+      throw FormatException('Overlong 2-byte sequence at $p');
+    }
+
+    p++;
+    if (p >= len) {
+      throw FormatException('Insufficient input');
+    }
+    z = b[p];
+    if ((z & 0xC0) != 0x80) {
+      throw FormatException('Invalid continuation byte $z at $p');
+    }
+    y = ((x & 0x1F) << 6) | (z & 0x3F);
+
+    return y;
+  }
+
+  // Decodes the 3-byte sequence with lead byte [x] at index [p] of [b], and
+  // returns the scalar value. Throws [FormatException] on a malformed sequence.
+  @pragma('vm:prefer-inline')
+  static int _decode3(Uint8List b, int len, int p, int x) {
+    int y, z;
+
+    p++;
+    if (p >= len) {
+      throw FormatException('Insufficient input');
+    }
+    z = b[p];
+    if ((z & 0xC0) != 0x80) {
+      throw FormatException('Invalid continuation byte $z at $p');
+    } else if (x == 0xE0 && z < 0xA0) {
+      throw FormatException('Overlong 3-byte sequence at ${p - 1}');
+    }
+    y = (x & 0xF) << 12;
+    y |= (z & 0x3F) << 6;
+
+    p++;
+    if (p >= len) {
+      throw FormatException('Insufficient input');
+    }
+    z = b[p];
+    if ((z & 0xC0) != 0x80) {
+      throw FormatException('Invalid continuation byte $z at $p');
+    }
+    y |= z & 0x3F;
+    if (y >= 0xD800 && y <= 0xDFFF) {
+      throw FormatException('Invalid surrogate $y at ${p - 2}');
+    }
+
+    return y;
+  }
+
+  // Decodes the 4-byte sequence with lead byte [x] at index [p] of [b], and
+  // returns the scalar value. Throws [FormatException] on a malformed sequence.
+  @pragma('vm:prefer-inline')
+  static int _decode4(Uint8List b, int len, int p, int x) {
+    int y, z;
+    if (x > 0xF4) {
+      throw FormatException('Invalid 4-byte lead $x at $p');
+    }
+
+    p++;
+    if (p >= len) {
+      throw FormatException('Insufficient input');
+    }
+    z = b[p];
+    if ((z & 0xC0) != 0x80) {
+      throw FormatException('Invalid continuation byte $z at $p');
+    } else if (x == 0xF0 && z < 0x90) {
+      throw FormatException('Overlong 4-byte sequence at ${p - 1}');
+    }
+    y = (x & 0x7) << 18;
+    y |= (z & 0x3F) << 12;
+
+    p++;
+    if (p >= len) {
+      throw FormatException('Insufficient input');
+    }
+    z = b[p];
+    if ((z & 0xC0) != 0x80) {
+      throw FormatException('Invalid continuation byte $z at $p');
+    }
+    y |= (z & 0x3F) << 6;
+
+    p++;
+    if (p >= len) {
+      throw FormatException('Insufficient input');
+    }
+    z = b[p];
+    if ((z & 0xC0) != 0x80) {
+      throw FormatException('Invalid continuation byte $z at $p');
+    }
+    y |= z & 0x3F;
+    if (y > 0x0010FFFF) {
+      throw FormatException('Above U+10FFFF at $p');
+    }
+
+    return y;
   }
 }
 
@@ -206,15 +302,23 @@ class _UTF8Decoder extends BitDecoder {
 /// [standard] for the codec instance.
 class UTF8Codec extends IterableCodec {
   @override
-  final BitEncoder encoder;
+  final UTF8Encoder encoder;
 
   @override
-  final BitDecoder decoder;
+  final UTF8Decoder decoder;
 
   const UTF8Codec._({
     required this.encoder,
     required this.decoder,
   });
+
+  /// Encodes the UTF-16 code units of [input] into a UTF-8 octet sequence.
+  @pragma('vm:prefer-inline')
+  Uint8List encodeString(String input) => encoder.encode(input);
+
+  /// Decodes a valid UTF-8 octet sequence in [input] directly to a [String].
+  @pragma('vm:prefer-inline')
+  String decodeToString(List<int> input) => decoder.decode(input);
 
   /// Codec instance to encode and decode UTF-8 character code units to 8-bit
   /// UTF-8 octet sequence.
@@ -223,7 +327,7 @@ class UTF8Codec extends IterableCodec {
   ///
   /// [rfc]: https://datatracker.ietf.org/doc/html/rfc3629
   static const UTF8Codec standard = UTF8Codec._(
-    encoder: _UTF8Encoder(),
-    decoder: _UTF8Decoder(),
+    encoder: UTF8Encoder(),
+    decoder: UTF8Decoder(),
   );
 }
