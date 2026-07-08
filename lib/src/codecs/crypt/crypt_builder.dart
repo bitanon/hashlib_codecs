@@ -66,8 +66,14 @@ class CryptDataBuilder {
   ///
   /// If [value] is not a [String], it will be converted to one with [toString].
   /// As a string, it must be a sequence of characters in `[a-zA-Z0-9/+.-]`.
+  ///
+  /// Throws:
+  /// - [ArgumentError] if [value] is `null`.
   CryptDataBuilder param(String name, dynamic value) {
-    _params[name] = value == null ? value : value.toString();
+    if (value == null) {
+      throw ArgumentError.notNull('value');
+    }
+    _params[name] = value.toString();
     return this;
   }
 

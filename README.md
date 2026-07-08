@@ -31,8 +31,9 @@ text. It carries no runtime dependencies of its own.
 - **Many alphabet variants**: RFC 4648 standard, base32hex, Crockford,
   z-base-32, geohash, word-safe, URL/filename-safe Base-64, and bcrypt.
 - **Optional padding**: encode and decode with or without `=` padding.
-- **Error resilient**: decoders tolerate whitespace and case where the
-  alphabet allows, and raise typed errors on genuinely invalid input.
+- **Error resilient**: decoders accept case and alphabet variations where the
+  encoding allows it (either Base-64 alphabet, upper or lower Base-32), and
+  raise typed errors on genuinely invalid input.
 - **Convenient output**: results integrate with `ByteCollector`, the digest
   container shared with `hashlib`, for one-call re-encoding.
 
@@ -40,7 +41,7 @@ text. It carries no runtime dependencies of its own.
 
 ```yaml
 dependencies:
-  convertlib: ^3.4.0
+  convertlib: ^3.5.0
 ```
 
 or run `dart pub add convertlib`. A single import exposes every codec:
@@ -80,8 +81,6 @@ void main() {
   print('match  : ${fromUtf8(fromBase64(b64)) == 'convertlib'}');
 }
 ```
-
-<!-- file: example/quickstart_example.dart -->
 
 Every snippet in this README is also a runnable program in the
 [example](https://github.com/bitanon/convertlib/tree/master/example) folder.
@@ -181,8 +180,6 @@ void main() {
 }
 ```
 
-<!-- file: example/base32_variants_example.dart -->
-
 ### URL-safe and unpadded Base-64
 
 For tokens embedded in URLs or JSON, drop the padding and switch to the
@@ -207,8 +204,6 @@ void main() {
 }
 ```
 
-<!-- file: example/base64_example.dart -->
-
 ### BigInt ↔ bytes
 
 Read a byte sequence as an arbitrary-precision integer and back. Combine with
@@ -228,8 +223,6 @@ void main() {
   print("from decimal => $decoded");
 }
 ```
-
-<!-- file: example/decimal_example.dart -->
 
 ### PHC / Modular Crypt Format
 
@@ -268,7 +261,44 @@ void main() {
 }
 ```
 
-<!-- file: example/crypt_example.dart -->
+## Testing and reliability
+
+Codecs are trivial to get subtly wrong. It is not enough to check just the
+`decode(encode(x)) == x` round-trips alone. For example: a dropped bit mask
+can produce output that still passes round-trips cleanly. This package is
+tested against that failure mode directly:
+
+- **Expectations come from outside the code.** Every codec is checked against
+  official vectors (RFC 4648 "foobar", RFC 3629 UTF-8 boundaries, PHC / bcrypt
+  strings) **and** differentially against independent reference implementations:
+  `dart:convert`, [`base_codecs`][base_codecs], and [`base32`][base32], so a
+  consistently-wrong codec cannot hide behind a passing round-trip.
+- **Wide input coverage.**
+  - Randomized round-trips at every length from 0 to 99 for each alphabet variant
+  - Full-range Unicode code points and surrogate-pair handling for UTF-8
+  - Per-instance assertions of the exact alphabet string each codec emits,
+    which catch miscopied lookup tables.
+- **Failure paths are asserted, not assumed.** Malformed UTF-8, invalid
+  characters, and exhaustive invalid-length sweeps all verify that a typed
+  error is raised (with the exact message and offset), never a silent wrong
+  result.
+- **Every platform.** The suite runs on the Dart VM, Node.js (JavaScript), and
+  Chrome (WASM) in CI across Dart SDK 2.19 and stable on Linux, macOS, and Windows.
+  Special care has been given for the web, where integers behave differently.
+- **Regressions stay fixed.** Real bugs found in the past (a word-safe Base-32
+  table accidentally copied from z-base-32, a dropped `& 0x3F` mask in the
+  UTF-8 decoder, a `ByteCollector.isEqual` self-comparison) each have a
+  permanent, externally-anchored regression test, and a differential fuzz
+  harness re-checks the codecs against the reference implementations.
+
+Because correctness is anchored to independent references rather than the
+package's own agreement with itself, `convertlib` is safe to rely on in
+production. If you do hit a discrepancy, please [open an issue] and include
+your input and the expected output.
+
+[base32]: https://pub.dev/packages/base32
+[base_codecs]: https://pub.dev/packages/base_codecs
+[open an issue]: https://github.com/bitanon/convertlib/issues
 
 <!-- file: BENCHMARK.md -->
 
@@ -492,8 +522,6 @@ void main() {
 > All benchmarks are done on 36GB _Apple M3 Pro_ using compiled _exe_
 >
 > Dart SDK version: 3.12.2 (stable) (Tue Jun 9 01:11:39 2026 -0700) on "macos_arm64"
-
-<!-- file: BENCHMARK.md -->
 
 ## License
 

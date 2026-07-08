@@ -133,6 +133,19 @@ void main() {
       );
     });
 
+    test('Decoder throws on non-zero partial word (invalid length)', () {
+      // A single 5-bit symbol leaves 5 bits that cannot form a byte.
+      final dec = AlphabetDecoder(
+        bits: 5,
+        alphabet: List<int>.generate(32, (i) => i),
+      );
+      expect(
+        () => dec.convert([1]),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid length')),
+      );
+    });
+
     test('Base64 encode/decode (no padding)', () {
       final enc = AlphabetEncoder(
         bits: 6,

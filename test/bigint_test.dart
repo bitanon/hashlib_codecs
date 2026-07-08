@@ -74,6 +74,42 @@ void main() {
       var out = BigInt.zero;
       expect(fromBigInt(out, msbFirst: true), equals(inp));
     });
+    group('zero-byte and boundary edges', () {
+      test('MSB-first ignores leading zero bytes', () {
+        // [0, 0, 1] big-endian is 0x000001 = 1.
+        expect(toBigInt([0, 0, 1], msbFirst: true), equals(BigInt.one));
+        expect(toBigInt([0, 0, 0, 0xFF], msbFirst: true),
+            equals(BigInt.from(0xFF)));
+      });
+      test('LSB-first ignores trailing zero bytes', () {
+        // [1, 0, 0] little-endian is 0x000001 = 1.
+        expect(toBigInt([1, 0, 0]), equals(BigInt.one));
+        expect(toBigInt([0xFF, 0, 0, 0]), equals(BigInt.from(0xFF)));
+      });
+      test('single 0xFF byte both endians', () {
+        expect(toBigInt([0xFF]), equals(BigInt.from(0xFF)));
+        expect(toBigInt([0xFF], msbFirst: true), equals(BigInt.from(0xFF)));
+        expect(fromBigInt(BigInt.from(0xFF)), equals([0xFF]));
+        expect(fromBigInt(BigInt.from(0xFF), msbFirst: true), equals([0xFF]));
+      });
+      test('LSB-first decode returns canonical form (trailing zeros dropped)',
+          () {
+        // Encoding [1, 0, 0] yields 1; decoding 1 yields [1] — the trailing
+        // zero bytes are not restored. Documents the canonical-form behavior.
+        var value = toBigInt([1, 0, 0]);
+        expect(fromBigInt(value), equals([1]));
+      });
+      test('agrees with BigInt.parse over random inputs', () {
+        // External oracle: build the big-endian hex string and parse it.
+        for (int i = 1; i < 64; ++i) {
+          var b = randomBytes(i);
+          var hex = b.map((x) => x.toRadixString(16).padLeft(2, '0')).join();
+          var expected = BigInt.parse(hex, radix: 16);
+          expect(toBigInt(b, msbFirst: true), equals(expected),
+              reason: 'length $i');
+        }
+      });
+    });
     test('little-endian encoding <-> decoding', () {
       for (int i = 0; i < 100; ++i) {
         var inp = [...randomBytes(i), 1];

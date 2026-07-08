@@ -110,6 +110,35 @@ void main() {
         expect(a, equals(b), reason: 'length $i');
       }
     });
+    group('cross-alphabet decode leniency', () {
+      // The standard and URL-safe codecs share one RFC-4648 decode table that
+      // maps both `+`/`/` and `-`/`_`, so either alphabet decodes with either
+      // codec. Expected bytes come from `dart:convert` (external oracle), not
+      // from re-encoding with our own codec.
+      test('standard codec decodes URL-safe (- and _) input', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var urlStr = cvt.base64Url.encode(b);
+          expect(fromBase64(urlStr), equals(b), reason: 'length $i');
+        }
+      });
+      test('URL-safe codec decodes standard (+ and /) input', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var stdStr = cvt.base64.encode(b);
+          expect(fromBase64(stdStr, codec: Base64Codec.urlSafe), equals(b),
+              reason: 'length $i');
+        }
+      });
+      test('standard codec decodes "____" (URL-safe alphabet)', () {
+        // [0xFF, 0xFF, 0xFF] encodes to "////" (standard) / "____" (url-safe).
+        expect(fromBase64('____'), equals([0xFF, 0xFF, 0xFF]));
+      });
+      test('URL-safe codec decodes "////" (standard alphabet)', () {
+        expect(fromBase64('////', codec: Base64Codec.urlSafe),
+            equals([0xFF, 0xFF, 0xFF]));
+      });
+    });
     group('decoding with invalid chars', () {
       test('Hashlib!', () {
         expect(

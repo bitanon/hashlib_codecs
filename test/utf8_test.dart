@@ -171,6 +171,24 @@ void main() {
         expect(decoder.target, 32);
       });
 
+      test('convert decodes pure ASCII to code points', () {
+        // Exercises the ASCII branch and the `n == len` fast return.
+        expect(decoder.convert('AB'.codeUnits), equals([0x41, 0x42]));
+      });
+
+      test('convert decodes mixed multi-byte sequences to code points', () {
+        // "A" (1) + "é" (2) + "中" (3) + "😀" (4); the output is shorter than
+        // the input, exercising the `sublist(0, n)` return.
+        expect(decoder.convert(toUtf8('Aé中😀')),
+            equals([0x41, 0xE9, 0x4E2D, 0x1F600]));
+      });
+
+      test(
+          'convert with insufficient input after the first 4-byte '
+          'continuation', () {
+        expect(() => decoder.convert([0xF0, 0x90]), throwsFormatException);
+      });
+
       test('with insufficient input for 2-byte sequence', () {
         expect(() => decoder.convert([0xC2]), throwsFormatException);
       });
@@ -327,6 +345,12 @@ void main() {
       test('long pure-ASCII input', () {
         var text = 'z' * 10000;
         expect(fromUtf8(toUtf8(text)), equals(text));
+      });
+
+      test('codec decodeToString decodes to a String', () {
+        // Exercises the `UTF8Codec.decodeToString` convenience method.
+        var text = 'Aé中😀';
+        expect(UTF8Codec.standard.decodeToString(toUtf8(text)), equals(text));
       });
     });
 

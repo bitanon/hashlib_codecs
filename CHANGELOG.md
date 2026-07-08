@@ -3,6 +3,8 @@
 - [**Breaking Changes**]
   - Renames internal abstract class `HashlibConverter` to `CipherlibConverter`.
   - Removes `encodeString`, `decodeString` from `IterableCodec`.
+- Fix `CryptDataBuilder.param` to throw an `ArgumentError` when the value is
+  `null`, instead of a raw `TypeError`.
 - Speed up Base-64 and Base-32 **encoding** with specialized single-pass encoders.
   Base-64 encoding now outperforms `dart:convert`.
 - Speed up Base-64 and Base-32 **decoding** with specialized single-pass decoders.

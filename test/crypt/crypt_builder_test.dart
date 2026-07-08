@@ -63,6 +63,11 @@ void main() {
           throwsArgumentError);
     });
 
+    test('should throw ArgumentError when param value is null', () {
+      final builder = CryptDataBuilder('algo');
+      expect(() => builder.param('rounds', null), throwsArgumentError);
+    });
+
     test('should throw ArgumentError for invalid param name', () {
       final builder = CryptDataBuilder('algo').param('invalid*name', 'value');
       expect(() => builder.build(), throwsArgumentError);

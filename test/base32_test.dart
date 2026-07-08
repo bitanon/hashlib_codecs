@@ -381,6 +381,22 @@ void main() {
         test('"123456789012345"', () {
           expect(() => fromBase32("123456789012345"), throwsFormatException);
         });
+        // Valid alphabet characters, but a length that leaves a non-zero
+        // partial word — reaches the length check, not the invalid-char check.
+        test('"B" (valid char, incomplete group)', () {
+          expect(
+            () => fromBase32("B"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid length')),
+          );
+        });
+        test('"MZX" (valid chars, incomplete group)', () {
+          expect(
+            () => fromBase32("MZX"),
+            throwsA(isA<FormatException>()
+                .having((e) => e.message, 'message', 'Invalid length')),
+          );
+        });
       });
     });
 
