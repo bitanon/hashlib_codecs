@@ -136,7 +136,7 @@ abstract class ByteCollector extends Object {
   /// The content comparison is constant-time: it does not exit early on the
   /// first mismatching byte, making this method safe for comparing MACs and
   /// message digests.
-  bool isEqual(dynamic other) {
+  bool isEqual(Object? other) {
     if (identical(this, other)) {
       return true;
     } else if (other is ByteCollector) {
