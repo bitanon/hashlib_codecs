@@ -24,7 +24,7 @@ jobs:
     uses: ./.github/workflows/release-test.yml
 
   publish:
-    if: github.repository == 'bitanon/hashlib_codecs'
+    if: github.repository == 'bitanon/convertlib'
     needs: test
     permissions:
       id-token: write # Required for authentication using OIDC
@@ -43,7 +43,7 @@ jobs:
         run: dart pub publish -f
 
   changelog:
-    if: github.repository == 'bitanon/hashlib_codecs'
+    if: github.repository == 'bitanon/convertlib'
     needs: publish
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +59,7 @@ jobs:
           CUR_TAG=${GITHUB_REF#refs/tags/v}
           echo "VERSION=${CUR_TAG}" >> $GITHUB_ENV
           PREV_TAG=$(git tag --sort=-v:refname | grep '^v[0-9]' | grep -A1 "^v$CUR_TAG" | tail -n1)
-          echo -e "\n**Full Changelog**: https://github.com/bitanon/hashlib_codecs/compare/${PREV_TAG}...v${CUR_TAG}" >> RELEASE_NOTES.md
+          echo -e "\n**Full Changelog**: https://github.com/bitanon/convertlib/compare/${PREV_TAG}...v${CUR_TAG}" >> RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3

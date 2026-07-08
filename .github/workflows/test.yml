@@ -116,7 +116,7 @@ jobs:
           dart run main.dart
 
   coverage:
-    if: github.repository == 'bitanon/hashlib_codecs'
+    if: github.repository == 'bitanon/convertlib'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
