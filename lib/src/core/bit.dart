@@ -25,16 +25,16 @@ abstract class BitEncoder extends BitConverter {
   /// word remains, 0 will be padded on the right to make the final word.
   @override
   List<int> convert(covariant List<int> input) {
-    int x, p, s, t, l, n, sb, tb;
-    sb = source;
-    tb = target;
+    final sb = source;
+    final tb = target;
     if (sb < 2 || sb > 64) {
-      throw ArgumentError('The source bit length should be between 2 to 64');
+      throw ArgumentError.value(source, 'source', 'should be between 2 to 64');
     }
     if (tb < 2 || tb > 64) {
-      throw ArgumentError('The target bit length should be between 2 to 64');
+      throw ArgumentError.value(target, 'target', 'should be between 2 to 64');
     }
 
+    int p, s, t, l, n;
     l = input.length * sb;
     n = l ~/ tb;
     if (n * tb < l) n++;
@@ -44,7 +44,7 @@ abstract class BitEncoder extends BitConverter {
     p = n = l = t = 0;
     s = 1 << (sb - 1);
     s = s ^ (s - 1);
-    for (x in input) {
+    for (final x in input) {
       p = (p << sb) ^ (x & s);
       t = (t << sb) ^ s;
       n += sb;
@@ -90,16 +90,16 @@ abstract class BitDecoder extends BitConverter {
   /// word remains, it will throw [FormatException].
   @override
   List<int> convert(covariant List<int> encoded) {
-    int x, p, s, t, l, n, sb, tb;
-    sb = source;
-    tb = target;
+    final sb = source;
+    final tb = target;
     if (sb < 2 || sb > 64) {
-      throw ArgumentError('The source bit length should be between 2 to 64');
+      throw ArgumentError.value(source, 'source', 'should be between 2 to 64');
     }
     if (tb < 2 || tb > 64) {
-      throw ArgumentError('The target bit length should be between 2 to 64');
+      throw ArgumentError.value(target, 'target', 'should be between 2 to 64');
     }
 
+    int p, s, t, l, n;
     l = encoded.length * sb;
     var out = Uint8List(l ~/ tb);
 
@@ -107,7 +107,7 @@ abstract class BitDecoder extends BitConverter {
     p = n = t = l = 0;
     s = 1 << (sb - 1);
     s = s ^ (s - 1);
-    for (x in encoded) {
+    for (final x in encoded) {
       if (x < 0 || x > s) break;
       p = (p << sb) ^ x;
       t = (t << sb) ^ s;
