@@ -13,7 +13,7 @@ Replace the dependency in your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  convertlib: ^3.4.0
+  convertlib: ^3.5.0
 ```
 
 And update your imports:

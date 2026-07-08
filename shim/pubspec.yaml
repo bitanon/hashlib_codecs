@@ -3,10 +3,10 @@ description: >-
   Renamed to convertlib. This package now re-exports convertlib for backward
   compatibility and is deprecated. Please migrate to the convertlib package.
 homepage: https://github.com/bitanon/convertlib
-version: 3.4.0
+version: 3.5.0
 
 environment:
   sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
-  convertlib: ^3.4.0
+  convertlib: ^3.5.0

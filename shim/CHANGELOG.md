@@ -1,4 +1,4 @@
-# 3.4.0
+# 3.5.0
 
 - **This package has been renamed to `convertlib`.**
 - `hashlib_codecs` now re-exports `package:convertlib/convertlib.dart` with no
