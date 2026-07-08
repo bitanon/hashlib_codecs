@@ -88,7 +88,10 @@ void main() {
     test('utf8 vs dart:convert over the full code-point range', () {
       for (int i = 0; i < rounds; ++i) {
         var s = String.fromCharCodes(rndCodePoints(rng.nextInt(33)));
-        var ref = cvt.utf8.encode(s);
+        // `utf8.encode` returns `List<int>` on Dart 2.19 (only `Uint8List` on
+        // Dart 3+); wrap it so `fromUtf8`, which takes a `Uint8List`, compiles
+        // on the 2.19 CI as well.
+        var ref = Uint8List.fromList(cvt.utf8.encode(s));
         expect(toUtf8(s), ref, reason: 'round=$i cps=${s.runes}');
         expect(fromUtf8(ref), s, reason: 'round=$i cps=${s.runes}');
       }
