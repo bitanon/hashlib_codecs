@@ -22,9 +22,12 @@
 - Allow empty parameter values in the PHC/crypt string format, as permitted by
   the specification (e.g. `$id$data=`). `CryptData.validate` no longer rejects
   an empty parameter value; salt and hash must still be non-empty.
+- Fix the PHC decoder mis-classifying a comma-containing `v=...` segment (e.g.
+  `v=19,m=8`) as the version; it is now parsed as a parameters segment.
+- Add value-based `==` and `hashCode` to `CryptData`.
 - `BigIntCodec` decoders now return a `Uint8List`; the `BigIntDecoder` typedef
   narrows from `Converter<BigInt, Iterable<int>>` to `Converter<BigInt,
-  Uint8List>`, and `fromBigInt` no longer copies the decoded bytes.
+Uint8List>`, and `fromBigInt` no longer copies the decoded bytes.
 - Tighten `ByteCollector.isEqual` parameter type from `dynamic` to `Object?`.
 - Standardize the `AlphabetDecoder` invalid-bit-length error on
   `ArgumentError.value`, matching `AlphabetEncoder`.

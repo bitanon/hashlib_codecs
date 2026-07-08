@@ -139,4 +139,39 @@ class CryptData {
           hash, 'hash', 'must be characters in [a-zA-Z0-9/+.-]');
     }
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! CryptData) return false;
+    if (id != other.id ||
+        version != other.version ||
+        salt != other.salt ||
+        hash != other.hash) {
+      return false;
+    }
+    final p = params;
+    final q = other.params;
+    if (p == q) return true;
+    if (p == null || q == null) return false;
+    if (p.length != q.length) return false;
+    for (final e in p.entries) {
+      if (!q.containsKey(e.key) || q[e.key] != e.value) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode {
+    final p = params;
+    int paramsHash = 0;
+    if (p != null) {
+      for (final e in p.entries) {
+        paramsHash ^= Object.hash(e.key, e.value);
+      }
+    }
+    return Object.hash(id, version, salt, hash, paramsHash);
+  }
 }

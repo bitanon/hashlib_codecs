@@ -69,6 +69,12 @@ void main() {
         var v = r"$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.";
         expect(toCrypt(fromCrypt(v)), equals(v));
       });
+      test('decode then encode round-trips to an equal object', () {
+        var v =
+            r"$argon2id$v=19$m=65536,t=2,p=1$gZiV/M1gPc22ElAH/Jh1Hw$CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno";
+        final data = fromCrypt(v);
+        expect(fromCrypt(toCrypt(data)), equals(data));
+      });
     });
 
     group('Decoder failure cases', () {
@@ -110,6 +116,15 @@ void main() {
           () => fromCrypt(r"$argon2id$v=sd"),
           'Invalid argument (version): '
           'must be decimal digits without leading zeros: "sd"',
+        );
+      });
+      test('version segment with a comma is treated as parameters', () {
+        // `v=19,m=8` in the version position is a parameters segment, so the
+        // reserved `v` key is reported instead of a bogus version error.
+        expectError<ArgumentError>(
+          () => fromCrypt(r"$argon2id$v=19,m=8$c2FsdA"),
+          'Invalid argument (params.key): '
+          'reserved; use version field instead: "v"',
         );
       });
       test('using reserved key in parameter', () {

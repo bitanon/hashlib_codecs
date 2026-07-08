@@ -87,7 +87,7 @@ class CryptDecoder extends Converter<String, CryptData> {
     parts = parts.skip(1);
     if (parts.isNotEmpty) {
       val = parts.first;
-      if (val.startsWith('v=')) {
+      if (val.startsWith('v=') && !val.contains(',')) {
         version = val.substring(2);
         parts = parts.skip(1);
       }
