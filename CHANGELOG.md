@@ -1,3 +1,9 @@
+# _next_
+
+- Add missing dartdoc to the `Base32Encoder`, `Base32Decoder`, `Base64Encoder`,
+  and `Base64Decoder` constructors and the `UTF8Encoder` and `UTF8Decoder`
+  classes.
+
 # 3.5.1
 
 - Widen `fromUtf8` to accept any `List<int>` input instead of requiring a

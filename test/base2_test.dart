@@ -31,7 +31,7 @@ void main() {
     });
     group("decoding", () {
       test('empty string => []', () {
-        expect(fromBinary(""), []);
+        expect(fromBinary(""), <int>[]);
       });
       test('1010 => [10]', () {
         expect(fromBinary("1010"), [10]);

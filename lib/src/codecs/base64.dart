@@ -3,9 +3,9 @@
 
 import 'dart:typed_data';
 
-import 'package:convertlib/convertlib.dart';
-import 'package:convertlib/src/core/alphabet.dart';
-import 'package:convertlib/src/core/codec.dart';
+import '../../convertlib.dart';
+import '../core/alphabet.dart';
+import '../core/codec.dart';
 
 // ========================================================
 // Base-64 Alphabets
@@ -76,6 +76,12 @@ const _base64DecodingBcrypt = [
 /// into a single correctly-sized (and, if applicable, padded) output buffer.
 /// This avoids the multiple regroup/lookup/pad passes of the generic engine.
 class Base64Encoder extends AlphabetEncoder {
+  /// Creates a new [Base64Encoder] instance.
+  ///
+  /// Parameters:
+  /// - The [alphabet] maps each 6-bit word to its output character.
+  /// - If [padding] is not null, the output is padded with it to a multiple of
+  ///   4 characters.
   const Base64Encoder({
     required super.alphabet,
     super.padding,
@@ -145,6 +151,12 @@ class Base64Encoder extends AlphabetEncoder {
 /// Every intermediate value stays within 8 bits, so it is safe on the
 /// JavaScript platform.
 class Base64Decoder extends AlphabetDecoder {
+  /// Creates a new [Base64Decoder] instance.
+  ///
+  /// Parameters:
+  /// - The [alphabet] maps each input character to its 6-bit word.
+  /// - If [padding] is not null, trailing occurrences of it are stripped before
+  ///   decoding.
   const Base64Decoder({
     required super.alphabet,
     super.padding,

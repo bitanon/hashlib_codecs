@@ -81,7 +81,7 @@ void main() {
 
     group("decoding", () {
       test('empty string => []', () {
-        expect(fromHex(""), []);
+        expect(fromHex(""), <int>[]);
       });
       test('5 => [5]', () {
         expect(fromHex("5"), [5]);

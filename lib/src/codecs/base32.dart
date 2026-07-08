@@ -3,8 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'package:convertlib/src/core/alphabet.dart';
-import 'package:convertlib/src/core/codec.dart';
+import '../core/alphabet.dart';
+import '../core/codec.dart';
 
 // ========================================================
 // Base-32 Alphabets
@@ -157,6 +157,12 @@ const _base32DecodingWordSafe = [
 /// so no 40-bit accumulator is used and the code is safe on the JavaScript
 /// platform (where `<<` operates on 32-bit integers).
 class Base32Encoder extends AlphabetEncoder {
+  /// Creates a new [Base32Encoder] instance.
+  ///
+  /// Parameters:
+  /// - The [alphabet] maps each 5-bit word to its output character.
+  /// - If [padding] is not null, the output is padded with it to a multiple of
+  ///   8 characters.
   const Base32Encoder({
     required super.alphabet,
     super.padding,
@@ -239,6 +245,12 @@ class Base32Encoder extends AlphabetEncoder {
 /// Every intermediate value stays within 8 bits, so it is safe on the
 /// JavaScript platform (where `<<` operates on 32-bit integers).
 class Base32Decoder extends AlphabetDecoder {
+  /// Creates a new [Base32Decoder] instance.
+  ///
+  /// Parameters:
+  /// - The [alphabet] maps each input character to its 5-bit word.
+  /// - If [padding] is not null, trailing occurrences of it are stripped before
+  ///   decoding.
   const Base32Decoder({
     required super.alphabet,
     super.padding,

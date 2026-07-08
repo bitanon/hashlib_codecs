@@ -3,8 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'package:convertlib/src/core/byte.dart';
-import 'package:convertlib/src/core/codec.dart';
+import '../core/byte.dart';
+import '../core/codec.dart';
 
 const int _zero = 0x30;
 const int _bigA = 0x41;

@@ -3,7 +3,7 @@
 
 import 'dart:typed_data';
 
-import 'package:convertlib/convertlib.dart';
+import '../../convertlib.dart';
 
 /*
   Char. number range  | UTF-8 octet sequence
@@ -18,7 +18,15 @@ import 'package:convertlib/convertlib.dart';
 // UTF-8 Encoder and Decoder
 // ========================================================
 
+/// Encodes a sequence of Unicode code points into a UTF-8 octet sequence.
+///
+/// Each code point in `U+0000..U+10FFFF` is emitted as 1 to 4 octets, and any
+/// UTF-16 surrogate pair in the input is combined into a single 4-octet
+/// sequence. Based on [RFC-3629][rfc].
+///
+/// [rfc]: https://datatracker.ietf.org/doc/html/rfc3629
 class UTF8Encoder extends BitEncoder {
+  /// Creates a new [UTF8Encoder] instance.
   const UTF8Encoder();
 
   @override
@@ -92,7 +100,14 @@ class UTF8Encoder extends BitEncoder {
   Uint8List encode(String input) => convert(input.codeUnits);
 }
 
+/// Decodes a UTF-8 octet sequence back into a sequence of Unicode code points.
+///
+/// Each 1 to 4 octet UTF-8 sequence is decoded into a single code point in
+/// `U+0000..U+10FFFF`. Based on [RFC-3629][rfc].
+///
+/// [rfc]: https://datatracker.ietf.org/doc/html/rfc3629
 class UTF8Decoder extends BitDecoder {
+  /// Creates a new [UTF8Decoder] instance.
   const UTF8Decoder();
 
   @override
