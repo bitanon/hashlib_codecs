@@ -27,6 +27,7 @@ BigIntCodec _codecFromParameters({
 ///
 /// Throws:
 /// - [FormatException] when the [input] is empty.
+@pragma('vm:prefer-inline')
 BigInt toBigInt(
   Iterable<int> input, {
   BigIntCodec? codec,
@@ -48,12 +49,12 @@ BigInt toBigInt(
 ///
 /// Throws:
 /// - [FormatException] when the [input] is negative.
+@pragma('vm:prefer-inline')
 Uint8List fromBigInt(
   BigInt input, {
   BigIntCodec? codec,
   bool msbFirst = false,
 }) {
   codec ??= _codecFromParameters(msbFirst: msbFirst);
-  var out = codec.decoder.convert(input);
-  return Uint8List.fromList(out as List<int>);
+  return codec.decoder.convert(input);
 }

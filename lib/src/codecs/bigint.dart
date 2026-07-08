@@ -2,6 +2,7 @@
 // All rights reserved. Check LICENSE file for details.
 
 import 'dart:convert' show Codec, Converter;
+import 'dart:typed_data';
 
 const int _zero = 0x30;
 const int _smallA = 0x61;
@@ -10,7 +11,7 @@ const int _smallA = 0x61;
 typedef BigIntEncoder = Converter<Iterable<int>, BigInt>;
 
 /// A converter that decodes a [BigInt] back into an 8-bit integer sequence.
-typedef BigIntDecoder = Converter<BigInt, Iterable<int>>;
+typedef BigIntDecoder = Converter<BigInt, Uint8List>;
 
 // ========================================================
 // LSB First Encoder and Decoder
@@ -51,27 +52,28 @@ class _BigIntLSBFirstDecoder extends BigIntDecoder {
   const _BigIntLSBFirstDecoder();
 
   @override
-  Iterable<int> convert(BigInt input) {
+  Uint8List convert(BigInt input) {
     if (input.isNegative) {
       throw FormatException('Negative numbers are not supported');
     }
     if (input == BigInt.zero) {
-      return [0];
+      return Uint8List(1);
     }
-    int i, a, b;
-    List<int> out = <int>[];
-    var bytes = input.toRadixString(16).codeUnits;
-    for (i = bytes.length - 2; i >= 0; i -= 2) {
-      a = bytes[i];
-      b = bytes[i + 1];
+    var hex = input.toRadixString(16).codeUnits;
+    int h = hex.length;
+    var out = Uint8List((h + 1) >> 1);
+    int i, a, b, k = 0;
+    for (i = h - 2; i >= 0; i -= 2) {
+      a = hex[i];
+      b = hex[i + 1];
       a -= a < _smallA ? _zero : _smallA - 10;
       b -= b < _smallA ? _zero : _smallA - 10;
-      out.add((a << 4) | b);
+      out[k++] = (a << 4) | b;
     }
     if (i == -1) {
-      a = bytes[0];
+      a = hex[0];
       a -= a < _smallA ? _zero : _smallA - 10;
-      out.add(a);
+      out[k++] = a;
     }
     return out;
   }
@@ -107,30 +109,29 @@ class _BigIntMSBFirstDecoder extends BigIntDecoder {
   const _BigIntMSBFirstDecoder();
 
   @override
-  Iterable<int> convert(BigInt input) {
+  Uint8List convert(BigInt input) {
     if (input.isNegative) {
       throw FormatException('Negative numbers are not supported');
     }
     if (input == BigInt.zero) {
-      return [0];
+      return Uint8List(1);
     }
-    int i, a, b, n;
-    List<int> out = <int>[];
-    var bytes = input.toRadixString(16).codeUnits;
-    n = bytes.length;
-    i = 1;
+    var hex = input.toRadixString(16).codeUnits;
+    int n = hex.length;
+    var out = Uint8List((n + 1) >> 1);
+    int i = 1, a, b, k = 0;
     if (n & 1 == 1) {
-      a = bytes[0];
+      a = hex[0];
       a -= a < _smallA ? _zero : _smallA - 10;
-      out.add(a);
+      out[k++] = a;
       i++;
     }
     for (; i < n; i += 2) {
-      a = bytes[i - 1];
-      b = bytes[i];
+      a = hex[i - 1];
+      b = hex[i];
       a -= a < _smallA ? _zero : _smallA - 10;
       b -= b < _smallA ? _zero : _smallA - 10;
-      out.add((a << 4) | b);
+      out[k++] = (a << 4) | b;
     }
     return out;
   }

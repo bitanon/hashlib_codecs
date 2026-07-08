@@ -49,7 +49,7 @@ class ConvertlibBigIntDecode extends SyncBenchmark {
 
 void main() async {
   print('--------- BigInt ----------');
-  for (var size in [1 << 16, 1 << 10, 1 << 5]) {
+  for (var size in [1 << 20, 1 << 10, 1 << 5]) {
     print('---- bytes -> BigInt: ${formatSize(size)} ----');
     await ConvertlibBigIntEncode(size).measureRate();
     print('---- BigInt -> bytes: ${formatSize(size)} ----');
