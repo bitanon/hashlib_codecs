@@ -33,8 +33,8 @@ class ConvertlibUtf8Encode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toUtf8(text);
+  dynamic run() {
+    return toUtf8(text);
   }
 }
 
@@ -46,8 +46,8 @@ class DartConvertUtf8Encode extends SyncBenchmark {
         super('dart:convert', size);
 
   @override
-  void run() {
-    cvt.utf8.encode(text);
+  dynamic run() {
+    return cvt.utf8.encode(text);
   }
 }
 
@@ -59,8 +59,8 @@ class ConvertlibUtf8Decode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    fromUtf8(encoded);
+  dynamic run() {
+    return fromUtf8(encoded);
   }
 }
 
@@ -72,8 +72,8 @@ class DartConvertUtf8Decode extends SyncBenchmark {
         super('dart:convert', size);
 
   @override
-  void run() {
-    cvt.utf8.decode(encoded);
+  dynamic run() {
+    return cvt.utf8.decode(encoded);
   }
 }
 

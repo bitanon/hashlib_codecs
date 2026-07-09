@@ -36,8 +36,8 @@ class GenericAlphabetEncode extends SyncBenchmark {
         super('AlphabetEncoder', size);
 
   @override
-  void run() {
-    enc.convert(input);
+  dynamic run() {
+    return enc.convert(input);
   }
 }
 
@@ -49,8 +49,8 @@ class SpecializedBase64Encode extends SyncBenchmark {
         super('Base64Encoder', size);
 
   @override
-  void run() {
-    Base64Codec.standard.encoder.convert(input);
+  dynamic run() {
+    return Base64Codec.standard.encoder.convert(input);
   }
 }
 
@@ -70,8 +70,8 @@ class GenericAlphabetDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    dec.convert(encoded);
+  dynamic run() {
+    return dec.convert(encoded);
   }
 }
 
@@ -89,8 +89,8 @@ class SpecializedBase64Decode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    Base64Codec.standard.decoder.convert(encoded);
+  dynamic run() {
+    return Base64Codec.standard.decoder.convert(encoded);
   }
 }
 

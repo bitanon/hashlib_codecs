@@ -16,8 +16,8 @@ class ConvertlibHexEncode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toHex(input);
+  dynamic run() {
+    return toHex(input);
   }
 }
 
@@ -29,8 +29,8 @@ class BaseCodecsHexEncode extends SyncBenchmark {
         super('base_codecs', size);
 
   @override
-  void run() {
-    bc.base16Encode(input);
+  dynamic run() {
+    return bc.base16Encode(input);
   }
 }
 
@@ -48,8 +48,8 @@ class ConvertlibHexDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    fromHex(encoded);
+  dynamic run() {
+    return fromHex(encoded);
   }
 }
 
@@ -67,8 +67,8 @@ class BaseCodecsHexDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    bc.base16Decode(encoded);
+  dynamic run() {
+    return bc.base16Decode(encoded);
   }
 }
 

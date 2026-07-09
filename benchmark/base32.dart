@@ -17,8 +17,8 @@ class ConvertlibBase32Encode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toBase32(input);
+  dynamic run() {
+    return toBase32(input);
   }
 }
 
@@ -30,8 +30,8 @@ class BaseCodecsBase32Encode extends SyncBenchmark {
         super('base_codecs', size);
 
   @override
-  void run() {
-    bc.base32RfcEncode(input);
+  dynamic run() {
+    return bc.base32RfcEncode(input);
   }
 }
 
@@ -43,8 +43,8 @@ class Base32PackageEncode extends SyncBenchmark {
         super('base32', size);
 
   @override
-  void run() {
-    b32.base32.encode(input);
+  dynamic run() {
+    return b32.base32.encode(input);
   }
 }
 
@@ -62,8 +62,8 @@ class ConvertlibBase32Decode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    fromBase32(encoded);
+  dynamic run() {
+    return fromBase32(encoded);
   }
 }
 
@@ -81,8 +81,8 @@ class BaseCodecsBase32Decode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    bc.base32RfcDecode(encoded);
+  dynamic run() {
+    return bc.base32RfcDecode(encoded);
   }
 }
 
@@ -100,8 +100,8 @@ class Base32PackageDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    b32.base32.decode(encoded);
+  dynamic run() {
+    return b32.base32.decode(encoded);
   }
 }
 

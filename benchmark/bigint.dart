@@ -23,8 +23,8 @@ class ConvertlibBigIntEncode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toBigInt(input);
+  dynamic run() {
+    return toBigInt(input);
   }
 }
 
@@ -42,8 +42,8 @@ class ConvertlibBigIntDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    fromBigInt(value);
+  dynamic run() {
+    return fromBigInt(value);
   }
 }
 

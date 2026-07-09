@@ -34,6 +34,11 @@ Uint8List>`, and `fromBigInt` no longer copies the decoded bytes.
 - Add `benchmark/alphabet.dart` covering the generic `AlphabetEncoder` and
   `AlphabetDecoder` engine.
 - Add `benchmark/bit.dart` covering the generic `BitEncoder` and `BitDecoder`.
+- Improve the benchmark harness (`benchmark/_base.dart`): it now reports the
+  median per-iteration time sampled across ~25ms batches instead of the
+  arithmetic mean, making results robust against GC pauses and keeping each
+  batch well above the coarsened web timer resolution. Benchmark tooling only;
+  no library code or output is affected.
 - Add tests from official / well-known sources and cover corner cases.
 
 # 3.5.1

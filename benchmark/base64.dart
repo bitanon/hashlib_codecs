@@ -16,8 +16,8 @@ class ConvertlibBase64Encode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toBase64(input);
+  dynamic run() {
+    return toBase64(input);
   }
 }
 
@@ -29,8 +29,8 @@ class ConvertBase64Encode extends SyncBenchmark {
         super('dart:convert', size);
 
   @override
-  void run() {
-    cvt.base64.encode(input);
+  dynamic run() {
+    return cvt.base64.encode(input);
   }
 }
 
@@ -48,8 +48,8 @@ class ConvertlibBase64Decode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    fromBase64(encoded);
+  dynamic run() {
+    return fromBase64(encoded);
   }
 }
 
@@ -67,8 +67,8 @@ class ConvertBase64Decode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    cvt.base64.decode(encoded);
+  dynamic run() {
+    return cvt.base64.decode(encoded);
   }
 }
 

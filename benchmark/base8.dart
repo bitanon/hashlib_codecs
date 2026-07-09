@@ -15,8 +15,8 @@ class ConvertlibOctalEncode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toOctal(input);
+  dynamic run() {
+    return toOctal(input);
   }
 }
 
@@ -34,8 +34,8 @@ class ConvertlibOctalDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    fromOctal(encoded);
+  dynamic run() {
+    return fromOctal(encoded);
   }
 }
 

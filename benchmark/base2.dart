@@ -15,8 +15,8 @@ class ConvertlibBinaryEncode extends SyncBenchmark {
         super('convertlib', size);
 
   @override
-  void run() {
-    toBinary(input);
+  dynamic run() {
+    return toBinary(input);
   }
 }
 
@@ -34,8 +34,8 @@ class ConvertlibBinaryDecode extends SyncBenchmark {
   }
 
   @override
-  void run() {
-    fromBinary(encoded);
+  dynamic run() {
+    return fromBinary(encoded);
   }
 }
 
