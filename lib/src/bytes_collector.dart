@@ -4,13 +4,14 @@
 import 'dart:convert' as cvt;
 import 'dart:typed_data';
 
-import 'base16.dart' show fromHex;
 import 'base16.dart' show toHex;
+import 'base16.dart' show tryFromHex;
 import 'base2.dart' show toBinary;
 import 'base32.dart' show toBase32;
 import 'base64.dart' show toBase64;
 import 'base8.dart' show toOctal;
 import 'bigint.dart' show toBigInt;
+import 'constant_time.dart' show constantTimeEquals;
 
 /// A container for digest bytes produced by a hash or encoding function.
 ///
@@ -149,23 +150,14 @@ abstract class ByteCollector extends Object {
         Uint8List.view(other.buffer, other.offsetInBytes, other.lengthInBytes),
       );
     } else if (other is String) {
-      Uint8List decoded;
-      try {
-        decoded = fromHex(other);
-      } on FormatException {
-        // A string that is not valid hexadecimal cannot match these bytes.
-        return false;
-      }
-      return isEqual(decoded);
+      // A string that is not valid hexadecimal cannot match these bytes.
+      final decoded = tryFromHex(other);
+      return decoded != null && isEqual(decoded);
     } else if (other is Iterable<int>) {
-      int i = 0, diff = 0;
-      for (int x in other) {
-        if (i >= bytes.length) {
-          return false;
-        }
-        diff |= x ^ bytes[i++];
-      }
-      return i == bytes.length && diff == 0;
+      return constantTimeEquals(
+        bytes,
+        other is List<int> ? other : List<int>.of(other),
+      );
     }
     return false;
   }

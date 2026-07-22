@@ -34,10 +34,12 @@ void main() {
       for (int i = 0; i < 50; ++i) {
         final b = randomBytes(i);
         expect(toBase32Bytes(b), equals(toBase32(b).codeUnits), reason: '$i');
-        // Exercises the padding-strip branch on a padded codec.
+        // An explicit padded codec with padding:false exercises the
+        // padding-strip branch.
         expect(
-          toBase32Bytes(b, padding: false),
-          equals(toBase32(b, padding: false).codeUnits),
+          toBase32Bytes(b, codec: Base32Codec.standard, padding: false),
+          equals(toBase32(b, codec: Base32Codec.standard, padding: false)
+              .codeUnits),
           reason: 'unpadded $i',
         );
         // A codec that never pads skips the strip branch.
@@ -51,10 +53,13 @@ void main() {
       for (int i = 0; i < 50; ++i) {
         final b = randomBytes(i);
         expect(toBase64Bytes(b), equals(toBase64(b).codeUnits), reason: '$i');
+        // An explicit padded codec with padding:false exercises the
+        // padding-strip branch.
         expect(
-          toBase64Bytes(b, url: true, padding: false),
-          equals(toBase64(b, url: true, padding: false).codeUnits),
-          reason: 'url unpadded $i',
+          toBase64Bytes(b, codec: Base64Codec.standard, padding: false),
+          equals(toBase64(b, codec: Base64Codec.standard, padding: false)
+              .codeUnits),
+          reason: 'unpadded $i',
         );
       }
     });

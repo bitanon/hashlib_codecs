@@ -10,14 +10,14 @@
 /// digests, where an early return would leak how many leading bytes matched.
 ///
 /// The length of the inputs is not treated as secret: a length mismatch returns
-/// false immediately.
+/// false immediately. This is the only early return, and it branches only on
+/// the public lengths — never on the contents. Once the lengths match, every
+/// element is folded into an accumulator with no data-dependent branch, so the
+/// running time depends only on the length.
 ///
 /// Parameters:
 /// - [a] and [b] are the byte sequences to compare.
 bool constantTimeEquals(List<int> a, List<int> b) {
-  if (identical(a, b)) {
-    return true;
-  }
   int n = a.length;
   if (n != b.length) {
     return false;
