@@ -153,11 +153,10 @@ abstract class ByteCollector extends Object {
       // A string that is not valid hexadecimal cannot match these bytes.
       final decoded = tryFromHex(other);
       return decoded != null && isEqual(decoded);
+    } else if (other is List<int>) {
+      return constantTimeEquals(bytes, other);
     } else if (other is Iterable<int>) {
-      return constantTimeEquals(
-        bytes,
-        other is List<int> ? other : List<int>.of(other),
-      );
+      return isEqual(List<int>.of(other));
     }
     return false;
   }
