@@ -7,6 +7,14 @@
 - Export the `ByteEncoder`, `ByteDecoder`, `AlphabetEncoder`, and `AlphabetDecoder`
   base classes, previously part of the API surface but not reachable through
   `package:convertlib/convertlib.dart`.
+- Add `constantTimeEquals`, a top-level constant-time byte comparison for
+  verifying MACs and digests without wrapping them in a `ByteCollector`.
+- Add `toHexBytes`, `toBinaryBytes`, `toOctalBytes`, `toBase32Bytes`, and
+  `toBase64Bytes`, returning the encoded ASCII output as a `Uint8List` without
+  the intermediate `String`.
+- Add non-throwing decoders `tryFromHex`, `tryFromBinary`, `tryFromOctal`,
+  `tryFromBase32`, `tryFromBase64`, `tryFromUtf8`, and `tryFromBigInt`, which
+  return `null` instead of throwing a `FormatException` on invalid input.
 - Fix the UTF-8 encoder emitting invalid bytes for scalar code points in
   `U+10000..U+10FFFF`; `UTF8Encoder.convert` now uses the 4-byte form (the public
   `toUtf8` was unaffected). Verified against `dart:convert`.
@@ -16,11 +24,14 @@
   now accumulates with multiplication and is exact up to `2^53` (VM unchanged).
 - `ByteCollector.isEqual` returns `false` for a [String] that is not valid
   hexadecimal instead of throwing a `FormatException`, matching its contract.
-- Add value-based `==` and `hashCode` to `CryptData`.
+- Add value-based `==` and `hashCode` to `CryptData`; a null and an empty
+  `params` map now compare equal (both encode to the same string).
 - PHC/crypt: allow empty parameter values (e.g. `$id$data=`), and fix the decoder
   mis-classifying a comma-containing `v=...` segment as the version.
 - Speed up `fromBase32`/`fromBase64` decoding and the generic `AlphabetEncoder` by
   removing extra allocations and passes; output is byte-identical.
+- Clarify the `FormatException` message for non-canonical encoded input:
+  `'Invalid length'` is now `'Invalid length or non-zero trailing bits'`.
 
 # 3.5.1
 
