@@ -225,7 +225,7 @@ final bigintSizes = [1 << 12, 1 << 8, 1 << 5];
 String sizeHeader(int size) => '${formatSize(size)} message';
 
 void dumpHeaders() {
-  dump("## Benchmarks");
+  dump("## 🚀 Benchmarks");
   dump('');
   dump("### Libraries");
   dump('');

@@ -12,6 +12,8 @@ call echo.>> BENCHMARK.md
 call echo|set /p="> ">> BENCHMARK.md
 call dart --version >> BENCHMARK.md
 
+call dart run tool\sync_benchmark_readme.dart || goto :error
+
 goto :EOF
 
 :error
