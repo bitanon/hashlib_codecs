@@ -36,12 +36,16 @@ text. It carries no runtime dependencies of its own.
   raise typed errors on genuinely invalid input.
 - **Convenient output**: results integrate with `ByteCollector`, the digest
   container shared with `hashlib`, for one-call re-encoding.
+- **Bytes or strings, throwing or not**: every encoder has a `to<Name>Bytes`
+  twin returning a `Uint8List`, every decoder a non-throwing `tryFrom<Name>`
+  returning `null` on bad input, plus a top-level `constantTimeEquals` for
+  MAC/digest checks.
 
 ## Install
 
 ```yaml
 dependencies:
-  convertlib: ^3.5.2
+  convertlib: ^3.6.1
 ```
 
 or run `dart pub add convertlib`. A single import exposes every codec:
@@ -87,17 +91,19 @@ Every snippet in this README is also a runnable program in the
 
 ## Supported codecs
 
-| Encoding              | Class         | Functions                |          Source          |
-| --------------------- | ------------- | ------------------------ | :----------------------: |
-| Binary (Base-2)       | `Base2Codec`  | `toBinary`, `fromBinary` |            —             |
-| Octal (Base-8)        | `Base8Codec`  | `toOctal`, `fromOctal`   |            —             |
-| Hexadecimal (Base-16) | `Base16Codec` | `toHex`, `fromHex`       |         RFC-4648         |
-| Base-32               | `Base32Codec` | `toBase32`, `fromBase32` |         RFC-4648         |
-| Base-64               | `Base64Codec` | `toBase64`, `fromBase64` |         RFC-4648         |
-| BigInt                | `BigIntCodec` | `toBigInt`, `fromBigInt` |            —             |
-| UTF-8                 | `UTF8Codec`   | `toUtf8`, `fromUtf8`     |         RFC-3629         |
-| Modular Crypt Format  | `CryptFormat` | `toCrypt`, `fromCrypt`   | [PHC string format][phc] |
+| Encoding              | Class         | Encode                        | Decode                          |          Source          |
+| --------------------- | ------------- | ----------------------------- | ------------------------------- | :----------------------: |
+| Binary (Base-2)       | `Base2Codec`  | `toBinary`, `toBinaryBytes`   | `fromBinary`, `tryFromBinary`   |            —             |
+| Octal (Base-8)        | `Base8Codec`  | `toOctal`, `toOctalBytes`     | `fromOctal`, `tryFromOctal`     |            —             |
+| Hexadecimal (Base-16) | `Base16Codec` | `toHex`, `toHexBytes`         | `fromHex`, `tryFromHex`         |     [RFC-4648][rfc4648]      |
+| Base-32               | `Base32Codec` | `toBase32`, `toBase32Bytes`   | `fromBase32`, `tryFromBase32`   |     [RFC-4648][rfc4648]      |
+| Base-64               | `Base64Codec` | `toBase64`, `toBase64Bytes`   | `fromBase64`, `tryFromBase64`   |     [RFC-4648][rfc4648]      |
+| BigInt                | `BigIntCodec` | `toBigInt`                    | `fromBigInt`, `tryFromBigInt`   |            —             |
+| UTF-8                 | `UTF8Codec`   | `toUtf8`                      | `fromUtf8`, `tryFromUtf8`       |     [RFC-3629][rfc3629]      |
+| Modular Crypt Format  | `CryptFormat` | `toCrypt`                     | `fromCrypt`                     | [PHC string format][phc] |
 
+[rfc4648]: https://datatracker.ietf.org/doc/html/rfc4648
+[rfc3629]: https://datatracker.ietf.org/doc/html/rfc3629
 [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 
 ### Alphabet variants
@@ -112,7 +118,8 @@ Every snippet in this README is also a runnable program in the
 - `Base32Codec.standard` (RFC-4648) — `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` (default)
 - `Base32Codec.lowercase` — `abcdefghijklmnopqrstuvwxyz234567`
 - `Base32Codec.hex` / `.hexLower` — base32hex, `0-9A-V` / `0-9a-v`
-- `Base32Codec.crockford` — `0123456789ABCDEFGHJKMNPQRSTVWXYZ`
+- `Base32Codec.crockford` — `0123456789ABCDEFGHJKMNPQRSTVWXYZ` (decoding is
+  case-insensitive and accepts `I`/`i`/`L`/`l` as `1` and `O`/`o` as `0`)
 - `Base32Codec.geohash` — `0123456789bcdefghjkmnpqrstuvwxyz`
 - `Base32Codec.z` — z-base-32, `ybndrfg8ejkmcpqxot1uwisza345h769`
 - `Base32Codec.wordSafe` — `23456789CFGHJMPQRVWXcfghjmpqrvwx`
@@ -128,6 +135,18 @@ to drop `=`, or a `codec:`:
 
 - `BigIntCodec.msbFirst` — treats bytes in big-endian order
 - `BigIntCodec.lsbFirst` — treats bytes in little-endian order (default)
+
+### Bytes, non-throwing decode, and constant-time compare
+
+- **Byte output** — the `to<Name>Bytes` encoders in the table above return the
+  encoded ASCII as a `Uint8List`, skipping the intermediate `String`.
+- **Non-throwing decoders** — the `tryFrom<Name>` decoders return `null` instead
+  of throwing a `FormatException` on invalid input.
+- **Constant-time compare** — `constantTimeEquals(a, b)` compares two byte lists
+  without exiting early on the first mismatch, for verifying MACs and digests.
+- **Low-level building blocks** — the generic converters `BitEncoder`/
+  `BitDecoder`, `ByteEncoder`/`ByteDecoder`, and `AlphabetEncoder`/
+  `AlphabetDecoder` are exported for building custom codecs.
 
 ### ByteCollector
 
