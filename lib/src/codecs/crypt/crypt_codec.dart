@@ -17,6 +17,13 @@ import 'crypt_data.dart';
 /// $<id>[$v=<version>][$<param>=<value>(,<param>=<value>)*][$<salt>[$<hash>]]
 /// ```
 ///
+/// This codec follows the PHC grammar above. It also parses the broader Modular
+/// Crypt Format (e.g. bcrypt `$2b$<cost>$<salt+hash>`), but only by the PHC
+/// field positions: such strings have no `param=value` segment, so a bcrypt
+/// cost is read as the [CryptData.salt] and the combined salt+digest as the
+/// [CryptData.hash]. The characters are preserved for round-tripping, but the
+/// fields are not split into their MCF meanings.
+///
 /// [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 class CryptFormat extends Codec<CryptData, String> {
   /// Creates a new [CryptFormat] instance.
