@@ -129,6 +129,9 @@ the table layout.
 backticks around identifiers: `Add constructor to ByteCollector abstract class`,
 `Introduce \`ByteCollector\` abstract class`. One logical change per commit.
 
+**Pull requests.** Do not append the "Generated with Claude Code" footer, or any
+other bot attribution, to PR bodies.
+
 **CHANGELOG.md.** Newest first, `# X.Y.Z` heading, `-` bullets. Breaking changes
 lead with `**Breaking Changes**:` and list renames as `` `old` -> `new` ``.
 Every released version has an entry; the top entry is extracted verbatim into
