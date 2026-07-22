@@ -8,6 +8,12 @@
   `dart:convert`. The public `toUtf8(String)` path was never affected, since
   UTF-16 strings deliver astral characters as surrogate pairs. **Observable
   output change** for direct `UTF8Encoder().convert([scalar])` callers.
+- Make the Crockford Base-32 decoder spec-compliant: it is now case-insensitive
+  and substitutes the ambiguous letters `I`/`i`/`L`/`l` -> `1` and `O`/`o` ->
+  `0` (the letter `U`/`u` is still not part of the alphabet). Previously
+  lowercase Crockford strings and the ambiguous letters were rejected. Verified
+  against `package:base_codecs`. Encoding output is unchanged. **Observable
+  change**: inputs that previously threw now decode.
 
 # 3.5.2
 
