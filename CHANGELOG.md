@@ -14,6 +14,10 @@
   lowercase Crockford strings and the ambiguous letters were rejected. Verified
   against `package:base_codecs`. Encoding output is unchanged. **Observable
   change**: inputs that previously threw now decode.
+- Fix `benchmark/bit.dart` exposing the private `_BitEncoder`/`_BitDecoder`
+  types through public fields, which failed `dart analyze --fatal-infos`
+  (benchmark tooling only; no library code or output is affected).
+- Alphabetize the `core/bit.dart` export in `lib/src/codecs_base.dart`.
 
 # 3.5.2
 

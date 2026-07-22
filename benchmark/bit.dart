@@ -40,7 +40,7 @@ Uint8List _sample(int size) => Uint8List.fromList(List.filled(size, 0x5a));
 class BitEncode extends SyncBenchmark {
   final int target;
   final Uint8List input;
-  late final _BitEncoder enc = _BitEncoder(8, target);
+  late final BitEncoder enc = _BitEncoder(8, target);
 
   BitEncode(int size, this.target)
       : input = _sample(size),
@@ -55,7 +55,7 @@ class BitEncode extends SyncBenchmark {
 class BitDecode extends SyncBenchmark {
   final int source;
   final int _size;
-  late final _BitDecoder dec = _BitDecoder(source, 8);
+  late final BitDecoder dec = _BitDecoder(source, 8);
   Uint8List encoded = Uint8List(0);
 
   BitDecode(int size, this.source)
