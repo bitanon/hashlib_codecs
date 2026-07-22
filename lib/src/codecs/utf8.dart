@@ -62,14 +62,14 @@ class UTF8Encoder extends BitEncoder {
         out[l++] = 0x80 | (x & 0x3F);
         p++;
       }
-      // Case: 3-byte
-      else if (x < 0xD800 || x > 0xDFFF) {
+      // Case: 3-byte (rest of the Basic Multilingual Plane, sans surrogates)
+      else if (x <= 0xFFFF && (x < 0xD800 || x > 0xDFFF)) {
         out[l++] = 0xE0 | (x >>> 12);
         out[l++] = 0x80 | ((x >>> 6) & 0x3F);
         out[l++] = 0x80 | (x & 0x3F);
         p++;
       }
-      // Case: 4-byte from a UTF-16 surrogate pair
+      // Case: 4-byte from a UTF-16 high surrogate paired with a low surrogate
       else if (x <= 0xDBFF) {
         p++;
         if (p >= len) {
@@ -85,8 +85,18 @@ class UTF8Encoder extends BitEncoder {
         out[l++] = 0x80 | ((c >>> 6) & 0x3F);
         out[l++] = 0x80 | (c & 0x3F);
         p++;
-      } else {
+      }
+      // Case: unpaired low surrogate
+      else if (x <= 0xDFFF) {
         throw FormatException('Unpaired low surrogate $x at $p');
+      }
+      // Case: 4-byte from a scalar code point in U+10000..U+10FFFF
+      else {
+        out[l++] = 0xF0 | (x >>> 18);
+        out[l++] = 0x80 | ((x >>> 12) & 0x3F);
+        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
+        out[l++] = 0x80 | (x & 0x3F);
+        p++;
       }
     }
 

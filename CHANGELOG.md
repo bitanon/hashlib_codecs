@@ -1,3 +1,14 @@
+# _next_
+
+- Fix the UTF-8 encoder producing invalid output for scalar code points in
+  `U+10000..U+10FFFF`. The `UTF8Encoder.convert` 3-byte branch had no upper
+  bound, so an astral scalar (e.g. `U+1F600`, a documented `source: 32` input)
+  was force-fit into 3 bytes and emitted invalid UTF-8 (including the byte
+  `0xFF`). It now emits the correct 4-byte sequence, verified against
+  `dart:convert`. The public `toUtf8(String)` path was never affected, since
+  UTF-16 strings deliver astral characters as surrogate pairs. **Observable
+  output change** for direct `UTF8Encoder().convert([scalar])` callers.
+
 # 3.5.2
 
 - Renames internal abstract class `CipherlibConverter` -> `BitConverter`.
