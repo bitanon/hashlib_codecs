@@ -37,8 +37,10 @@ void main() {
       // valid character. It must survive unchanged.
       expect(stripWhitespace([0x141, 0x20, 0x142]), equals([0x141, 0x142]));
     });
-    test('returns the same content when there is no whitespace', () {
-      expect(stripWhitespace([1, 2, 3, 0x100]), equals([1, 2, 3, 0x100]));
+    test('returns the same instance when there is no whitespace', () {
+      // A clean input must not be copied, so the flag costs no allocation.
+      final input = [1, 2, 3, 0x100];
+      expect(identical(stripWhitespace(input), input), isTrue);
     });
     test('an all-whitespace input becomes empty', () {
       expect(stripWhitespace([0x20, 0x09, 0x0A, 0x0D]), isEmpty);
