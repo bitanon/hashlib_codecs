@@ -130,8 +130,9 @@ abstract class ByteCollector extends Object {
   /// - A [String], which will be treated as a hexadecimal encoded byte array
   ///
   /// This function will return True if all bytes in the [other] matches with
-  /// the [bytes] of this object. If the length does not match, or the type of
-  /// [other] is not supported, it returns False immediately.
+  /// the [bytes] of this object. If the length does not match, the type of
+  /// [other] is not supported, or a [String] is not valid hexadecimal, it
+  /// returns False immediately.
   ///
   /// The content comparison is constant-time: it does not exit early on the
   /// first mismatching byte, making this method safe for comparing MACs and
@@ -148,7 +149,14 @@ abstract class ByteCollector extends Object {
         Uint8List.view(other.buffer, other.offsetInBytes, other.lengthInBytes),
       );
     } else if (other is String) {
-      return isEqual(fromHex(other));
+      Uint8List decoded;
+      try {
+        decoded = fromHex(other);
+      } on FormatException {
+        // A string that is not valid hexadecimal cannot match these bytes.
+        return false;
+      }
+      return isEqual(decoded);
     } else if (other is Iterable<int>) {
       int i = 0, diff = 0;
       for (int x in other) {
