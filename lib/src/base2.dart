@@ -20,7 +20,8 @@ String toBinary(
   List<int> input, {
   Base2Codec codec = Base2Codec.standard,
 }) {
-  return String.fromCharCodes(toBinaryBytes(input, codec: codec));
+  var out = codec.encoder.convert(input);
+  return String.fromCharCodes(out);
 }
 
 /// Converts 8-bit integer sequence to Base-2 and returns the ASCII bytes.

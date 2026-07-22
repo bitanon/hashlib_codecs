@@ -43,9 +43,15 @@ String toBase32(
   bool lower = false,
   bool padding = true,
 }) {
-  return String.fromCharCodes(
-    toBase32Bytes(input, codec: codec, lower: lower, padding: padding),
+  codec ??= _codecFromParameters(
+    lower: lower,
+    padding: padding,
   );
+  Iterable<int> out = codec.encoder.convert(input);
+  if (!padding && _codecsWithPadding.contains(codec)) {
+    out = out.takeWhile((x) => x != codec!.encoder.padding);
+  }
+  return String.fromCharCodes(out);
 }
 
 /// Converts 8-bit integer sequence to Base-32 and returns the ASCII bytes.

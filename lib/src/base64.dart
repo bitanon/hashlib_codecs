@@ -39,9 +39,15 @@ String toBase64(
   bool url = false,
   bool padding = true,
 }) {
-  return String.fromCharCodes(
-    toBase64Bytes(input, codec: codec, url: url, padding: padding),
+  codec ??= _codecFromParameters(
+    url: url,
+    padding: padding,
   );
+  Iterable<int> out = codec.encoder.convert(input);
+  if (!padding && _codecsWithPadding.contains(codec)) {
+    out = out.takeWhile((x) => x != codec!.encoder.padding);
+  }
+  return String.fromCharCodes(out);
 }
 
 /// Converts 8-bit integer sequence to Base-64 and returns the ASCII bytes.

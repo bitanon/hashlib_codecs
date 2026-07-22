@@ -27,7 +27,9 @@ String toHex(
   Base16Codec? codec,
   bool upper = false,
 }) {
-  return String.fromCharCodes(toHexBytes(input, codec: codec, upper: upper));
+  codec ??= _codecFromParameters(upper: upper);
+  var out = codec.encoder.convert(input);
+  return String.fromCharCodes(out);
 }
 
 /// Converts 8-bit integer sequence to Base-16 and returns the ASCII bytes.

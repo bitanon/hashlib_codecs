@@ -20,7 +20,8 @@ String toOctal(
   List<int> input, {
   Base8Codec codec = Base8Codec.standard,
 }) {
-  return String.fromCharCodes(toOctalBytes(input, codec: codec));
+  var out = codec.encoder.convert(input);
+  return String.fromCharCodes(out);
 }
 
 /// Converts 8-bit integer sequence to Base-8 and returns the ASCII bytes.
