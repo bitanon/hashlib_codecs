@@ -98,6 +98,19 @@ class AlphabetDecoder extends ByteDecoder {
   /// The conversion will stop immediately upon encountering this character.
   final int? padding;
 
+  /// Whether to skip ASCII whitespace characters in the encoded input.
+  ///
+  /// When true, the decoder skips horizontal tab (`\t`, U+0009), line feed
+  /// (`\n`, U+000A), vertical tab (U+000B), form feed (U+000C), carriage
+  /// return (`\r`, U+000D), and space (U+0020) anywhere in the input,
+  /// including among trailing [padding] characters. Real-world encoded text
+  /// (e.g. PEM or MIME documents) is often wrapped with such characters.
+  ///
+  /// When false (the default), whitespace is rejected as an invalid
+  /// character. A whitespace character that is part of the [alphabet] is
+  /// always decoded to its alphabet value, never skipped.
+  final bool ignoreWhitespace;
+
   /// Creates a new [AlphabetDecoder] instance.
   ///
   /// Parameters:
@@ -105,10 +118,13 @@ class AlphabetDecoder extends ByteDecoder {
   /// - The [alphabet] contains mapping from input word to output word.
   /// - If [padding] is not null, conversion will stop immediately upon
   ///   encountering this character.
+  /// - If [ignoreWhitespace] is true, ASCII whitespace characters in the
+  ///   input are skipped instead of rejected.
   const AlphabetDecoder({
     required super.bits,
     required this.alphabet,
     this.padding,
+    this.ignoreWhitespace = false,
   });
 
   @override
@@ -119,6 +135,7 @@ class AlphabetDecoder extends ByteDecoder {
     final table = alphabet;
     final tlen = table.length;
     final pad = padding;
+    final ws = ignoreWhitespace;
     final len = encoded.length;
     final sb = source;
     if (sb < 2 || sb > 64) {
@@ -128,11 +145,14 @@ class AlphabetDecoder extends ByteDecoder {
     int i, x, y, p, n, l;
     var out = Uint8List((len * sb) >>> 3);
 
+    // The whitespace checks below sit inside the invalid-character branches,
+    // so characters that map through the alphabet pay no extra cost.
     p = n = l = 0;
     for (i = 0; i < len; ++i) {
       y = encoded[i];
       if (y == pad) break;
       if (y < 0 || y >= tlen || (x = table[y]) < 0) {
+        if (ws && (y == 0x20 || (y >= 0x09 && y <= 0x0D))) continue;
         throw FormatException('Invalid character $y at $i');
       }
       p = (p << sb) ^ x;
@@ -147,6 +167,7 @@ class AlphabetDecoder extends ByteDecoder {
     for (; i < len; ++i) {
       y = encoded[i];
       if (y != pad) {
+        if (ws && (y == 0x20 || (y >= 0x09 && y <= 0x0D))) continue;
         throw FormatException('Invalid character $y at $i');
       }
     }

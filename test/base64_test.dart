@@ -250,5 +250,125 @@ void main() {
         );
       });
     });
+
+    group('decoding with ignoreWhitespace', () {
+      test('PEM-style body wrapped at 64 columns with LF', () {
+        // The encoded text comes from dart:convert (external reference).
+        var data = List<int>.generate(96, (i) => i);
+        var b64 = cvt.base64.encode(data);
+        var pem = '${b64.substring(0, 64)}\n${b64.substring(64)}\n';
+        expect(fromBase64(pem, ignoreWhitespace: true), equals(data));
+        expect(() => fromBase64(pem), throwsFormatException);
+      });
+      test('MIME-style body wrapped at 76 columns with CRLF', () {
+        var data = List<int>.generate(100, (i) => (i * 7 + 3) & 0xFF);
+        var b64 = cvt.base64.encode(data);
+        var mime = StringBuffer();
+        for (int i = 0; i < b64.length; i += 76) {
+          mime.write(
+              b64.substring(i, i + 76 > b64.length ? b64.length : i + 76));
+          mime.write('\r\n');
+        }
+        var laced = mime.toString();
+        expect(fromBase64(laced, ignoreWhitespace: true), equals(data));
+        expect(() => fromBase64(laced), throwsFormatException);
+      });
+      test('every ASCII whitespace character is skipped', () {
+        // Zm9vYmFy = "foobar" (RFC 4648 test vector)
+        var laced = ' Zm\t9v\nYm\vFy\f\r ';
+        expect(
+          fromBase64(laced, ignoreWhitespace: true),
+          equals('foobar'.codeUnits),
+        );
+        expect(() => fromBase64(laced), throwsFormatException);
+      });
+      test('whitespace around and between padding characters', () {
+        // Zg== = "f", Zm8= = "fo" (RFC 4648 test vectors)
+        expect(
+          fromBase64('Zg =\n=', ignoreWhitespace: true),
+          equals('f'.codeUnits),
+        );
+        expect(
+          fromBase64('Zm8=\n', ignoreWhitespace: true),
+          equals('fo'.codeUnits),
+        );
+      });
+      test('empty and whitespace-only input decode to empty output', () {
+        expect(fromBase64('', ignoreWhitespace: true), equals([]));
+        expect(fromBase64(' \t\r\n', ignoreWhitespace: true), equals([]));
+      });
+      test('codec overrides: url-safe and bcrypt', () {
+        var inp = [0x3, 0xF1];
+        expect(
+          fromBase64('A_ E=\n',
+              codec: Base64Codec.urlSafe, ignoreWhitespace: true),
+          equals(inp),
+        );
+        var bcrypt = toBase64(inp, codec: Base64Codec.bcrypt);
+        expect(
+          fromBase64('$bcrypt\n',
+              codec: Base64Codec.bcrypt, ignoreWhitespace: true),
+          equals(fromBase64(bcrypt, codec: Base64Codec.bcrypt)),
+        );
+      });
+      test('invalid characters still throw, with original position', () {
+        expect(
+          () => fromBase64('Zm9v\n?A==', ignoreWhitespace: true),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid character 63 at 5')),
+        );
+      });
+      test('non-ASCII whitespace is not skipped', () {
+        expect(
+          () => fromBase64('Zm9v\u00A0YmFy', ignoreWhitespace: true),
+          throwsFormatException,
+        );
+        expect(
+          () => fromBase64('Zm9v\u2028YmFy', ignoreWhitespace: true),
+          throwsFormatException,
+        );
+      });
+      test('invalid length still throws', () {
+        expect(
+          () => fromBase64('Zm9vY\n', ignoreWhitespace: true),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
+        );
+      });
+      test('tryFromBase64 honors the flag', () {
+        expect(tryFromBase64('Zm9v\nYmFy'), isNull);
+        expect(
+          tryFromBase64('Zm9v\nYmFy', ignoreWhitespace: true),
+          equals('foobar'.codeUnits),
+        );
+      });
+      test('clean input decodes byte-identical to strict decoding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = cvt.base64.encode(b);
+          expect(
+            fromBase64(r, ignoreWhitespace: true),
+            equals(fromBase64(r)),
+            reason: 'length $i',
+          );
+        }
+      });
+      test('whitespace-laced input matches dart:convert of clean input', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = cvt.base64.encode(b);
+          var laced = StringBuffer();
+          for (int j = 0; j < r.length; ++j) {
+            laced.write(r[j]);
+            if (j % 3 == 2) laced.write('\n');
+          }
+          expect(
+            fromBase64(laced.toString(), ignoreWhitespace: true),
+            equals(cvt.base64.decode(r)),
+            reason: 'length $i',
+          );
+        }
+      });
+    });
   });
 }

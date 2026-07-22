@@ -1,3 +1,13 @@
+# _next_
+
+- Add whitespace-tolerant decoding: `fromHex`, `fromBase32`, `fromBase64`, and
+  their `tryFrom` counterparts accept `ignoreWhitespace: true` to skip ASCII
+  whitespace (tab, line feed, vertical tab, form feed, carriage return, and
+  space) in the encoded input, e.g. the body of a PEM or MIME document.
+  `AlphabetDecoder`, `Base32Decoder`, and `Base64Decoder` gain the same opt-in
+  flag. Strict rejection remains the default and the default output is
+  unchanged.
+
 # 3.6.1
 
 - Update `README.md` for the 3.6.0 API: the `to<Name>Bytes` byte encoders, the

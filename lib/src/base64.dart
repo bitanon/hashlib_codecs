@@ -86,6 +86,10 @@ Uint8List toBase64Bytes(
 /// - [input] should be a valid base-64 encoded string.
 /// - If [padding] is true, the [input] may contain padding characters, which
 ///   are ignored during decoding.
+/// - If [ignoreWhitespace] is true, ASCII whitespace characters (tab, line
+///   feed, vertical tab, form feed, carriage return, and space) in the
+///   [input] are skipped instead of rejected, so line-wrapped input such as
+///   the body of a PEM or MIME document can be decoded directly.
 /// - [codec] is the [Base64Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -101,23 +105,38 @@ Uint8List fromBase64(
   String input, {
   Base64Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  return codec.decoder.convert(input.codeUnits);
+  Base64Decoder decoder = codec.decoder;
+  if (ignoreWhitespace && !decoder.ignoreWhitespace) {
+    decoder = Base64Decoder(
+      alphabet: decoder.alphabet,
+      padding: decoder.padding,
+      ignoreWhitespace: true,
+    );
+  }
+  return decoder.convert(input.codeUnits);
 }
 
 /// Converts a Base-64 string to an 8-bit integer sequence, returning `null`
 /// instead of throwing when the [input] is not valid.
 ///
 /// This is the non-throwing counterpart of [fromBase64]. See [fromBase64] for
-/// the meaning of [codec] and [padding].
+/// the meaning of [codec], [padding], and [ignoreWhitespace].
 Uint8List? tryFromBase64(
   String input, {
   Base64Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   try {
-    return fromBase64(input, codec: codec, padding: padding);
+    return fromBase64(
+      input,
+      codec: codec,
+      padding: padding,
+      ignoreWhitespace: ignoreWhitespace,
+    );
   } on FormatException {
     return null;
   }
