@@ -150,10 +150,10 @@ class CryptData {
         hash != other.hash) {
       return false;
     }
-    final p = params;
-    final q = other.params;
-    if (p == q) return true;
-    if (p == null || q == null) return false;
+    // Treat a null params map and an empty one as equal: both encode to the
+    // same string (the encoder skips empty params) and have the same hashCode.
+    final p = params ?? const <String, String>{};
+    final q = other.params ?? const <String, String>{};
     if (p.length != q.length) return false;
     for (final e in p.entries) {
       if (!q.containsKey(e.key) || q[e.key] != e.value) {

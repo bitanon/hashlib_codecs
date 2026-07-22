@@ -58,3 +58,20 @@ Uint8List fromBigInt(
   codec ??= _codecFromParameters(msbFirst: msbFirst);
   return codec.decoder.convert(input);
 }
+
+/// Converts a non-negative [BigInt] to an 8-bit integer sequence, returning
+/// `null` instead of throwing when the [input] is negative.
+///
+/// This is the non-throwing counterpart of [fromBigInt]. See [fromBigInt] for
+/// the meaning of [codec] and [msbFirst].
+Uint8List? tryFromBigInt(
+  BigInt input, {
+  BigIntCodec? codec,
+  bool msbFirst = false,
+}) {
+  try {
+    return fromBigInt(input, codec: codec, msbFirst: msbFirst);
+  } on FormatException {
+    return null;
+  }
+}

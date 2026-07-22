@@ -231,7 +231,7 @@ class Base64Decoder extends AlphabetDecoder {
 
     // A non-zero partial word means the input was not a valid length.
     if (p > 0) {
-      throw FormatException('Invalid length');
+      throw FormatException('Invalid length or non-zero trailing bits');
     }
 
     return out;

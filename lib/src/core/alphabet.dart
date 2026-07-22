@@ -151,7 +151,7 @@ class AlphabetDecoder extends ByteDecoder {
       }
     }
     if (p > 0) {
-      throw FormatException('Invalid length');
+      throw FormatException('Invalid length or non-zero trailing bits');
     }
     if (l < out.length) {
       return out.sublist(0, l);

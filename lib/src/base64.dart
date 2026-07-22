@@ -50,6 +50,36 @@ String toBase64(
   return String.fromCharCodes(out);
 }
 
+/// Converts 8-bit integer sequence to Base-64 and returns the ASCII bytes.
+///
+/// This is the same as [toBase64] but returns the encoded characters as a
+/// [Uint8List] of ASCII codes, skipping the intermediate [String].
+///
+/// Parameters:
+/// - [input] is a sequence of 8-bit integers
+/// - If [url] is true, URL and Filename-safe alphabet is used.
+/// - If [padding] is true, the output will have padding characters.
+/// - [codec] is the [Base64Codec] to use. It is derived from the other
+///   parameters if not provided.
+Uint8List toBase64Bytes(
+  List<int> input, {
+  Base64Codec? codec,
+  bool url = false,
+  bool padding = true,
+}) {
+  codec ??= _codecFromParameters(
+    url: url,
+    padding: padding,
+  );
+  Uint8List out = codec.encoder.convert(input);
+  if (!padding && _codecsWithPadding.contains(codec)) {
+    out = Uint8List.fromList(
+      out.takeWhile((x) => x != codec!.encoder.padding).toList(),
+    );
+  }
+  return out;
+}
+
 /// Converts 6-bit Base-64 character sequence to 8-bit integer sequence.
 ///
 /// Parameters:
@@ -74,4 +104,21 @@ Uint8List fromBase64(
 }) {
   codec ??= _codecFromParameters(padding: padding);
   return codec.decoder.convert(input.codeUnits);
+}
+
+/// Converts a Base-64 string to an 8-bit integer sequence, returning `null`
+/// instead of throwing when the [input] is not valid.
+///
+/// This is the non-throwing counterpart of [fromBase64]. See [fromBase64] for
+/// the meaning of [codec] and [padding].
+Uint8List? tryFromBase64(
+  String input, {
+  Base64Codec? codec,
+  bool padding = true,
+}) {
+  try {
+    return fromBase64(input, codec: codec, padding: padding);
+  } on FormatException {
+    return null;
+  }
 }

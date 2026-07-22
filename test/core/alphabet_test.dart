@@ -147,8 +147,8 @@ void main() {
       );
       expect(
         () => dec.convert([1]),
-        throwsA(isA<FormatException>()
-            .having((e) => e.message, 'message', 'Invalid length')),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message',
+            'Invalid length or non-zero trailing bits')),
       );
     });
 

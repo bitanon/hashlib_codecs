@@ -210,43 +210,43 @@ void main() {
       test('H', () {
         expect(
           () => fromBase64("H"),
-          throwsA(isA<FormatException>()
-              .having((e) => e.message, 'message', 'Invalid length')),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
         );
       });
       test('Ha', () {
         expect(
           () => fromBase64("Ha"),
-          throwsA(isA<FormatException>()
-              .having((e) => e.message, 'message', 'Invalid length')),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
         );
       });
       test('HaB', () {
         expect(
           () => fromBase64("HaB"),
-          throwsA(isA<FormatException>()
-              .having((e) => e.message, 'message', 'Invalid length')),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
         );
       });
       test('Hashl', () {
         expect(
           () => fromBase64("Hashl"),
-          throwsA(isA<FormatException>()
-              .having((e) => e.message, 'message', 'Invalid length')),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
         );
       });
       test('Hashli', () {
         expect(
           () => fromBase64("Hashli"),
-          throwsA(isA<FormatException>()
-              .having((e) => e.message, 'message', 'Invalid length')),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
         );
       });
       test('Hashlib', () {
         expect(
           () => fromBase64("Hashlib"),
-          throwsA(isA<FormatException>()
-              .having((e) => e.message, 'message', 'Invalid length')),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
         );
       });
     });

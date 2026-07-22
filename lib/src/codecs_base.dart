@@ -8,6 +8,7 @@ export 'base64.dart';
 export 'base8.dart';
 export 'bigint.dart';
 export 'bytes_collector.dart';
+export 'constant_time.dart';
 export 'codecs/base16.dart';
 export 'codecs/base2.dart';
 export 'codecs/base32.dart';

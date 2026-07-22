@@ -12,6 +12,10 @@ import 'codec.dart';
 /// right-padding a trailing partial word with zero bits. Both [source] and
 /// [target] must be in the range 2 to 64.
 ///
+/// The regrouped words are returned in a byte list, so [target] must not exceed
+/// 8; a larger [target] produces words above 255 that are truncated to 8 bits.
+/// Every shipped codec uses a [target] of 8 or less.
+///
 /// This is the shared engine behind the fixed-width base codecs.
 abstract class BitEncoder extends BitConverter {
   /// Creates a new [BitEncoder] instance.
@@ -74,6 +78,10 @@ abstract class BitEncoder extends BitConverter {
 /// input. A leftover non-zero partial word throws a [FormatException]. Both
 /// [source] and [target] must be in the range 2 to 64.
 ///
+/// The regrouped words are returned in a byte list, so [target] must not exceed
+/// 8; a larger [target] produces words above 255 that are truncated to 8 bits.
+/// Every shipped codec decodes to a [target] of 8.
+///
 /// This is the shared engine behind the fixed-width base codecs.
 abstract class BitDecoder extends BitConverter {
   /// Creates a new [BitDecoder] instance.
@@ -122,7 +130,7 @@ abstract class BitDecoder extends BitConverter {
 
     // p > 0 means that there is a non-zero partial word remaining
     if (p > 0) {
-      throw FormatException('Invalid length');
+      throw FormatException('Invalid length or non-zero trailing bits');
     }
 
     if (l < out.length) {

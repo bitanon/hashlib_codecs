@@ -225,9 +225,16 @@ void main() {
       test('not equal when one params is null and the other is not', () {
         final withParams = CryptData('id', params: {'m': '1'});
         final withoutParams = CryptData('id');
-        // exercises both operands of the `p == null || q == null` guard
         expect(withoutParams == withParams, isFalse);
         expect(withParams == withoutParams, isFalse);
+      });
+
+      test('null params equals empty params (they encode identically)', () {
+        final nullParams = CryptData('id');
+        final emptyParams = CryptData('id', params: {});
+        expect(nullParams == emptyParams, isTrue);
+        expect(emptyParams == nullParams, isTrue);
+        expect(nullParams.hashCode, emptyParams.hashCode);
       });
 
       test('not equal when params have different lengths', () {

@@ -48,8 +48,8 @@ void main() {
       final dec = const Bits3to8Decoder();
       expect(
         () => dec.convert([1]),
-        throwsA(isA<FormatException>()
-            .having((e) => e.message, 'message', 'Invalid length')),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message',
+            'Invalid length or non-zero trailing bits')),
       );
     });
 
@@ -58,8 +58,8 @@ void main() {
       final dec = const Bits3to8Decoder();
       expect(
         () => dec.convert([0, 1, 2, 3, 4, 9, 6, 7]),
-        throwsA(isA<FormatException>()
-            .having((e) => e.message, 'message', 'Invalid length')),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message',
+            'Invalid length or non-zero trailing bits')),
       );
     });
 

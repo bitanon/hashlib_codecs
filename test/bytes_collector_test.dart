@@ -192,6 +192,18 @@ void main() {
         expect(x.isEqual('bead'), isFalse);
       });
 
+      test('invalid hex string returns false instead of throwing', () {
+        // Regression: `isEqual` decodes a String as hex via `fromHex`, which
+        // throws on invalid input. The dartdoc promises False for unsupported
+        // input and the method is meant to be safe for untrusted data, so a
+        // malformed hex string must return false, not throw.
+        final x = TestCollector(Uint8List.fromList([0xde, 0xad]));
+        expect(x.isEqual('zz'), isFalse);
+        expect(x.isEqual('nothex'), isFalse);
+        expect(x.isEqual('de a'), isFalse); // odd length / space
+        expect(x.isEqual('deadbeefg'), isFalse); // trailing non-hex nibble
+      });
+
       test('List<int> length mismatch', () {
         final x = TestCollector(Uint8List.fromList([1, 2, 3, 4]));
         expect(x.isEqual(<int>[1, 2, 3]), isFalse);

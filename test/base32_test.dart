@@ -373,43 +373,43 @@ void main() {
         test('"B" (1 char)', () {
           expect(
             () => fromBase32("B"),
-            throwsA(isA<FormatException>()
-                .having((e) => e.message, 'message', 'Invalid length')),
+            throwsA(isA<FormatException>().having((e) => e.message, 'message',
+                'Invalid length or non-zero trailing bits')),
           );
         });
         test('"MZX" (3 chars)', () {
           expect(
             () => fromBase32("MZX"),
-            throwsA(isA<FormatException>()
-                .having((e) => e.message, 'message', 'Invalid length')),
+            throwsA(isA<FormatException>().having((e) => e.message, 'message',
+                'Invalid length or non-zero trailing bits')),
           );
         });
         test('"MZXW6Y" (6 chars)', () {
           expect(
             () => fromBase32("MZXW6Y"),
-            throwsA(isA<FormatException>()
-                .having((e) => e.message, 'message', 'Invalid length')),
+            throwsA(isA<FormatException>().having((e) => e.message, 'message',
+                'Invalid length or non-zero trailing bits')),
           );
         });
         test('"MZXW6YTBO" (full group + 1)', () {
           expect(
             () => fromBase32("MZXW6YTBO"),
-            throwsA(isA<FormatException>()
-                .having((e) => e.message, 'message', 'Invalid length')),
+            throwsA(isA<FormatException>().having((e) => e.message, 'message',
+                'Invalid length or non-zero trailing bits')),
           );
         });
         test('"MZXW6YTBOI2" (full group + 3)', () {
           expect(
             () => fromBase32("MZXW6YTBOI2"),
-            throwsA(isA<FormatException>()
-                .having((e) => e.message, 'message', 'Invalid length')),
+            throwsA(isA<FormatException>().having((e) => e.message, 'message',
+                'Invalid length or non-zero trailing bits')),
           );
         });
         test('"MZXW6YTBOI2XX2" (full group + 6)', () {
           expect(
             () => fromBase32("MZXW6YTBOI2XX2"),
-            throwsA(isA<FormatException>()
-                .having((e) => e.message, 'message', 'Invalid length')),
+            throwsA(isA<FormatException>().having((e) => e.message, 'message',
+                'Invalid length or non-zero trailing bits')),
           );
         });
       });
