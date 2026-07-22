@@ -41,3 +41,19 @@ String fromUtf8(
     codec.decoder.decode(
       input is Uint8List ? input : Uint8List.fromList(input),
     );
+
+/// Converts a UTF-8 octet sequence to code points, returning `null` instead of
+/// throwing when the [input] is not a valid UTF-8 octet sequence.
+///
+/// This is the non-throwing counterpart of [fromUtf8]. See [fromUtf8] for the
+/// meaning of [codec].
+String? tryFromUtf8(
+  List<int> input, {
+  UTF8Codec codec = UTF8Codec.standard,
+}) {
+  try {
+    return fromUtf8(input, codec: codec);
+  } on FormatException {
+    return null;
+  }
+}

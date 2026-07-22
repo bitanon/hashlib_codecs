@@ -27,9 +27,26 @@ String toHex(
   Base16Codec? codec,
   bool upper = false,
 }) {
+  return String.fromCharCodes(toHexBytes(input, codec: codec, upper: upper));
+}
+
+/// Converts 8-bit integer sequence to Base-16 and returns the ASCII bytes.
+///
+/// This is the same as [toHex] but returns the encoded characters as a
+/// [Uint8List] of ASCII codes, skipping the intermediate [String].
+///
+/// Parameters:
+/// - [input] is a sequence of 8-bit integers.
+/// - If [upper] is true, the uppercase standard alphabet is used.
+/// - [codec] is the [Base16Codec] to use. It is derived from the other
+///   parameters if not provided.
+Uint8List toHexBytes(
+  List<int> input, {
+  Base16Codec? codec,
+  bool upper = false,
+}) {
   codec ??= _codecFromParameters(upper: upper);
-  var out = codec.encoder.convert(input);
-  return String.fromCharCodes(out);
+  return codec.encoder.convert(input);
 }
 
 /// Converts 4-bit Base-16 character sequence to 8-bit integer sequence.
@@ -50,4 +67,20 @@ Uint8List fromHex(
 }) {
   codec ??= _codecFromParameters();
   return codec.decoder.convert(input.codeUnits);
+}
+
+/// Converts a Base-16 string to an 8-bit integer sequence, returning `null`
+/// instead of throwing when the [input] is not valid.
+///
+/// This is the non-throwing counterpart of [fromHex]. See [fromHex] for the
+/// meaning of [codec].
+Uint8List? tryFromHex(
+  String input, {
+  Base16Codec? codec,
+}) {
+  try {
+    return fromHex(input, codec: codec);
+  } on FormatException {
+    return null;
+  }
 }
