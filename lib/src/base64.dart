@@ -4,7 +4,6 @@
 import 'dart:typed_data';
 
 import 'codecs/base64.dart';
-import 'core/whitespace.dart';
 
 Base64Codec _codecFromParameters({
   bool url = false,
@@ -109,11 +108,10 @@ Uint8List fromBase64(
   bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  List<int> data = input.codeUnits;
-  if (ignoreWhitespace) {
-    data = stripWhitespace(data);
-  }
-  return codec.decoder.convert(data);
+  return codec.decoder.convert(
+    input.codeUnits,
+    ignoreWhitespace: ignoreWhitespace,
+  );
 }
 
 /// Converts a Base-64 string to an 8-bit integer sequence, returning `null`

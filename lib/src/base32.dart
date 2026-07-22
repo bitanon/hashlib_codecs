@@ -4,7 +4,6 @@
 import 'dart:typed_data';
 
 import 'codecs/base32.dart';
-import 'core/whitespace.dart';
 
 Base32Codec _codecFromParameters({
   bool lower = false,
@@ -111,11 +110,10 @@ Uint8List fromBase32(
   bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  List<int> data = input.codeUnits;
-  if (ignoreWhitespace) {
-    data = stripWhitespace(data);
-  }
-  return codec.decoder.convert(data);
+  return codec.decoder.convert(
+    input.codeUnits,
+    ignoreWhitespace: ignoreWhitespace,
+  );
 }
 
 /// Converts a Base-32 string to an 8-bit integer sequence, returning `null`

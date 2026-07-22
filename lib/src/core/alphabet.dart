@@ -115,7 +115,7 @@ class AlphabetDecoder extends ByteDecoder {
   int get source => bits;
 
   @override
-  Uint8List convert(List<int> encoded) {
+  Uint8List convert(List<int> encoded, {bool ignoreWhitespace = false}) {
     final table = alphabet;
     final tlen = table.length;
     final pad = padding;
@@ -131,6 +131,7 @@ class AlphabetDecoder extends ByteDecoder {
     p = n = l = 0;
     for (i = 0; i < len; ++i) {
       y = encoded[i];
+      if (ignoreWhitespace && (y == 0x20 || (y >= 0x09 && y <= 0x0D))) continue;
       if (y == pad) break;
       if (y < 0 || y >= tlen || (x = table[y]) < 0) {
         throw FormatException('Invalid character $y at $i');
@@ -146,6 +147,7 @@ class AlphabetDecoder extends ByteDecoder {
 
     for (; i < len; ++i) {
       y = encoded[i];
+      if (ignoreWhitespace && (y == 0x20 || (y >= 0x09 && y <= 0x0D))) continue;
       if (y != pad) {
         throw FormatException('Invalid character $y at $i');
       }

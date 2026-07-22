@@ -262,7 +262,14 @@ class Base32Decoder extends AlphabetDecoder {
   }) : super(bits: 5);
 
   @override
-  Uint8List convert(List<int> encoded) {
+  Uint8List convert(List<int> encoded, {bool ignoreWhitespace = false}) {
+    // The fast path below decodes fixed 8-character groups, so it cannot skip
+    // interspersed whitespace. Defer that case to the generic bit-accumulator,
+    // which tolerates whitespace anywhere without an intermediate buffer.
+    if (ignoreWhitespace) {
+      return super.convert(encoded, ignoreWhitespace: true);
+    }
+
     final table = alphabet;
     final pad = padding;
     final tlen = table.length;

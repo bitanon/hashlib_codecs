@@ -89,6 +89,13 @@ void main() {
       expect(() => fromBase64('SG!s', ignoreWhitespace: true),
           throwsFormatException);
     });
+    test('a wide code unit is rejected, not truncated, when tolerant', () {
+      // 0x141 & 0xFF == 0x41 ('A'). If a byte-width buffer truncated it the
+      // decoder would silently accept it (failure mode #2). It must throw.
+      final wide = 'SG${String.fromCharCode(0x141)}s';
+      expect(() => fromBase64(wide, ignoreWhitespace: true),
+          throwsFormatException);
+    });
     test('tryFromBase64 honours the flag', () {
       expect(tryFromBase64('SGVs\nbG8='), isNull);
       expect(tryFromBase64('SGVs\nbG8=', ignoreWhitespace: true),
