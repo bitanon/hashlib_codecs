@@ -36,12 +36,16 @@ text. It carries no runtime dependencies of its own.
   raise typed errors on genuinely invalid input.
 - **Convenient output**: results integrate with `ByteCollector`, the digest
   container shared with `hashlib`, for one-call re-encoding.
+- **Bytes or strings, throwing or not**: every encoder has a `to<Name>Bytes`
+  twin returning a `Uint8List`, every decoder a non-throwing `tryFrom<Name>`
+  returning `null` on bad input, plus a top-level `constantTimeEquals` for
+  MAC/digest checks.
 
 ## Install
 
 ```yaml
 dependencies:
-  convertlib: ^3.5.2
+  convertlib: ^3.6.1
 ```
 
 or run `dart pub add convertlib`. A single import exposes every codec:
@@ -112,7 +116,8 @@ Every snippet in this README is also a runnable program in the
 - `Base32Codec.standard` (RFC-4648) — `ABCDEFGHIJKLMNOPQRSTUVWXYZ234567` (default)
 - `Base32Codec.lowercase` — `abcdefghijklmnopqrstuvwxyz234567`
 - `Base32Codec.hex` / `.hexLower` — base32hex, `0-9A-V` / `0-9a-v`
-- `Base32Codec.crockford` — `0123456789ABCDEFGHJKMNPQRSTVWXYZ`
+- `Base32Codec.crockford` — `0123456789ABCDEFGHJKMNPQRSTVWXYZ` (decoding is
+  case-insensitive and accepts `I`/`i`/`L`/`l` as `1` and `O`/`o` as `0`)
 - `Base32Codec.geohash` — `0123456789bcdefghjkmnpqrstuvwxyz`
 - `Base32Codec.z` — z-base-32, `ybndrfg8ejkmcpqxot1uwisza345h769`
 - `Base32Codec.wordSafe` — `23456789CFGHJMPQRVWXcfghjmpqrvwx`
@@ -128,6 +133,21 @@ to drop `=`, or a `codec:`:
 
 - `BigIntCodec.msbFirst` — treats bytes in big-endian order
 - `BigIntCodec.lsbFirst` — treats bytes in little-endian order (default)
+
+### Bytes, non-throwing decode, and constant-time compare
+
+- **Byte output** — every string encoder has a `to<Name>Bytes` twin that returns
+  the encoded ASCII output as a `Uint8List`, skipping the intermediate `String`:
+  `toHexBytes`, `toBinaryBytes`, `toOctalBytes`, `toBase32Bytes`, `toBase64Bytes`.
+- **Non-throwing decoders** — every decoder has a `tryFrom<Name>` that returns
+  `null` instead of throwing a `FormatException` on invalid input: `tryFromHex`,
+  `tryFromBinary`, `tryFromOctal`, `tryFromBase32`, `tryFromBase64`,
+  `tryFromUtf8`, `tryFromBigInt`.
+- **Constant-time compare** — `constantTimeEquals(a, b)` compares two byte lists
+  without exiting early on the first mismatch, for verifying MACs and digests.
+- **Low-level building blocks** — the generic converters `BitEncoder`/
+  `BitDecoder`, `ByteEncoder`/`ByteDecoder`, and `AlphabetEncoder`/
+  `AlphabetDecoder` are exported for building custom codecs.
 
 ### ByteCollector
 

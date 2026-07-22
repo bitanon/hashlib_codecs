@@ -1,3 +1,9 @@
+# 3.6.1
+
+- Update `README.md` for the 3.6.0 API: the `to<Name>Bytes` byte encoders, the
+  non-throwing `tryFrom<Name>` decoders, `constantTimeEquals`, the exported
+  converter base classes, and the case-insensitive Crockford decoding.
+
 # 3.6.0
 
 - [**Breaking Changes**]

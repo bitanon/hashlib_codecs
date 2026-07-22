@@ -163,6 +163,19 @@ release. After a release, bump the dependency in `~/projects/hashlib`
 - _(new)_ When a change touches public API surface, update `example/` and
   `test_integration/main.dart` in the same commit if the new API belongs in the
   showcase — the integration job is the smoke test of the public surface.
+- _(new)_ **Always update `README.md` in the same commit as any public-API
+  change** — every new top-level `to`/`from`/`try` function, codec, alphabet
+  variant, or exported class gets a line in the relevant README section (the
+  "Supported codecs" table, an alphabet list, or the conveniences section), and
+  the install snippet's version tracks the release. README is a shipped artifact
+  scored by pana; a stale README is a release defect, not a follow-up.
+- _(new)_ **100% line coverage and 100% dartdoc are hard gates, not goals.**
+  Every commit keeps `lib/` at 100% line coverage (`bash scripts/coverage.sh`)
+  and every public symbol documented. New code ships in the same commit as the
+  tests that exercise all of its branches, and every public class, member,
+  constant, and top-level function carries dartdoc. Dartdoc is enforced by the
+  `public_member_api_docs` lint and pana; there is no coverage gate in CI, so
+  the coverage bar is on you — run the script before you commit.
 
 ## Failure modes — named, with the rule that prevents each
 
