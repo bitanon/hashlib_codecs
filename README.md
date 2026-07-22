@@ -223,6 +223,33 @@ void main() {
 }
 ```
 
+### Whitespace-tolerant decoding
+
+Line-wrapped payloads (PEM, MIME, HTTP headers) carry newlines and spaces that
+strict decoders reject. Pass `ignoreWhitespace: true` to `fromHex`, `fromBase32`,
+or `fromBase64` to skip ASCII whitespace (space, `\t`, `\n`, `\v`, `\f`, `\r`)
+instead. It is off by default, so ordinary decoding is unchanged.
+
+<!-- file: example/whitespace_example.dart -->
+
+```dart
+import 'package:convertlib/convertlib.dart';
+
+void main() {
+  // A Base-64 body wrapped across lines the way PEM/MIME fold it.
+  const wrapped = 'SGVsbG8sIHdv\n'
+      'cmxkISBGcm9t\n'
+      'IGNvbnZlcnRs\n'
+      'aWIu\n';
+
+  print(fromUtf8(fromBase64(wrapped, ignoreWhitespace: true)));
+
+  // Strict decoding (the default) still rejects the whitespace.
+  print(tryFromBase64(wrapped)); // null
+  print(tryFromBase64(wrapped, ignoreWhitespace: true) != null); // true
+}
+```
+
 ### BigInt ↔ bytes
 
 Read a byte sequence as an arbitrary-precision integer and back. Combine with

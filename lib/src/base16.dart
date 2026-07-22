@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'codecs/base16.dart';
+import 'core/whitespace.dart';
 
 Base16Codec _codecFromParameters({
   bool upper = false,
@@ -55,6 +56,9 @@ Uint8List toHexBytes(
 ///
 /// Parameters:
 /// - [input] should be a valid Base-16 (hexadecimal) string.
+/// - If [ignoreWhitespace] is true, ASCII whitespace characters (space, tab,
+///   line feed, vertical tab, form feed, and carriage return) in the [input]
+///   are skipped instead of rejected. It is `false` by default.
 /// - [codec] is the [Base16Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -66,22 +70,28 @@ Uint8List toHexBytes(
 Uint8List fromHex(
   String input, {
   Base16Codec? codec,
+  bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters();
-  return codec.decoder.convert(input.codeUnits);
+  List<int> data = input.codeUnits;
+  if (ignoreWhitespace) {
+    data = stripWhitespace(data);
+  }
+  return codec.decoder.convert(data);
 }
 
 /// Converts a Base-16 string to an 8-bit integer sequence, returning `null`
 /// instead of throwing when the [input] is not valid.
 ///
 /// This is the non-throwing counterpart of [fromHex]. See [fromHex] for the
-/// meaning of [codec].
+/// meaning of [codec] and [ignoreWhitespace].
 Uint8List? tryFromHex(
   String input, {
   Base16Codec? codec,
+  bool ignoreWhitespace = false,
 }) {
   try {
-    return fromHex(input, codec: codec);
+    return fromHex(input, codec: codec, ignoreWhitespace: ignoreWhitespace);
   } on FormatException {
     return null;
   }

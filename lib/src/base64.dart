@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'codecs/base64.dart';
+import 'core/whitespace.dart';
 
 Base64Codec _codecFromParameters({
   bool url = false,
@@ -86,6 +87,10 @@ Uint8List toBase64Bytes(
 /// - [input] should be a valid base-64 encoded string.
 /// - If [padding] is true, the [input] may contain padding characters, which
 ///   are ignored during decoding.
+/// - If [ignoreWhitespace] is true, ASCII whitespace characters (space, tab,
+///   line feed, vertical tab, form feed, and carriage return) in the [input]
+///   are skipped instead of rejected. This is useful for line-wrapped payloads
+///   such as PEM and MIME. It is `false` by default.
 /// - [codec] is the [Base64Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -101,23 +106,34 @@ Uint8List fromBase64(
   String input, {
   Base64Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  return codec.decoder.convert(input.codeUnits);
+  List<int> data = input.codeUnits;
+  if (ignoreWhitespace) {
+    data = stripWhitespace(data);
+  }
+  return codec.decoder.convert(data);
 }
 
 /// Converts a Base-64 string to an 8-bit integer sequence, returning `null`
 /// instead of throwing when the [input] is not valid.
 ///
 /// This is the non-throwing counterpart of [fromBase64]. See [fromBase64] for
-/// the meaning of [codec] and [padding].
+/// the meaning of [codec], [padding], and [ignoreWhitespace].
 Uint8List? tryFromBase64(
   String input, {
   Base64Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   try {
-    return fromBase64(input, codec: codec, padding: padding);
+    return fromBase64(
+      input,
+      codec: codec,
+      padding: padding,
+      ignoreWhitespace: ignoreWhitespace,
+    );
   } on FormatException {
     return null;
   }

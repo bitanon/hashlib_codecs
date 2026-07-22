@@ -4,6 +4,7 @@
 import 'dart:typed_data';
 
 import 'codecs/base32.dart';
+import 'core/whitespace.dart';
 
 Base32Codec _codecFromParameters({
   bool lower = false,
@@ -90,6 +91,9 @@ Uint8List toBase32Bytes(
 /// - [input] should be a valid base-32 encoded string.
 /// - If [padding] is true, the [input] may contain padding characters, which
 ///   are ignored during decoding.
+/// - If [ignoreWhitespace] is true, ASCII whitespace characters (space, tab,
+///   line feed, vertical tab, form feed, and carriage return) in the [input]
+///   are skipped instead of rejected. It is `false` by default.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -104,23 +108,34 @@ Uint8List fromBase32(
   String input, {
   Base32Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  return codec.decoder.convert(input.codeUnits);
+  List<int> data = input.codeUnits;
+  if (ignoreWhitespace) {
+    data = stripWhitespace(data);
+  }
+  return codec.decoder.convert(data);
 }
 
 /// Converts a Base-32 string to an 8-bit integer sequence, returning `null`
 /// instead of throwing when the [input] is not valid.
 ///
 /// This is the non-throwing counterpart of [fromBase32]. See [fromBase32] for
-/// the meaning of [codec] and [padding].
+/// the meaning of [codec], [padding], and [ignoreWhitespace].
 Uint8List? tryFromBase32(
   String input, {
   Base32Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   try {
-    return fromBase32(input, codec: codec, padding: padding);
+    return fromBase32(
+      input,
+      codec: codec,
+      padding: padding,
+      ignoreWhitespace: ignoreWhitespace,
+    );
   } on FormatException {
     return null;
   }

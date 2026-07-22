@@ -1,3 +1,12 @@
+# _next_
+
+- Add an opt-in `ignoreWhitespace` parameter to `fromHex`, `fromBase32`,
+  `fromBase64`, and their `tryFrom` counterparts. When `true`, ASCII whitespace
+  (space, tab, line feed, vertical tab, form feed, carriage return) in the input
+  is skipped instead of rejected, so line-wrapped payloads such as PEM and MIME
+  decode without pre-processing. It is `false` by default, so existing output is
+  unchanged.
+
 # 3.6.1
 
 - Update `README.md` for the 3.6.0 API: the `to<Name>Bytes` byte encoders, the

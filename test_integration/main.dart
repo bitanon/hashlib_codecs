@@ -34,6 +34,8 @@ void main() {
   print("base64 (bytes) => ${toBase64Bytes(inp)}");
   print("tryFromHex('zz') => ${tryFromHex('zz')}");
   print("tryFromBase64(valid) => ${tryFromBase64(toBase64(inp))}");
+  print("fromBase64(whitespace) => "
+      "${fromBase64('A/\nE=', ignoreWhitespace: true)}");
   print("constantTimeEquals => ${constantTimeEquals(inp, List.of(inp))}");
   print('');
 }
