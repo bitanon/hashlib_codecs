@@ -498,6 +498,56 @@ void main() {
       });
     });
 
+    // Crockford decoding is case-insensitive and, per the specification,
+    // substitutes the ambiguous letters (I/i/L/l -> 1 and O/o -> 0); U/u is not
+    // part of the alphabet. The external oracle is `package:base_codecs`'
+    // `base32Crockford`, which applies the same rules.
+    // https://www.crockford.com/base32.html
+    group('crockford decode (spec-compliant, vs base_codecs)', () {
+      test('encoding matches base_codecs', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var ours = toBase32(b, codec: Base32Codec.crockford);
+          expect(ours, base_codecs.base32CrockfordEncode(b), reason: '$i');
+        }
+      });
+      test('decoding uppercase matches base_codecs', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var s = toBase32(b, codec: Base32Codec.crockford);
+          expect(fromBase32(s, codec: Base32Codec.crockford),
+              base_codecs.base32CrockfordDecode(s),
+              reason: '$i');
+        }
+      });
+      test('decoding lowercase matches base_codecs', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var s = toBase32(b, codec: Base32Codec.crockford).toLowerCase();
+          expect(fromBase32(s, codec: Base32Codec.crockford),
+              base_codecs.base32CrockfordDecode(s),
+              reason: '$i');
+        }
+      });
+      test('ambiguous letters I/i/L/l -> 1 and O/o -> 0', () {
+        // "foo" encodes to "CSQPY"; lowercase must decode identically.
+        expect(fromBase32('csqpy', codec: Base32Codec.crockford),
+            equals('foo'.codeUnits));
+        // Every spelling of the ambiguous symbols matches the reference.
+        for (final s in ['10', '1O', 'IO', 'io', 'i0', 'L0', 'lo']) {
+          expect(fromBase32(s, codec: Base32Codec.crockford),
+              base_codecs.base32CrockfordDecode(s),
+              reason: s);
+        }
+      });
+      test('U and u are rejected', () {
+        expect(() => fromBase32('U0', codec: Base32Codec.crockford),
+            throwsFormatException);
+        expect(() => fromBase32('u0', codec: Base32Codec.crockford),
+            throwsFormatException);
+      });
+    });
+
     group('compare against package: base32', () {
       test('encoding (uppercase)', () {
         for (int i = 0; i < 100; ++i) {

@@ -189,6 +189,32 @@ void main() {
       test('with empty input for decoder returns empty list', () {
         expect(encoder.convert([]), isEmpty);
       });
+
+      // Regression: the 3-byte branch used to lack an upper bound, so a scalar
+      // code point >= U+10000 fed to `convert` (a documented `source: 32`
+      // input) was force-fit into 3 bytes and produced invalid UTF-8 (e.g.
+      // U+1F600 emitted the byte 0xFF). The 4-byte path was only reachable via
+      // a UTF-16 surrogate pair, never a scalar astral value. The external
+      // oracle here is `dart:convert`'s `utf8.encode`.
+      group('scalar code point >= U+10000 uses the 4-byte form', () {
+        const scalars = <int>[
+          0x10000, // first 4-byte scalar
+          0x1F600, // 😀, whose broken output contained the invalid byte 0xFF
+          0x1D11E, // 𝄞 musical symbol G clef
+          0x10FFFF, // last valid code point
+        ];
+        for (final cp in scalars) {
+          test('U+${cp.toRadixString(16)}', () {
+            final expected = utf8.encode(String.fromCharCode(cp));
+            expect(encoder.convert([cp]), equals(expected));
+            // And it must round-trip back to the same scalar.
+            expect(
+              UTF8Codec.standard.decoder.convert(encoder.convert([cp])),
+              equals([cp]),
+            );
+          });
+        }
+      });
     });
 
     group('Decoder', () {

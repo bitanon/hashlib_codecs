@@ -39,7 +39,7 @@ class UTF8Encoder extends BitEncoder {
   @override
   Uint8List convert(List<int> input) {
     int len = input.length;
-    int l = 0, p = 0, x, y, c;
+    int l = 0, p = 0, x, y;
     var out = Uint8List(len << 2);
     while (p < len) {
       x = input[p];
@@ -62,31 +62,34 @@ class UTF8Encoder extends BitEncoder {
         out[l++] = 0x80 | (x & 0x3F);
         p++;
       }
-      // Case: 3-byte
-      else if (x < 0xD800 || x > 0xDFFF) {
+      // Case: 3-byte (rest of the Basic Multilingual Plane, sans surrogates)
+      else if (x <= 0xFFFF && (x < 0xD800 || x > 0xDFFF)) {
         out[l++] = 0xE0 | (x >>> 12);
         out[l++] = 0x80 | ((x >>> 6) & 0x3F);
         out[l++] = 0x80 | (x & 0x3F);
         p++;
       }
-      // Case: 4-byte from a UTF-16 surrogate pair
-      else if (x <= 0xDBFF) {
-        p++;
-        if (p >= len) {
-          throw FormatException('Unpaired high surrogate $x at ${p - 1}');
+      // Case: 4-byte, either a scalar in U+10000..U+10FFFF or a UTF-16
+      // high surrogate combined with the following low surrogate into one.
+      else {
+        if (x <= 0xDBFF) {
+          p++;
+          if (p >= len) {
+            throw FormatException('Unpaired high surrogate $x at ${p - 1}');
+          }
+          y = input[p];
+          if (y < 0xDC00 || y > 0xDFFF) {
+            throw FormatException('Invalid surrogate pair ($x, $y) at $p');
+          }
+          x = 0x10000 + (((x - 0xD800) << 10) | (y - 0xDC00));
+        } else if (x <= 0xDFFF) {
+          throw FormatException('Unpaired low surrogate $x at $p');
         }
-        y = input[p];
-        if (y < 0xDC00 || y > 0xDFFF) {
-          throw FormatException('Invalid surrogate pair ($x, $y) at $p');
-        }
-        c = 0x10000 + (((x - 0xD800) << 10) | (y - 0xDC00));
-        out[l++] = 0xF0 | (c >>> 18);
-        out[l++] = 0x80 | ((c >>> 12) & 0x3F);
-        out[l++] = 0x80 | ((c >>> 6) & 0x3F);
-        out[l++] = 0x80 | (c & 0x3F);
+        out[l++] = 0xF0 | (x >>> 18);
+        out[l++] = 0x80 | ((x >>> 12) & 0x3F);
+        out[l++] = 0x80 | ((x >>> 6) & 0x3F);
+        out[l++] = 0x80 | (x & 0x3F);
         p++;
-      } else {
-        throw FormatException('Unpaired low surrogate $x at $p');
       }
     }
 

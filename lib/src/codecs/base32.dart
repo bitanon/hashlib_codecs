@@ -78,12 +78,17 @@ const _base32EncodingCrockford = [
 ];
 
 // Crockford's Base32 Reversed
+//
+// Case-insensitive, and per the Crockford spec the ambiguous letters decode to
+// digits: I/i/L/l -> 1 and O/o -> 0. The letter U/u is not decoded.
 const _base32DecodingCrockford = [
   __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, //
   __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __,
   __, __, __, __, __, __, __, __, __, __, 00, 01, 02, 03, 04, 05, 06, 07, 08,
-  09, __, __, __, __, __, __, __, 10, 11, 12, 13, 14, 15, 16, 17, __, 18, 19,
-  __, 20, 21, __, 22, 23, 24, 25, 26, __, 27, 28, 29, 30, 31, __, __, __, __,
+  09, __, __, __, __, __, __, __, 10, 11, 12, 13, 14, 15, 16, 17, 01, 18, 19,
+  01, 20, 21, 00, 22, 23, 24, 25, 26, __, 27, 28, 29, 30, 31, __, __, __, __,
+  __, __, 10, 11, 12, 13, 14, 15, 16, 17, 01, 18, 19, 01, 20, 21, 00, 22, 23,
+  24, 25, 26, __, 27, 28, 29, 30, 31, __, __, __, __, __, __, __, __, __, __,
 ];
 
 // GeoHash's Base32
@@ -508,6 +513,10 @@ class Base32Codec extends IterableCodec {
   ///
   /// This alphabet uses additional characters for a mod-37 checksum, and avoid
   /// the character U to reduce the likelihood of accidental obscenity.
+  ///
+  /// Decoding is case-insensitive and, following the specification, accepts the
+  /// ambiguous letters as digits: `I`, `i`, `L`, `l` decode as `1`, and `O`,
+  /// `o` decode as `0`. The letter `U`/`u` is not part of the alphabet.
   ///
   /// It is not padded.
   static const Base32Codec crockford = Base32Codec._(

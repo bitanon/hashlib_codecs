@@ -26,10 +26,11 @@ against itself is how this repo got the wordSafe bug.
 
 ## 2. Generate the alphabet tables — never type them
 
-Edit `scripts/alphabet_maker.py`: add the alphabet as a bytes literal, print
+Edit `tool/alphabet_maker.dart`: add the alphabet as a string literal, print
 with `fwd()` (forward table) and `rev()` (reverse table; pass multiple
-alphabets to one `rev()` call to make a case-insensitive decoder). Run
-`python3 scripts/alphabet_maker.py` and paste the output. Leave the new section
+alphabets to one `rev()` call to make a case-insensitive decoder, and an
+optional alias map for substitutions like Crockford's `I/L -> 1`). Run
+`dart run tool/alphabet_maker.dart` and paste the output. Leave the new section
 in the script (commented like the others) so the table is regenerable. Keep the
 trailing `//` after the first row of each table so `dart format` preserves the
 grid layout.

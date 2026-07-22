@@ -1,5 +1,5 @@
 // Generates the forward (encode) and reverse (decode) alphabet lookup tables
-// used by the codecs. Dart port of tool/alphabet_maker.py.
+// used by the codecs.
 //
 // Run with: dart run tool/alphabet_maker.dart
 
@@ -17,18 +17,22 @@ void show(List<String> list, int n) {
   stdout.write("\n");
 }
 
-void rev(List<String> merge) {
+void rev(List<String> merge, [Map<String, int> alias = const {}]) {
   var v = <int>[];
+  void put(int c, int value) {
+    while (c >= v.length) {
+      v.addAll(List.filled(19, -1));
+    }
+    v[c] = value;
+  }
+
   for (var s in merge) {
     var chars = s.codeUnits;
     for (var i = 0; i < chars.length; i++) {
-      var c = chars[i];
-      while (c >= v.length) {
-        v.addAll(List.filled(19, -1));
-      }
-      v[c] = i;
+      put(chars[i], i);
     }
   }
+  alias.forEach((ch, value) => put(ch.codeUnitAt(0), value));
   show([
     for (var x in v) x < 0 ? "__" : x.toString().padLeft(2, "0"),
   ], 19);
@@ -55,7 +59,15 @@ void main() {
   // fwd("0123456789ABCDEFGHJKMNPQRSTVWXYZ");
   // stdout.write("];\n");
   // stdout.write("const _base32DecodingCrockford = <int>[");
-  // rev(["0123456789ABCDEFGHJKMNPQRSTVWXYZ"]);
+  // rev(
+  //   [
+  //     "0123456789ABCDEFGHJKMNPQRSTVWXYZ",
+  //     "0123456789abcdefghjkmnpqrstvwxyz",
+  //   ],
+  //   // Crockford decoders accept lowercase and substitute the ambiguous
+  //   // letters: I/i/L/l -> 1 and O/o -> 0. The letter U is not decoded.
+  //   {"I": 1, "i": 1, "L": 1, "l": 1, "O": 0, "o": 0},
+  // );
   // stdout.write("];\n");
 
   // stdout.write("const _base32EncodingGeoHash = <int>[");
