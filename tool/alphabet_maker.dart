@@ -17,13 +17,6 @@ void show(List<String> list, int n) {
   stdout.write("\n");
 }
 
-// Builds a reverse (decode) table mapping a character code to its word value.
-//
-// Each string in [merge] maps its characters to their positions; later strings
-// override earlier ones (used to fold a lowercase alphabet onto the same
-// values for a case-insensitive decoder). The optional [alias] map assigns
-// extra character-code -> value entries after the merge, for substitutions such
-// as Crockford's `I/i/L/l -> 1` and `O/o -> 0`.
 void rev(List<String> merge, [Map<String, int> alias = const {}]) {
   var v = <int>[];
   void put(int c, int value) {
