@@ -1,12 +1,22 @@
-# convertlib
+<h1 align="center">convertlib</h1>
 
-[![package version](https://img.shields.io/pub/v/convertlib?label=pub)](https://pub.dev/packages/convertlib)
-[![dart support](https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart)](https://dart.dev/guides/whats-new#september-8-2021-214-release)
-[![likes](https://img.shields.io/pub/likes/convertlib?logo=dart)](https://pub.dev/packages/convertlib/score)
-[![pub points](https://img.shields.io/pub/points/convertlib?logo=dart&color=teal)](https://pub.dev/packages/convertlib/score)
-[![codecov](https://codecov.io/gh/bitanon/convertlib/graph/badge.svg?token=ISIYJ8MNI0)](https://codecov.io/gh/bitanon/convertlib)
-[![test](https://github.com/bitanon/convertlib/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/bitanon/convertlib/actions/workflows/test.yml)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bitanon/convertlib)
+<p align="center">
+  <b>Fast, error-resilient, zero-dependency codecs for Dart.</b>
+</p>
+
+<p align="center">
+  Binary&nbsp;&middot;&nbsp;Octal&nbsp;&middot;&nbsp;Hex&nbsp;&middot;&nbsp;Base-32&nbsp;&middot;&nbsp;Base-64&nbsp;&middot;&nbsp;BigInt&nbsp;&middot;&nbsp;UTF-8&nbsp;&middot;&nbsp;PHC&nbsp;/&nbsp;Modular&nbsp;Crypt
+</p>
+
+<p align="center">
+  <a href="https://pub.dev/packages/convertlib"><img src="https://img.shields.io/pub/v/convertlib?label=pub" alt="package version"></a>
+  <a href="https://dart.dev/guides/whats-new#september-8-2021-214-release"><img src="https://img.shields.io/badge/dart-%3e%3d%202.19.0-39f?logo=dart" alt="dart support"></a>
+  <a href="https://pub.dev/packages/convertlib/score"><img src="https://img.shields.io/pub/likes/convertlib?logo=dart" alt="likes"></a>
+  <a href="https://pub.dev/packages/convertlib/score"><img src="https://img.shields.io/pub/points/convertlib?logo=dart&amp;color=teal" alt="pub points"></a>
+  <a href="https://codecov.io/gh/bitanon/convertlib"><img src="https://codecov.io/gh/bitanon/convertlib/graph/badge.svg?token=ISIYJ8MNI0" alt="codecov"></a>
+  <a href="https://github.com/bitanon/convertlib/actions/workflows/test.yml"><img src="https://github.com/bitanon/convertlib/actions/workflows/test.yml/badge.svg?branch=master" alt="test"></a>
+  <a href="https://deepwiki.com/bitanon/convertlib"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
+</p>
 
 A pure-Dart library of fast, error-resilient codecs: binary, octal, hex,
 Base-32, Base-64, BigInt, UTF-8, and the PHC / Modular Crypt Format — with a
@@ -14,34 +24,32 @@ rich set of alphabet variants, optional padding, and zero dependencies.
 
 `convertlib` is the foundation layer of a three-package family:
 
-[![convertlib](https://img.shields.io/badge/convertlib-success?style=for-the-badge&logo=dart)](https://pub.dev/packages/convertlib) &rarr; [![hashlib](https://img.shields.io/badge/hashlib-blue?style=for-the-badge&logo=dart)](https://pub.dev/packages/hashlib) &rarr; [![cipherlib](https://img.shields.io/badge/cipherlib-informational?style=for-the-badge&logo=dart)](https://pub.dev/packages/cipherlib)
+<p align="center">
+  <a href="https://pub.dev/packages/convertlib"><img src="https://img.shields.io/badge/convertlib-success?style=for-the-badge&amp;logo=dart" alt="convertlib"></a>
+  &rarr;
+  <a href="https://pub.dev/packages/hashlib"><img src="https://img.shields.io/badge/hashlib-blue?style=for-the-badge&amp;logo=dart" alt="hashlib"></a>
+  &rarr;
+  <a href="https://pub.dev/packages/cipherlib"><img src="https://img.shields.io/badge/cipherlib-informational?style=for-the-badge&amp;logo=dart" alt="cipherlib"></a>
+</p>
 
 Both `hashlib` (hashes, MACs, KDFs) and `cipherlib` (ciphers, AEAD, ML-KEM)
 build on it, reusing its codecs to render digests, keys, and ciphertext as
 text. It carries no runtime dependencies of its own.
 
-## Highlights
+## ✨ Highlights
 
-- **Runs on every platform**: pure Dart with no native code or FFI, so the same
-  library works everywhere Dart does — the VM, Flutter (Android, iOS, Windows,
-  macOS, Linux), and the web (dart2js and dart2wasm).
-- **Zero dependencies**: nothing is pulled into your dependency tree.
-- **Broad coverage**: Base-2, Base-8, Base-16, Base-32, Base-64, BigInt, UTF-8,
-  and the PHC / Modular Crypt Format, each with a symmetrical `to`/`from` pair.
-- **Many alphabet variants**: RFC 4648 standard, base32hex, Crockford,
-  z-base-32, geohash, word-safe, URL/filename-safe Base-64, and bcrypt.
-- **Optional padding**: encode and decode with or without `=` padding.
-- **Error resilient**: decoders accept case and alphabet variations where the
-  encoding allows it (either Base-64 alphabet, upper or lower Base-32), and
-  raise typed errors on genuinely invalid input.
-- **Convenient output**: results integrate with `ByteCollector`, the digest
-  container shared with `hashlib`, for one-call re-encoding.
-- **Bytes or strings, throwing or not**: every encoder has a `to<Name>Bytes`
-  twin returning a `Uint8List`, every decoder a non-throwing `tryFrom<Name>`
-  returning `null` on bad input, plus a top-level `constantTimeEquals` for
-  MAC/digest checks.
+|     | Feature                              | What you get                                                                                                                                    |
+| :-: | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🌍  | **Runs on every platform**           | Pure Dart with no native code or FFI — the same library works on the VM, Flutter (Android, iOS, Windows, macOS, Linux), and the web (dart2js and dart2wasm). |
+| 📦  | **Zero dependencies**                | Nothing is pulled into your dependency tree.                                                                                                     |
+| 🔡  | **Broad coverage**                   | Base-2, Base-8, Base-16, Base-32, Base-64, BigInt, UTF-8, and the PHC / Modular Crypt Format, each with a symmetrical `to`/`from` pair.          |
+| 🎛️  | **Many alphabet variants**           | RFC 4648 standard, base32hex, Crockford, z-base-32, geohash, word-safe, URL/filename-safe Base-64, and bcrypt.                                   |
+| ✳️  | **Optional padding**                 | Encode and decode with or without `=` padding.                                                                                                  |
+| 🛡️  | **Error resilient**                  | Decoders accept case and alphabet variations where the encoding allows it, and raise typed errors on genuinely invalid input.                   |
+| 🧩  | **Convenient output**                | Results integrate with `ByteCollector`, the digest container shared with `hashlib`, for one-call re-encoding.                                    |
+| ⚙️  | **Bytes or strings, throwing or not**| Every encoder has a `to<Name>Bytes` twin returning a `Uint8List`, every decoder a non-throwing `tryFrom<Name>` returning `null`, plus a top-level `constantTimeEquals`. |
 
-## Install
+## 📦 Install
 
 ```yaml
 dependencies:
@@ -57,7 +65,7 @@ import 'package:convertlib/convertlib.dart';
 Full API reference:
 [convertlib library](https://pub.dev/documentation/convertlib/latest/convertlib/convertlib-library.html).
 
-## Quickstart
+## ⚡ Quickstart
 
 Every codec exposes a `to<Name>` encoder and a `from<Name>` decoder that are
 exact inverses of each other:
@@ -89,7 +97,7 @@ void main() {
 Every snippet in this README is also a runnable program in the
 [example](https://github.com/bitanon/convertlib/tree/master/example) folder.
 
-## Supported codecs
+## 🧬 Supported codecs
 
 | Encoding              | Class         | Encode                        | Decode                          |          Source          |
 | --------------------- | ------------- | ----------------------------- | ------------------------------- | :----------------------: |
@@ -106,7 +114,7 @@ Every snippet in this README is also a runnable program in the
 [rfc3629]: https://datatracker.ietf.org/doc/html/rfc3629
 [phc]: https://github.com/C2SP/C2SP/blob/main/phc-strings.md
 
-### Alphabet variants
+### 🔤 Alphabet variants
 
 **Base-16** — `toHex(..., upper: true)` selects the uppercase alphabet:
 
@@ -136,7 +144,7 @@ to drop `=`, or a `codec:`:
 - `BigIntCodec.msbFirst` — treats bytes in big-endian order
 - `BigIntCodec.lsbFirst` — treats bytes in little-endian order (default)
 
-### Bytes, non-throwing decode, and constant-time compare
+### 🧰 Bytes, non-throwing decode, and constant-time compare
 
 - **Byte output** — the `to<Name>Bytes` encoders in the table above return the
   encoded ASCII as a `Uint8List`, skipping the intermediate `String`.
@@ -148,7 +156,7 @@ to drop `=`, or a `codec:`:
   `BitDecoder`, `ByteEncoder`/`ByteDecoder`, and `AlphabetEncoder`/
   `AlphabetDecoder` are exported for building custom codecs.
 
-### ByteCollector
+### 📥 ByteCollector
 
 `ByteCollector` is the byte container shared with `hashlib`, holding the output
 of a hash or encoding function and re-encoding it on demand:
@@ -168,7 +176,7 @@ of a hash or encoding function and re-encoding it on demand:
 | `to(encoding)`                | Decodes bytes with a given `dart:convert` `Encoding`     |
 | `isEqual(other)`              | Constant-time compare against bytes, buffer, or hex text |
 
-## Recipes
+## 🍳 Recipes
 
 ### Base-32 alphabet variants
 
@@ -280,7 +288,7 @@ void main() {
 }
 ```
 
-## Testing and reliability
+## 🧪 Testing and reliability
 
 Codecs are trivial to get subtly wrong. It is not enough to check just the
 `decode(encode(x)) == x` round-trips alone. For example: a dropped bit mask
@@ -320,8 +328,7 @@ your input and the expected output.
 [open an issue]: https://github.com/bitanon/convertlib/issues
 
 <!-- file: BENCHMARK.md -->
-
-## Benchmarks
+## 🚀 Benchmarks
 
 ### Libraries
 
@@ -420,6 +427,7 @@ your input and the expected output.
 </tbody>
 </table>
 
+
 ### Decoding
 
 <table>
@@ -508,6 +516,7 @@ your input and the expected output.
 </tbody>
 </table>
 
+
 ### BigInt
 
 <table>
@@ -538,11 +547,13 @@ your input and the expected output.
 </tbody>
 </table>
 
+
 > All benchmarks are done on 36GB _Apple M3 Pro_ using compiled _exe_
 >
 > Dart SDK version: 3.12.2 (stable) (Tue Jun 9 01:11:39 2026 -0700) on "macos_arm64"
+<!-- end BENCHMARK.md -->
 
-## License
+## 📄 License
 
 BSD 3-Clause License. See the [LICENSE](LICENSE) file for details. Issues and
 contributions are welcome at
