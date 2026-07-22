@@ -1,66 +1,26 @@
-# _next_
+# 3.6.0
 
-- Fix the UTF-8 encoder producing invalid output for scalar code points in
-  `U+10000..U+10FFFF`. The `UTF8Encoder.convert` 3-byte branch had no upper
-  bound, so an astral scalar (e.g. `U+1F600`, a documented `source: 32` input)
-  was force-fit into 3 bytes and emitted invalid UTF-8 (including the byte
-  `0xFF`). It now emits the correct 4-byte sequence, verified against
-  `dart:convert`. The public `toUtf8(String)` path was never affected, since
-  UTF-16 strings deliver astral characters as surrogate pairs. **Observable
-  output change** for direct `UTF8Encoder().convert([scalar])` callers.
-- Make the Crockford Base-32 decoder spec-compliant: it is now case-insensitive
-  and substitutes the ambiguous letters `I`/`i`/`L`/`l` -> `1` and `O`/`o` ->
-  `0` (the letter `U`/`u` is still not part of the alphabet). Previously
-  lowercase Crockford strings and the ambiguous letters were rejected. Verified
-  against `package:base_codecs`. Encoding output is unchanged. **Observable
-  change**: inputs that previously threw now decode.
-- Fix `benchmark/bit.dart` exposing the private `_BitEncoder`/`_BitDecoder`
-  types through public fields, which failed `dart analyze --fatal-infos`
-  (benchmark tooling only; no library code or output is affected).
-- Alphabetize the `core/bit.dart` export in `lib/src/codecs_base.dart`.
-
-# 3.5.2
-
-- Renames internal abstract class `CipherlibConverter` -> `BitConverter`.
-- Add missing dartdoc to the `Base32Encoder`, `Base32Decoder`, `Base64Encoder`,
-  and `Base64Decoder` constructors and the `UTF8Encoder` and `UTF8Decoder`
-  classes.
-- Speed up `fromBase32` and `fromBase64` by returning the decoder output
-  directly instead of copying it into a fresh `Uint8List`.
-- Speed up the generic `AlphabetEncoder` by fusing the alphabet lookup into the
-  bit-regrouping loop and writing straight into a single correctly-sized buffer,
-  removing an extra allocation and two full passes over the output. Output is
-  byte-identical (verified against `dart:convert` and RFC 4648 vectors).
-- Export the `ByteEncoder`, `ByteDecoder`, `AlphabetEncoder`, and
-  `AlphabetDecoder` base classes, which were part of the public API surface but
-  not reachable through `package:convertlib/convertlib.dart`.
-- Move `BitEncoder` and `BitDecoder` into the same file.
-- `AlphabetDecoder` extends `ByteDecoder` now intead of `BitDecoder`.
-- Fix `ByteCollector.number` truncating values wider than 32 bits on the web,
-  where bitwise operators are limited to 32 bits. It now accumulates with
-  multiplication and is exact up to `2^53` on the web (a web `int` cannot
-  represent larger values). Output on the VM is unchanged.
-- Allow empty parameter values in the PHC/crypt string format, as permitted by
-  the specification (e.g. `$id$data=`). `CryptData.validate` no longer rejects
-  an empty parameter value; salt and hash must still be non-empty.
-- Fix the PHC decoder mis-classifying a comma-containing `v=...` segment (e.g.
-  `v=19,m=8`) as the version; it is now parsed as a parameters segment.
+- [**Breaking Changes**]
+  - `CipherlibConverter` -> `BitConverter` (the exported bit-converter base class).
+  - `BigIntDecoder` narrows from `Converter<BigInt, Iterable<int>>` to
+    `Converter<BigInt, Uint8List>`; `BigIntCodec` decoders now return a `Uint8List`.
+- Export the `ByteEncoder`, `ByteDecoder`, `AlphabetEncoder`, and `AlphabetDecoder`
+  base classes, previously part of the API surface but not reachable through
+  `package:convertlib/convertlib.dart`.
+- Fix the UTF-8 encoder emitting invalid bytes for scalar code points in
+  `U+10000..U+10FFFF`; `UTF8Encoder.convert` now uses the 4-byte form (the public
+  `toUtf8` was unaffected). Verified against `dart:convert`.
+- Make the Crockford Base-32 decoder case-insensitive and decode the ambiguous
+  letters `I`/`i`/`L`/`l` as `1` and `O`/`o` as `0`. Encoding output is unchanged.
+- Fix `ByteCollector.number` truncating values wider than 32 bits on the web; it
+  now accumulates with multiplication and is exact up to `2^53` (VM unchanged).
+- `ByteCollector.isEqual` returns `false` for a [String] that is not valid
+  hexadecimal instead of throwing a `FormatException`, matching its contract.
 - Add value-based `==` and `hashCode` to `CryptData`.
-- `BigIntCodec` decoders now return a `Uint8List`; the `BigIntDecoder` typedef
-  narrows from `Converter<BigInt, Iterable<int>>` to `Converter<BigInt,
-Uint8List>`, and `fromBigInt` no longer copies the decoded bytes.
-- Tighten `ByteCollector.isEqual` parameter type from `dynamic` to `Object?`.
-- Standardize the `AlphabetDecoder` invalid-bit-length error on
-  `ArgumentError.value`, matching `AlphabetEncoder`.
-- Add `benchmark/alphabet.dart` covering the generic `AlphabetEncoder` and
-  `AlphabetDecoder` engine.
-- Add `benchmark/bit.dart` covering the generic `BitEncoder` and `BitDecoder`.
-- Improve the benchmark harness (`benchmark/_base.dart`): it now reports the
-  median per-iteration time sampled across ~25ms batches instead of the
-  arithmetic mean, making results robust against GC pauses and keeping each
-  batch well above the coarsened web timer resolution. Benchmark tooling only;
-  no library code or output is affected.
-- Add tests from official / well-known sources and cover corner cases.
+- PHC/crypt: allow empty parameter values (e.g. `$id$data=`), and fix the decoder
+  mis-classifying a comma-containing `v=...` segment as the version.
+- Speed up `fromBase32`/`fromBase64` decoding and the generic `AlphabetEncoder` by
+  removing extra allocations and passes; output is byte-identical.
 
 # 3.5.1
 
