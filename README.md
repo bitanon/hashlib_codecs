@@ -150,6 +150,12 @@ to drop `=`, or a `codec:`:
   encoded ASCII as a `Uint8List`, skipping the intermediate `String`.
 - **Non-throwing decoders** — the `tryFrom<Name>` decoders return `null` instead
   of throwing a `FormatException` on invalid input.
+- **Whitespace-tolerant decode** — `fromHex`, `fromBase32`, `fromBase64`, and
+  their `tryFrom` counterparts accept `ignoreWhitespace: true` to skip ASCII
+  whitespace (tab, line feed, vertical tab, form feed, carriage return, and
+  space) in the input — handy for PEM/MIME bodies and hex dumps. Strict
+  rejection remains the default. `AlphabetDecoder`, `Base32Decoder`, and
+  `Base64Decoder` expose the same flag for custom codecs.
 - **Constant-time compare** — `constantTimeEquals(a, b)` compares two byte lists
   without exiting early on the first mismatch, for verifying MACs and digests.
 - **Low-level building blocks** — the generic converters `BitEncoder`/
@@ -228,6 +234,11 @@ void main() {
   // Decode back to the original bytes
   final back = fromBase64(toBase64(data, url: true));
   print('roundtrip   : ${fromUtf8(back)}');
+
+  // Line-wrapped input (PEM/MIME style) decodes with ignoreWhitespace
+  const pem = 'YSA+\nPiBi\nLCBj\nL2Q=\n';
+  final body = fromBase64(pem, ignoreWhitespace: true);
+  print('pem body    : ${fromUtf8(body)}');
 }
 ```
 

@@ -156,9 +156,13 @@ class Base64Decoder extends AlphabetDecoder {
   /// - The [alphabet] maps each input character to its 6-bit word.
   /// - If [padding] is not null, trailing occurrences of it are stripped before
   ///   decoding.
+  /// - If [ignoreWhitespace] is true, ASCII whitespace characters (tab, line
+  ///   feed, vertical tab, form feed, carriage return, and space) in the
+  ///   input are skipped instead of rejected.
   const Base64Decoder({
     required super.alphabet,
     super.padding,
+    super.ignoreWhitespace,
   }) : super(bits: 6);
 
   @override
@@ -166,13 +170,33 @@ class Base64Decoder extends AlphabetDecoder {
     final table = alphabet;
     final pad = padding;
     final tlen = table.length;
+    List<int> src = encoded;
     int len = encoded.length;
+
+    // Opt-in: compact the input once, dropping ASCII whitespace, so that the
+    // 4-character fast path below still runs on whitespace-laced input. Every
+    // character is validated here, reporting its original position; only
+    // valid characters (all below `tlen`) and padding reach the buffer.
+    if (ignoreWhitespace) {
+      var compact = Uint16List(len);
+      int j, k, w;
+      for (j = k = 0; j < len; ++j) {
+        w = encoded[j];
+        if (w != pad && (w < 0 || w >= tlen || table[w] < 0)) {
+          if (w == 0x20 || (w >= 0x09 && w <= 0x0D)) continue;
+          throw FormatException('Invalid character $w at $j');
+        }
+        compact[k++] = w;
+      }
+      src = compact;
+      len = k;
+    }
 
     // Padding is only valid as a trailing suffix, strip it here. A padding
     // character anywhere else is rejected as an invalid character.
     // decode table maps it to -1).
     if (pad != null) {
-      while (len > 0 && encoded[len - 1] == pad) {
+      while (len > 0 && src[len - 1] == pad) {
         len--;
       }
     }
@@ -185,10 +209,10 @@ class Base64Decoder extends AlphabetDecoder {
     // Fast path: complete 4-character groups into 3 bytes.
     int fastEnd = len - (len & 3);
     while (i < fastEnd) {
-      y0 = encoded[i];
-      y1 = encoded[i + 1];
-      y2 = encoded[i + 2];
-      y3 = encoded[i + 3];
+      y0 = src[i];
+      y1 = src[i + 1];
+      y2 = src[i + 2];
+      y3 = src[i + 3];
       if (y0 < 0 ||
           y1 < 0 ||
           y2 < 0 ||
@@ -216,7 +240,7 @@ class Base64Decoder extends AlphabetDecoder {
     // No padding remains, so this only regroups bits and validates characters.
     int p = 0, n = 0, x, y;
     for (; i < len; ++i) {
-      y = encoded[i];
+      y = src[i];
       if (y < 0 || y >= tlen || (x = table[y]) < 0) {
         throw FormatException('Invalid character $y at $i');
       }

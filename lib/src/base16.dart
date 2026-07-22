@@ -55,6 +55,10 @@ Uint8List toHexBytes(
 ///
 /// Parameters:
 /// - [input] should be a valid Base-16 (hexadecimal) string.
+/// - If [ignoreWhitespace] is true, ASCII whitespace characters (tab, line
+///   feed, vertical tab, form feed, carriage return, and space) in the
+///   [input] are skipped instead of rejected, so line-wrapped or
+///   space-grouped input can be decoded directly.
 /// - [codec] is the [Base16Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -66,22 +70,38 @@ Uint8List toHexBytes(
 Uint8List fromHex(
   String input, {
   Base16Codec? codec,
+  bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters();
-  return codec.decoder.convert(input.codeUnits);
+  if (!ignoreWhitespace) {
+    return codec.decoder.convert(input.codeUnits);
+  }
+  // Compact the input once, dropping ASCII whitespace, which is never a valid
+  // Base-16 digit. The buffer keeps the full 16-bit code units so that the
+  // decoder sees exactly the characters the strict path would.
+  int i, k, y, n;
+  n = input.length;
+  var compact = Uint16List(n);
+  for (i = k = 0; i < n; ++i) {
+    y = input.codeUnitAt(i);
+    if (y == 0x20 || (y >= 0x09 && y <= 0x0D)) continue;
+    compact[k++] = y;
+  }
+  return codec.decoder.convert(Uint16List.sublistView(compact, 0, k));
 }
 
 /// Converts a Base-16 string to an 8-bit integer sequence, returning `null`
 /// instead of throwing when the [input] is not valid.
 ///
 /// This is the non-throwing counterpart of [fromHex]. See [fromHex] for the
-/// meaning of [codec].
+/// meaning of [codec] and [ignoreWhitespace].
 Uint8List? tryFromHex(
   String input, {
   Base16Codec? codec,
+  bool ignoreWhitespace = false,
 }) {
   try {
-    return fromHex(input, codec: codec);
+    return fromHex(input, codec: codec, ignoreWhitespace: ignoreWhitespace);
   } on FormatException {
     return null;
   }

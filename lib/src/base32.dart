@@ -90,6 +90,10 @@ Uint8List toBase32Bytes(
 /// - [input] should be a valid base-32 encoded string.
 /// - If [padding] is true, the [input] may contain padding characters, which
 ///   are ignored during decoding.
+/// - If [ignoreWhitespace] is true, ASCII whitespace characters (tab, line
+///   feed, vertical tab, form feed, carriage return, and space) in the
+///   [input] are skipped instead of rejected, so line-wrapped input can be
+///   decoded directly.
 /// - [codec] is the [Base32Codec] to use. It is derived from the other
 ///   parameters if not provided.
 ///
@@ -104,23 +108,38 @@ Uint8List fromBase32(
   String input, {
   Base32Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   codec ??= _codecFromParameters(padding: padding);
-  return codec.decoder.convert(input.codeUnits);
+  Base32Decoder decoder = codec.decoder;
+  if (ignoreWhitespace && !decoder.ignoreWhitespace) {
+    decoder = Base32Decoder(
+      alphabet: decoder.alphabet,
+      padding: decoder.padding,
+      ignoreWhitespace: true,
+    );
+  }
+  return decoder.convert(input.codeUnits);
 }
 
 /// Converts a Base-32 string to an 8-bit integer sequence, returning `null`
 /// instead of throwing when the [input] is not valid.
 ///
 /// This is the non-throwing counterpart of [fromBase32]. See [fromBase32] for
-/// the meaning of [codec] and [padding].
+/// the meaning of [codec], [padding], and [ignoreWhitespace].
 Uint8List? tryFromBase32(
   String input, {
   Base32Codec? codec,
   bool padding = true,
+  bool ignoreWhitespace = false,
 }) {
   try {
-    return fromBase32(input, codec: codec, padding: padding);
+    return fromBase32(
+      input,
+      codec: codec,
+      padding: padding,
+      ignoreWhitespace: ignoreWhitespace,
+    );
   } on FormatException {
     return null;
   }

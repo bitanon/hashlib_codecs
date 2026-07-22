@@ -588,5 +588,92 @@ void main() {
         }
       });
     });
+
+    group('decoding with ignoreWhitespace', () {
+      test('every ASCII whitespace character is skipped', () {
+        // MZXW6YTBOI====== = "foobar" (RFC 4648 test vector), whitespace
+        // laced through the characters and the trailing padding.
+        var laced = ' MZ\tXW\n6Y TB\r\nOI==\f==\v==';
+        expect(
+          fromBase32(laced, ignoreWhitespace: true),
+          equals('foobar'.codeUnits),
+        );
+        expect(() => fromBase32(laced), throwsFormatException);
+      });
+      test('line-wrapped input matches strict decoding of clean input', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b);
+          var laced = StringBuffer();
+          for (int j = 0; j < r.length; ++j) {
+            laced.write(r[j]);
+            if (j % 8 == 7) laced.write('\r\n');
+          }
+          expect(
+            fromBase32(laced.toString(), ignoreWhitespace: true),
+            equals(fromBase32(r)),
+            reason: 'length $i',
+          );
+        }
+      });
+      test('empty and whitespace-only input decode to empty output', () {
+        expect(fromBase32('', ignoreWhitespace: true), equals([]));
+        expect(fromBase32(' \t\r\n', ignoreWhitespace: true), equals([]));
+      });
+      test('codec overrides: base32hex and crockford', () {
+        // CPNMUOJ1E8====== = "foobar" in base32hex (RFC 4648 test vector)
+        expect(
+          fromBase32('CPNM UOJ1\nE8==\t====', // rearranged whitespace
+              codec: Base32Codec.hex,
+              ignoreWhitespace: true),
+          equals('foobar'.codeUnits),
+        );
+        var b = [0x1F, 0x2E, 0x3D, 0x4C, 0x5B];
+        var crock = toBase32(b, codec: Base32Codec.crockford);
+        expect(
+          fromBase32('$crock\n',
+              codec: Base32Codec.crockford, ignoreWhitespace: true),
+          equals(b),
+        );
+      });
+      test('invalid characters still throw, with original position', () {
+        expect(
+          () => fromBase32('MZXW\n!YTB', ignoreWhitespace: true),
+          throwsA(isA<FormatException>().having(
+              (e) => e.message, 'message', 'Invalid character 33 at 5')),
+        );
+      });
+      test('non-ASCII whitespace is not skipped', () {
+        expect(
+          () => fromBase32('MZXW\u00A06YTB', ignoreWhitespace: true),
+          throwsFormatException,
+        );
+      });
+      test('invalid length still throws', () {
+        expect(
+          () => fromBase32('MZXW6YTBO\n', ignoreWhitespace: true),
+          throwsA(isA<FormatException>().having((e) => e.message, 'message',
+              'Invalid length or non-zero trailing bits')),
+        );
+      });
+      test('tryFromBase32 honors the flag', () {
+        expect(tryFromBase32('MZXW\n6YTB'), isNull);
+        expect(
+          tryFromBase32('MZXW\n6YTB', ignoreWhitespace: true),
+          equals('foobar'.codeUnits.sublist(0, 5)),
+        );
+      });
+      test('clean input decodes byte-identical to strict decoding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var r = toBase32(b);
+          expect(
+            fromBase32(r, ignoreWhitespace: true),
+            equals(fromBase32(r)),
+            reason: 'length $i',
+          );
+        }
+      });
+    });
   });
 }

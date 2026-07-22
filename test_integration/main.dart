@@ -36,4 +36,12 @@ void main() {
   print("tryFromBase64(valid) => ${tryFromBase64(toBase64(inp))}");
   print("constantTimeEquals => ${constantTimeEquals(inp, List.of(inp))}");
   print('');
+
+  print("fromHex (ignore whitespace) => "
+      "${fromHex('03 f1', ignoreWhitespace: true)}");
+  print("fromBase32 (ignore whitespace) => "
+      "${fromBase32('AP YQ\n====', ignoreWhitespace: true)}");
+  print("fromBase64 (ignore whitespace) => "
+      "${fromBase64('A/ E=\n', ignoreWhitespace: true)}");
+  print('');
 }

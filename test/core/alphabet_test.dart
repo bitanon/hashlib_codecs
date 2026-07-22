@@ -326,4 +326,90 @@ void main() {
       }
     });
   });
+
+  group('AlphabetDecoder ignoreWhitespace', () {
+    final pad = '='.codeUnitAt(0);
+    final b64rev = () {
+      final t = List<int>.filled(128, -1);
+      for (var i = 0; i < b64codes.length; i++) {
+        t[b64codes[i]] = i;
+      }
+      return t;
+    }();
+    final relaxed = AlphabetDecoder(
+      bits: 6,
+      alphabet: b64rev,
+      padding: pad,
+      ignoreWhitespace: true,
+    );
+
+    test('skips whitespace between characters', () {
+      // TWFu = "Man" (RFC 4648)
+      expect(relaxed.convert(' TW\tFu\r\n'.codeUnits), equals('Man'.codeUnits));
+    });
+
+    test('skips whitespace among trailing padding characters', () {
+      // TQ== = "M" (RFC 4648)
+      expect(relaxed.convert('TQ=\n= '.codeUnits), equals('M'.codeUnits));
+    });
+
+    test('strict decoder (default) still rejects whitespace', () {
+      final strict = AlphabetDecoder(bits: 6, alphabet: b64rev, padding: pad);
+      expect(strict.ignoreWhitespace, isFalse);
+      expect(
+        () => strict.convert('TWFu\n'.codeUnits),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 10 at 4')),
+      );
+    });
+
+    test('invalid characters still throw before the padding', () {
+      expect(
+        () => relaxed.convert('TW\n?u'.codeUnits),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 63 at 3')),
+      );
+    });
+
+    test('invalid characters still throw after the padding', () {
+      expect(
+        () => relaxed.convert('TQ==\n?'.codeUnits),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 63 at 5')),
+      );
+    });
+
+    test('non-ASCII whitespace is rejected', () {
+      expect(
+        () => relaxed.convert('TWFu\u00A0'.codeUnits),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', 'Invalid character 160 at 4')),
+      );
+    });
+
+    test('a whitespace character in the alphabet decodes as its value', () {
+      // Alphabet membership takes precedence over whitespace skipping.
+      final identity = List<int>.generate(256, (i) => i);
+      final dec = AlphabetDecoder(
+        bits: 8,
+        alphabet: identity,
+        ignoreWhitespace: true,
+      );
+      expect(dec.convert([0x20, 0x0A, 0x41]), equals([0x20, 0x0A, 0x41]));
+    });
+
+    test('output matches the strict decoder on clean input', () {
+      final strict = AlphabetDecoder(bits: 6, alphabet: b64rev, padding: pad);
+      final enc = AlphabetEncoder(bits: 6, alphabet: b64codes, padding: pad);
+      for (var len = 0; len <= 60; len++) {
+        final data = List<int>.generate(len, (i) => (i * 31 + 13) & 0xFF);
+        final encoded = enc.convert(data);
+        expect(
+          relaxed.convert(encoded),
+          equals(strict.convert(encoded)),
+          reason: 'length $len',
+        );
+      }
+    });
+  });
 }

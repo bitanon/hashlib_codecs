@@ -214,5 +214,81 @@ void main() {
         }
       });
     });
+
+    group('decoding with ignoreWhitespace', () {
+      test('space-grouped byte pairs', () {
+        // 48656c6c6f = "Hello" (ASCII)
+        expect(
+          fromHex('48 65 6c 6c 6f', ignoreWhitespace: true),
+          equals('Hello'.codeUnits),
+        );
+        expect(() => fromHex('48 65 6c 6c 6f'), throwsFormatException);
+      });
+      test('every ASCII whitespace character is skipped', () {
+        expect(
+          fromHex('\t48\n65\v6C\f6c\r6F ', ignoreWhitespace: true),
+          equals('Hello'.codeUnits),
+        );
+      });
+      test('odd length input with whitespace', () {
+        expect(fromHex('F 0F', ignoreWhitespace: true), equals([0xF, 0x0F]));
+      });
+      test('empty and whitespace-only input decode to empty output', () {
+        expect(fromHex('', ignoreWhitespace: true), equals([]));
+        expect(fromHex(' \t\r\n', ignoreWhitespace: true), equals([]));
+      });
+      test('codec override', () {
+        expect(
+          fromHex('48 65', codec: Base16Codec.upper, ignoreWhitespace: true),
+          equals([0x48, 0x65]),
+        );
+      });
+      test('invalid characters still throw', () {
+        expect(
+          () => fromHex('48 6g', ignoreWhitespace: true),
+          throwsFormatException,
+        );
+      });
+      test('non-ASCII whitespace is not skipped', () {
+        expect(
+          () => fromHex('48\u00A065', ignoreWhitespace: true),
+          throwsFormatException,
+        );
+      });
+      test('tryFromHex honors the flag', () {
+        expect(tryFromHex('48 65'), isNull);
+        expect(
+          tryFromHex('48 65', ignoreWhitespace: true),
+          equals([0x48, 0x65]),
+        );
+      });
+      test('clean input decodes byte-identical to strict decoding', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var h = toHex(b);
+          expect(
+            fromHex(h, ignoreWhitespace: true),
+            equals(fromHex(h)),
+            reason: 'length $i',
+          );
+        }
+      });
+      test('hex-dump style input matches base_codecs of clean input', () {
+        for (int i = 0; i < 100; ++i) {
+          var b = randomBytes(i);
+          var h = toHex(b, upper: true);
+          var laced = StringBuffer();
+          for (int j = 0; j < h.length; ++j) {
+            laced.write(h[j]);
+            if (j % 2 == 1) laced.write(j % 32 == 31 ? '\n' : ' ');
+          }
+          expect(
+            fromHex(laced.toString(), ignoreWhitespace: true),
+            equals(base_codecs.base16.decode(h)),
+            reason: 'length $i',
+          );
+        }
+      });
+    });
   });
 }
